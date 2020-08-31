@@ -1,0 +1,20 @@
+name: fc_node_simple_example
+description: A simple log request.
+# version: 1.0.0
+# homepage: https://www.example.com
+
+environment:
+  sdk: '>=2.8.1 <3.0.0'
+
+dependencies:
+  tekartik_app_node_build:
+    path: ../../../../app_node_utils.dart/app_build
+  tekartik_app_node_utils:
+    path: ../../../../app_node_utils.dart/node_utils
+  tekartik_aliyun_fc_universal:
+    path: ../../../common/fc_universal
+
+dev_dependencies:
+  pedantic: ^1.9.0
+  test: ^1.14.4
+  build_runner:
