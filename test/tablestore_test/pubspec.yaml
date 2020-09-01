@@ -1,0 +1,21 @@
+name: tekartik_aliyun_tablestore_test
+description: Tablestore tests
+# version: 1.0.0
+# homepage: https://www.example.com
+
+environment:
+  sdk: '>=2.8.1 <3.0.0'
+
+dependencies:
+  path: ^1.7.0
+  test:
+  tekartik_aliyun_tablestore_universal:
+    path: ../../common/tablestore_universal
+
+dev_dependencies:
+  pedantic: ^1.9.0
+  # Node needed dev dependencies
+  tekartik_app_node_build:
+    path: ../../../app_node_utils.dart/app_build
+  build_node_compilers:
+  build_runner:

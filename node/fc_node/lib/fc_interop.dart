@@ -6,7 +6,7 @@ import 'dart:js_util';
 import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
 import 'package:tekartik_aliyun_fc/fc_api.dart';
-import 'package:tekartik_browser_utils/js_utils.dart';
+import 'package:tekartik_js_utils/js_utils.dart';
 
 @JS()
 @anonymous
