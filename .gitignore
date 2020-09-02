@@ -1,0 +1,27 @@
+# See https://www.dartlang.org/guides/libraries/private-files
+
+# Files and directories created by pub
+.dart_tool/
+.packages
+.pub/
+build/
+# If you're building an application, you may want to check-in your pubspec.lock
+pubspec.lock
+
+# Directory created by dartdoc
+# If you don't generate documentation locally you can remove this line.
+doc/api/
+
+# Intellij
+.idea/
+*.iml
+
+# VSCode
+.vscode
+
+local_*
+/node/example/ts_node_min/deploy/node_modules/
+/node/example/ts_node_min/deploy/index.js
+/node/example/ts_node_min/pubspec.lock
+/test/tablestore_test/node_modules/
+/test/tablestore_test/package-lock.json
