@@ -6,7 +6,7 @@ Future main() async {
     'common/fc_universal',
     'common/tablestore',
     'common/tablestore_sembast',
-    'common/tablestore_universal',
+    //'common/tablestore_universal',
     'node/fc_node',
     'test/tablestore_test',
   ]) {
