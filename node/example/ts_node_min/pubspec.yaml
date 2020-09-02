@@ -8,8 +8,6 @@ environment:
 
 dependencies:
   path: ^1.7.0
-  tekartik_app_node_utils:
-    path: ../../../../app_node_utils.dart/node_utils
   tekartik_aliyun_tablestore_universal:
     path: ../../../common/tablestore_universal
 
@@ -18,6 +16,10 @@ dev_dependencies:
   test: ^1.14.4
   # Node needed dev dependencies
   tekartik_app_node_build:
-    path: ../../../../app_node_utils.dart/app_build
+    git:
+      url: git://github.com/tekartik/app_node_utils.dart
+      path: app_build
+      ref: dart2
+    version: '>=0.1.0'
   build_node_compilers:
   build_runner:

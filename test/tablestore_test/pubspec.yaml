@@ -16,6 +16,10 @@ dev_dependencies:
   pedantic: ^1.9.0
   # Node needed dev dependencies
   tekartik_app_node_build:
-    path: ../../../app_node_utils.dart/app_build
+    git:
+      url: git://github.com/tekartik/app_node_utils.dart
+      path: app_build
+      ref: dart2
+    version: '>=0.1.0'
   build_node_compilers:
   build_runner:
