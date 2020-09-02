@@ -10,6 +10,7 @@ Future main() async {
     'node/fc_node',
     'test/tablestore_test',
   ]) {
+    print('package: $dir');
     await ioPackageRunCi(dir);
     /*
     var shell = Shell();

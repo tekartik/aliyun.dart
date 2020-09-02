@@ -6,14 +6,16 @@ import 'package:tekartik_app_node_utils/node_utils.dart';
 void main() {
   group('tablestore', () {
     var env = platform.environment;
-    if (env['TRAVIS'] == null) {
+    if (env['TRAVIS'] != null) {
       // skip
       return;
     }
     // skip on vm for now too
     if (platformContext.io != null) {
-      tablestoreTest(tsClientOptionsFromEnv);
+      // skip
+      return;
     }
+    tablestoreTest(tsClientOptionsFromEnv);
   });
   test('placeholder', () {});
 }
