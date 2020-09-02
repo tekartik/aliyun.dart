@@ -1,5 +1,12 @@
 import 'package:meta/meta.dart';
 
+/// Table store exception
+class TsException implements Exception {
+  final String message;
+
+  TsException(this.message);
+}
+
 /// Client options
 class TsClientOptions {
   /// Aliyun access key id
@@ -28,6 +35,9 @@ class TsClientOptions {
 
 abstract class TsClient {
   Future<List<String>> listTableNames();
+  Future deleteTable(String name);
+
+  Future createTable(String tableName);
 }
 
 mixin TsClientMixin implements TsClient {

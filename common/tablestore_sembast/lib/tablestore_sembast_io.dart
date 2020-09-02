@@ -3,9 +3,9 @@
 /// More dartdocs go here.
 library tekartik_aliyun_tablestore_sembast_io;
 
-import 'package:tekartik_aliyun_tablestore/tablestore.dart';
-import 'package:tekartik_aliyun_tablestore_sembast/src/tablestore_sembast_base.dart';
 import 'package:sembast/sembast_io.dart';
+import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_sembast/tablestore_sembast.dart';
 
 final Tablestore tablestoreSembastIo =
     getTablestoreSembast(factory: databaseFactoryIo);

@@ -13,7 +13,7 @@ void main() {
     // skip on vm for now too
     if (platformContext.io != null) {
       // skip
-      return;
+      // return;
     }
     tablestoreTest(tsClientOptionsFromEnv);
   });

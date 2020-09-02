@@ -47,10 +47,57 @@ abstract class _TablestoreJs {
 @anonymous
 class _TsClientListTableParamsJs {}
 
-class TableStoreNodeException implements Exception {
+@JS()
+@anonymous
+class _TsClientDeleteTableParamsJs {
+  external String get tableName;
+  external set tableName(String tableName);
+  external factory _TsClientDeleteTableParamsJs({String tableName});
+}
+
+/*
+var params = {
+  tableMeta: {
+    tableName: 'sampleTable',
+    primaryKey: [
+      {
+        name: 'gid',
+        type: 'INTEGER'
+      },
+      {
+        name: 'uid',
+        type: 'INTEGER'
+      }
+    ]
+  },
+  reservedThroughput: {
+    capacityUnit: {
+      read: 0,
+      write: 0
+    }
+  },
+  tableOptions: {
+    timeToLive: -1,// 数据的过期时间, 单位秒, -1代表永不过期. 假如设置过期时间为一年, 即为 365 * 24 * 3600.
+    maxVersions: 1// 保存的最大版本数, 设置为1即代表每列上最多保存一个版本(保存最新的版本).
+  },
+  streamSpecification: {
+    enableStream: true, //开启Stream
+    expirationTime: 24 //Stream的过期时间，单位是小时，最长为168，设置完以后不能修改
+  }
+};
+
+@JS()
+@anonymous
+class _TsClientCreateTableParamsJs {
+  external String get tableName;
+  external set tableName(String tableName);
+  external factory _TsClientDeleteTableParamsJs({String tableName});
+}
+*/
+class TablestoreNodeException implements Exception {
   final String message;
 
-  TableStoreNodeException(this.message);
+  TablestoreNodeException(this.message);
 
   @override
   String toString() => 'TableStoreNodeException($message)';
@@ -60,6 +107,10 @@ class TableStoreNodeException implements Exception {
 @anonymous
 class _TsClientJs {
   external void listTable(_TsClientListTableParamsJs params, Function callback);
+  external void deleteTable(
+      _TsClientDeleteTableParamsJs params, Function callback);
+
+  external void createTable(dynamic params, Function callack);
 }
 
 @JS()
@@ -85,10 +136,12 @@ class TsClientNode with TsClientMixin implements TsClient {
 
   void _handleError(Completer completer, dynamic err) {
     if (!completer.isCompleted) {
-      if (err is TableStoreNodeException) {
+      if (err is TablestoreNodeException) {
         completer.completeError(err);
       } else {
-        completer.completeError(TableStoreNodeException(err.toString()));
+        //  TableStoreNodeException(404:
+        //   OTSObjectNotExistRequested table does not exist.)
+        completer.completeError(TablestoreNodeException(err.toString()));
       }
     }
   }
@@ -121,8 +174,73 @@ class TsClientNode with TsClientMixin implements TsClient {
   }
 
   @override
+  Future createTable(String name) async {
+    var params = {
+      'tableMeta': {
+        'tableName': name,
+        'primaryKey': [
+          {'name': 'gid', 'type': 'INTEGER'},
+          {'name': 'uid', 'type': 'INTEGER'}
+        ]
+      },
+      'reservedThroughput': {
+        'capacityUnit': {'read': 0, 'write': 0}
+      },
+      'tableOptions': {
+        'timeToLive':
+            -1, // 数据的过期时间, 单位秒, -1代表永不过期. 假如设置过期时间为一年, 即为 365 * 24 * 3600.
+        'maxVersions': 1 // 保存的最大版本数, 设置为1即代表每列上最多保存一个版本(保存最新的版本).
+      },
+      'streamSpecification': {
+        'enableStream': true, //开启Stream
+        'expirationTime': 24 //Stream的过期时间，单位是小时，最长为168，设置完以后不能修改
+      }
+    };
+    var completer = Completer<List<String>>();
+    try {
+      native.createTable(jsify(params), allowInterop((err, data) {
+        if (err != null) {
+          _handleError(completer, err);
+        } else {
+          var response = data;
+          print(jsObjectToDebugString(response));
+          // {tableNames: [Exp1, Exp2], RequestId: 0005ae3d-8b60-c9d8-a4c1-720b0589c481}
+
+          _handleSuccess(completer, null);
+        }
+      }));
+    } catch (e) {
+      _handleError(completer, e);
+    }
+    return completer.future;
+  }
+
+  @override
   String toString() {
     return 'TsClientNode()';
+  }
+
+  @override
+  Future deleteTable(String name) {
+    var completer = Completer<void>();
+    try {
+      native.deleteTable(_TsClientDeleteTableParamsJs(tableName: name),
+          allowInterop((err, data) {
+        if (err != null) {
+          // TableStoreNodeException(404:OTSObjectNotExistRequested table does not exist.)
+          _handleError(completer, err);
+        } else {
+          var response = data;
+          print(jsObjectToDebugString(response));
+          // {tableNames: [Exp1, Exp2], RequestId: 0005ae3d-8b60-c9d8-a4c1-720b0589c481}
+
+          _handleSuccess(completer, null);
+        }
+      }));
+    } catch (e) {
+      _handleError(completer, e);
+    }
+    return completer.future;
   }
 }
 
