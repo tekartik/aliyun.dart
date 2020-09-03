@@ -106,7 +106,9 @@ int columnTypeToSembast(TsColumnType type) {
     case TsColumnType.integer:
       return 1;
     case TsColumnType.string:
-      return 1;
+      return 2;
+    case TsColumnType.binary:
+      return 3;
   }
   throw UnsupportedError('sembast type $type)');
 }
@@ -117,6 +119,8 @@ TsColumnType sembastColumnTypeToColumnType(int type) {
       return TsColumnType.integer;
     case 2:
       return TsColumnType.string;
+    case 3:
+      return TsColumnType.binary;
   }
   throw UnsupportedError('native type $type');
 }

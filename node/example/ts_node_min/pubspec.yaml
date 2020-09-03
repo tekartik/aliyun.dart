@@ -23,7 +23,3 @@ dev_dependencies:
     version: '>=0.1.0'
   build_node_compilers:
   build_runner:
-
-dependency_overrides:
-  tekartik_js_utils:
-    path: /home/alex/tekartik/devx/git/github.com/tekartik/js_utils.dart/js_utils
