@@ -23,3 +23,5 @@ dev_dependencies:
     version: '>=0.1.0'
   build_node_compilers:
   build_runner:
+  tekartik_aliyun_tablestore_universal:
+    path: ../../common/tablestore_universal

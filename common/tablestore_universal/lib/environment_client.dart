@@ -6,7 +6,7 @@ TsClientOptions _tsClientOptionsFromEnv;
 TsClientOptions get tsClientOptionsFromEnv => _tsClientOptionsFromEnv ??= () {
       var endpoint = _env['endpoint'];
       if (endpoint == null) {
-        print('Missing endpoint env variable');
+        print('Missing endpoint env variable in $_env');
       }
       return TsClientOptions(
           endpoint: _env['endpoint'],

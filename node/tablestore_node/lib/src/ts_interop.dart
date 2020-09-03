@@ -5,7 +5,10 @@ import 'dart:js_util';
 
 import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
+import 'package:node_interop/util.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_common_utils/int_utils.dart';
+import 'package:tekartik_http/http.dart';
 
 import 'import.dart';
 
@@ -41,6 +44,17 @@ class _TsClientOptionsJs {
 abstract class _TablestoreJs {
   /// Reference to constructor Client.
   external dynamic get Client;
+
+  external PrimaryKeyTypeJs get PrimaryKeyType;
+}
+
+@JS()
+@anonymous
+// // Key types: {INTEGER: 1, STRING: 2, BINARY: 3}
+abstract class PrimaryKeyTypeJs {
+  external int get INTEGER;
+  external int get STRING;
+  external int get BINARY;
 }
 
 @JS()
@@ -49,10 +63,8 @@ class _TsClientListTableParamsJs {}
 
 @JS()
 @anonymous
-class _TsClientDeleteTableParamsJs {
-  external String get tableName;
-  external set tableName(String tableName);
-  external factory _TsClientDeleteTableParamsJs({String tableName});
+class _TsClientTableParamsJs {
+  external factory _TsClientTableParamsJs({String tableName});
 }
 
 /*
@@ -99,6 +111,11 @@ class TablestoreNodeException implements Exception {
 
   TablestoreNodeException(this.message);
 
+  // TableStoreNodeException(404:OTSObjec
+  int get httpStatusCode => parseStartInt(message);
+
+  bool get isNotFound => httpStatusCode == httpStatusCodeNotFound;
+
   @override
   String toString() => 'TableStoreNodeException($message)';
 }
@@ -107,8 +124,10 @@ class TablestoreNodeException implements Exception {
 @anonymous
 class _TsClientJs {
   external void listTable(_TsClientListTableParamsJs params, Function callback);
-  external void deleteTable(
-      _TsClientDeleteTableParamsJs params, Function callback);
+
+  external void deleteTable(_TsClientTableParamsJs params, Function callback);
+
+  external void describeTable(_TsClientTableParamsJs params, Function callback);
 
   external void createTable(dynamic params, Function callack);
 }
@@ -127,6 +146,103 @@ class TsTableNode implements TsTable {
 @anonymous
 abstract class _TsClientListTableResponseJs {
   List<String> get tableNames;
+}
+
+//     "primaryKey": [
+//       {
+//         "name": "gid",
+//         "type": 1
+//       },
+@JS()
+@anonymous
+abstract class _TsClientPrimaryKey {
+  external String get name;
+
+  external int get type;
+}
+
+//   "tableMeta": {
+//     "primaryKey": [
+//       {
+//         "name": "gid",
+//         "type": 1
+//       },
+//       {
+//         "name": "uid",
+//         "type": 1
+//       }
+//     ],
+//     "definedColumn": [],
+//     "indexMeta": [],
+//     "tableName": "test_create1"
+//   },
+@JS()
+@anonymous
+abstract class _TsClientTableDescriptionTableMeta {
+  external String get tableName;
+
+  external List<dynamic /*_TsClientPrimaryKey*/ > get primaryKey;
+}
+
+List<_TsClientPrimaryKey> tableMetaPrimaryKeys(
+        _TsClientTableDescriptionTableMeta tableMeta) =>
+    tableMeta.primaryKey.cast<_TsClientPrimaryKey>().toList(growable: false);
+
+// {
+//   "shardSplits": [],
+//   "indexMetas": [],
+//   "tableMeta": {
+//     "primaryKey": [
+//       {
+//         "name": "gid",
+//         "type": 1
+//       },
+//       {
+//         "name": "uid",
+//         "type": 1
+//       }
+//     ],
+//     "definedColumn": [],
+//     "indexMeta": [],
+//     "tableName": "test_create1"
+//   },
+//   "reservedThroughputDetails": {
+//     "capacityUnit": {
+//       "read": 0,
+//       "write": 0
+//     },
+//     "lastIncreaseTime": {
+//       "low": 1599074982,
+//       "high": 0,
+//       "unsigned": false
+//     }
+//   },
+//   "tableOptions": {
+//     "timeToLive": -1,
+//     "maxVersions": 1,
+//     "deviationCellVersionInSec": {
+//       "low": 86400,
+//       "high": 0,
+//       "unsigned": false
+//     }
+//   },
+//   "tableStatus": 1,
+//   "streamDetails": {
+//     "enableStream": true,
+//     "streamId": "test_create1_1599074982214249",
+//     "expirationTime": 24,
+//     "lastEnableTime": {
+//       "low": -1471628695,
+//       "high": 372313,
+//       "unsigned": false
+//     }
+//   },
+//   "RequestId": "0005ae6f-af63-250c-a4c1-720b08797701"
+// }
+@JS()
+@anonymous
+abstract class _TsClientTableDescription {
+  external _TsClientTableDescriptionTableMeta get tableMeta;
 }
 
 class TsClientNode with TsClientMixin implements TsClient {
@@ -161,7 +277,8 @@ class TsClientNode with TsClientMixin implements TsClient {
           _handleError(completer, err);
         } else {
           var response = data as _TsClientListTableResponseJs;
-          // print(jsObjectToDebugString(response));
+
+          // devPrint(jsonPretty(jsObjectAsMap(response)));
           // {tableNames: [Exp1, Exp2], RequestId: 0005ae3d-8b60-c9d8-a4c1-720b0589c481}
 
           _handleSuccess(completer, List<String>.from(response.tableNames));
@@ -224,7 +341,7 @@ class TsClientNode with TsClientMixin implements TsClient {
   Future deleteTable(String name) {
     var completer = Completer<void>();
     try {
-      native.deleteTable(_TsClientDeleteTableParamsJs(tableName: name),
+      native.deleteTable(_TsClientTableParamsJs(tableName: name),
           allowInterop((err, data) {
         if (err != null) {
           // TableStoreNodeException(404:OTSObjectNotExistRequested table does not exist.)
@@ -242,9 +359,79 @@ class TsClientNode with TsClientMixin implements TsClient {
     }
     return completer.future;
   }
+
+  Future<dynamic> _nativeOperationWithCallback<T>(
+      dynamic Function(Function callback) action) {
+    var completer = Completer<void>();
+    try {
+      action(allowInterop((err, data) {
+        if (err != null) {
+          // TableStoreNodeException(404:OTSObjectNotExistRequested table does not exist.)
+          _handleError(completer, err);
+        } else {
+          // var response = data;
+          // devPrint(jsObjectToDebugString(response));
+
+          // Pretty print debug
+          // devPrint(jsonPretty(jsObjectAsMap(response)));
+          // {tableNames: [Exp1, Exp2], RequestId: 0005ae3d-8b60-c9d8-a4c1-720b0589c481}
+
+          _handleSuccess(completer, data);
+        }
+      }));
+    } catch (e) {
+      _handleError(completer, e);
+    }
+    return completer.future;
+  }
+
+  @override
+  Future<TsTableDescription> describeTable(String tableName) async {
+    var nativeDesc = await _nativeOperationWithCallback((callback) {
+      native.describeTable(
+          _TsClientTableParamsJs(tableName: tableName), callback);
+    });
+    return tableDescriptionFromNative(nativeDesc);
+  }
+}
+
+TsColumnType nativeTypeToColumnType(int type) {
+  if (type == _tablestoreJs.PrimaryKeyType.INTEGER) {
+    return TsColumnType.integer;
+  } else if (type == _tablestoreJs.PrimaryKeyType.STRING) {
+    return TsColumnType.string;
+  } else if (type == _tablestoreJs.PrimaryKeyType.BINARY) {
+    return TsColumnType.binary;
+  }
+  throw 'type $type not supported';
+}
+
+TsTableDescription tableDescriptionFromNative(dynamic nativeDesc) {
+  if (nativeDesc != null) {
+    var nativeDescObject = nativeDesc as _TsClientTableDescription;
+    var nativeTableMeta = nativeDescObject.tableMeta;
+    if (nativeTableMeta != null) {
+      List<TsPrimaryKey> primaryKeys;
+      var nativePrimaryKeys = tableMetaPrimaryKeys(nativeTableMeta);
+      if (nativePrimaryKeys != null) {
+        primaryKeys = <TsPrimaryKey>[];
+        nativePrimaryKeys.forEach((element) {
+          primaryKeys.add(TsPrimaryKey(
+              type: nativeTypeToColumnType(element.type), name: element.name));
+        });
+      }
+      var tableMeta = TsTableDescriptionTableMeta(
+          tableName: nativeTableMeta.tableName, primaryKeys: primaryKeys);
+      return TsTableDescription(tableMeta: tableMeta);
+//
+    }
+  }
+  return null;
 }
 
 class TablestoreNode with TablestoreMixin implements Tablestore {
+  PrimaryKeyTypeJs get primaryKeyType => _tablestoreJs.PrimaryKeyType;
+
   @override
   TsClient client({TsClientOptions options}) {
     var nativeClient = callConstructor(_tablestoreJs.Client, [
@@ -257,6 +444,16 @@ class TablestoreNode with TablestoreMixin implements Tablestore {
     if (nativeClient == null) {
       return null;
     }
+
+    // devPrint('tablestoreJs: ${jsObjectKeys(_tablestoreJs)}');
+    //  [util, rowExistenceExpectation, Direction, UpdateType, BatchWriteType, ReturnType, DefinedColumnType, PrimaryKeyType, PrimaryKeyOption,
+    //  IndexUpdateMode, IndexType, INF_MIN, INF_MAX, PK_AUTO_INCR, Long, plainBufferConsts, plainBufferCrc8, PlainBufferInputStream,
+    //  PlainBufferOutputStream, PlainBufferCodedInputStream, PlainBufferCodedOutputStream, PlainBufferBuilder, LogicalOperator, ColumnConditionType,
+    //  ComparatorType, RowExistenceExpectation, ColumnCondition, CompositeCondition, SingleColumnCondition, Condition, ColumnPaginationFilter,
+    //  encoder, decoder, Config, Endpoint, HttpRequest, HttpResponse, HttpClient, SequentialExecutor, EventListeners, Request, Response,
+    //  Signer, events, NodeHttpClient, RetryUtil, DefaultRetryPolicy, Client, QueryType, ScoreMode, SortOrder, SortMode, FieldType, ColumnReturnType, GeoDistanceType, IndexOptions, QueryOperator]
+    // Key types: {INTEGER: 1, STRING: 2, BINARY: 3}
+    // devPrint('Key types: ${jsObjectAsMap(getProperty(_tablestoreJs, 'PrimaryKeyType'))}');
 
     return TsClientNode(nativeClient);
   }

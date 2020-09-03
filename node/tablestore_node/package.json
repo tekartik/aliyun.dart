@@ -1,0 +1,12 @@
+{
+  "name": "ts_node_min_example",
+  "description": "Minimum example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "tekartik",
+  "license": "BSD-2",
+  "homepage": "https://github.com/tekartik/aliyun.dart",
+  "dependencies": {
+    "tablestore": "^5.0.7"
+  }
+}

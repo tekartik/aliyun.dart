@@ -33,11 +33,52 @@ class TsClientOptions {
   }
 }
 
+enum TsColumnType {
+  integer,
+  string,
+  binary,
+}
+
+class TsPrimaryKey {
+  final String name;
+  final TsColumnType type;
+
+  TsPrimaryKey({this.name, this.type});
+
+  @override
+  String toString() => 'pk($name, ${type.toString().split('.').last})';
+}
+
+class TsTableCreateOption {
+  String name;
+  List<TsPrimaryKey> primaryKeys;
+}
+
+class TsTableDescriptionTableMeta {
+  final String tableName;
+  List<TsPrimaryKey> primaryKeys;
+
+  TsTableDescriptionTableMeta({this.tableName, this.primaryKeys});
+}
+
+// Out
+class TsTableDescription {
+  final TsTableDescriptionTableMeta tableMeta;
+
+  TsTableDescription({this.tableMeta});
+
+  @override
+  String toString() =>
+      'name ${tableMeta.tableName}, primaryKeys: ${tableMeta.primaryKeys}';
+}
+
 abstract class TsClient {
   Future<List<String>> listTableNames();
   Future deleteTable(String name);
 
   Future createTable(String tableName);
+
+  Future<TsTableDescription> describeTable(String tableName);
 }
 
 mixin TsClientMixin implements TsClient {

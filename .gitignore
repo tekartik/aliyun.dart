@@ -20,8 +20,7 @@ doc/api/
 .vscode
 
 local_*
-/node/example/ts_node_min/deploy/node_modules/
+node_modules/
 /node/example/ts_node_min/deploy/index.js
 /node/example/ts_node_min/pubspec.lock
-/test/tablestore_test/node_modules/
-/test/tablestore_test/package-lock.json
+package-lock.json
