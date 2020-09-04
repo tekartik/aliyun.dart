@@ -1,7 +1,7 @@
 import 'package:tekartik_aliyun_tablestore_universal/environment_client.dart';
 import 'package:tekartik_aliyun_tablestore_universal/tablestore_universal.dart';
+import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:test/test.dart';
-import 'package:tekartik_common_utils/env_utils.dart';
 
 void main() {
   tablesTest(tsClientOptionsFromEnv);
@@ -23,35 +23,86 @@ void tablesTest(TsClientOptions options) {
   test('listTableNames', () async {
     expect(await client.listTableNames(), const TypeMatcher<List>());
   });
-  test('createTable', () async {
+
+  var create1Table = 'test_create1';
+  Future createTableCreate1() async {
     // We are limited in the number of create, test it well and sometimes delete!
-    var tableName = 'test_create1';
+    var tableName = create1Table;
     var names = await client.listTableNames();
     if (!names.contains(tableName)) {
-      await client.createTable(tableName);
+      var description = TsTableDescription(
+          tableMeta: TsTableDescriptionTableMeta(
+              tableName: 'test_create1',
+              primaryKeys: [
+                TsPrimaryKey(name: 'gid', type: TsColumnType.integer),
+                TsPrimaryKey(name: 'uid', type: TsColumnType.integer)
+              ]),
+          reservedThroughput: tableCreateReservedThroughputDefault,
+          tableOptions: tableCreateOptionsDefault);
+      await client.createTable(tableName, description);
     }
-    names = await client.listTableNames();
-    expect(names, contains(tableName));
+  }
+
+  test('createTable', () async {
+    // We are limited in the number of create, test it well and sometimes delete!
+    var names = await client.listTableNames();
+    await createTableCreate1();
+    expect(names, contains(create1Table));
   });
   test('describeTable', () async {
     // We are limited in the number of create, test it well and sometimes delete!
-    var tableName = 'test_create1';
+    await createTableCreate1();
+
+    var tableDescription = await client.describeTable(create1Table);
+    var keys = ['tableMeta', 'tableOptions', 'reservedThroughput'];
+    var map = tableDescription.toMap()
+      ..removeWhere((key, value) => !keys.contains(key));
+    expect(map, {
+      'tableMeta': {
+        'name': 'test_create1',
+        'primaryKeys': [
+          {'name': 'gid', 'type': 'integer'},
+          {'name': 'uid', 'type': 'integer'}
+        ]
+      },
+      'reservedThroughput': {
+        'capacityUnit': {'read': 0, 'write': 0}
+      },
+      'tableOptions': {'timeToLive': -1, 'maxVersions': 1}
+    });
+  });
+
+  var workTable = 'test_work2';
+
+  Future createWorkTable() async {
+    var description = TsTableDescription(
+        tableMeta:
+            TsTableDescriptionTableMeta(tableName: workTable, primaryKeys: [
+          TsPrimaryKey(name: 'key1', type: TsColumnType.string),
+          TsPrimaryKey(name: 'key2', type: TsColumnType.integer),
+          TsPrimaryKey(name: 'key3', type: TsColumnType.string),
+          TsPrimaryKey(name: 'key4', type: TsColumnType.integer),
+        ]),
+        reservedThroughput: tableCreateReservedThroughputDefault,
+        tableOptions: tableCreateOptionsDefault);
     var names = await client.listTableNames();
-    if (!names.contains(tableName)) {
-      await client.createTable(tableName);
+    if (!names.contains(workTable)) {
+      await client.createTable(workTable, description);
     }
-    names = await client.listTableNames();
-    expect(names, contains(tableName));
+  }
 
-    var tableDescription = await client.describeTable(tableName);
+  test('createWorkTable', () async {
+    await createWorkTable();
+    var tableDescription = await client.describeTable(workTable);
     var tableMeta = tableDescription.tableMeta;
-    expect(tableMeta.tableName, tableName);
-
-    if (isRunningAsJavascript) {
-      // TODO only for node, to check soon!
-      expect(tableMeta.primaryKeys.length, 2);
-      expect(tableMeta.primaryKeys[0].name, 'gid');
-      expect(tableMeta.primaryKeys[0].type, TsColumnType.integer);
-    }
+    expect(tableMeta.toMap(), {
+      'name': 'test_work2',
+      'primaryKeys': [
+        {'name': 'key1', 'type': 'string'},
+        {'name': 'key2', 'type': 'integer'},
+        {'name': 'key3', 'type': 'string'},
+        {'name': 'key4', 'type': 'integer'}
+      ]
+    });
   });
 }

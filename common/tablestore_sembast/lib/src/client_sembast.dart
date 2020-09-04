@@ -11,7 +11,10 @@ var versionRecord = metaMapStore.record(metaVersionKey);
 var tablesMetaRecord = metaStore.record('tables').cast<String, List<dynamic>>();
 
 RecordRef<String, Map<String, dynamic>> getTableMetaRecord(String tableName) =>
-    metaMapStore.record('table_$tableName');
+    metaMapStore.record('table_meta_$tableName');
+RecordRef<String, Map<String, dynamic>> getTableExtraInfoRecord(
+        String tableName) =>
+    metaMapStore.record('table_extra_$tableName');
 
 class TsClientSembast implements TsClient {
   final TablestoreSembast tablestore;
@@ -65,75 +68,62 @@ class TsClientSembast implements TsClient {
   }
 
   @override
-  Future createTable(String name) async {
+  Future createTable(String name, TsTableDescription description) async {
+    if (name != description?.tableMeta?.tableName) {
+      throw ArgumentError.value(name, description?.tableMeta?.tableName,
+          'table name different in meta');
+    }
     await (await _db).transaction((txn) async {
       var tableNames = await _listTableNames(txn);
 
       if (!tableNames.contains(name)) {
         var tableMetaRecord = getTableMetaRecord(name);
+        var tableExtraRecord = getTableExtraInfoRecord(name);
         tableNames.add(name);
-        await tablesMetaRecord.put(txn, tableNames);
-        await tableMetaRecord.put(txn, <String, dynamic>{'primaryKeys': []});
+        await put(txn, tablesMetaRecord, tableNames);
+        await put(txn, tableMetaRecord, description.tableMeta.toMap());
+        await put(
+            txn,
+            tableExtraRecord,
+            // Remove table meta
+            TsTableDescription(
+                    reservedThroughput: description.reservedThroughput,
+                    tableOptions: description.tableOptions)
+                .toMap());
       } else {
         throw TsException('table $name already exists');
       }
     });
   }
 
+  Future<V /*?*/ > put<K, V>(
+      DatabaseClient client, RecordRef<K, V> record, V value) {
+    if (debugTs) {
+      print('[SBw] $record $value');
+    }
+    return record.put(client, value);
+  }
+
   @override
   Future<TsTableDescription> describeTable(String tableName) async {
     return await (await _db).transaction((txn) async {
       var tableMetaRecord = getTableMetaRecord(tableName);
+      var tableExtraRecord = getTableExtraInfoRecord(tableName);
       var tableMetaRaw = await tableMetaRecord.get(txn);
+      TsTableDescription extra;
       if (tableMetaRaw == null) {
         throw TsException('table $tableName does not exists');
       }
+      var tableExtraRaw = await tableExtraRecord.get(txn);
+      if (tableExtraRaw != null) {
+        // Everything but tableMeta
+        extra = TsTableDescription.fromMap(tableExtraRaw);
+      }
 
-      // devPrint('table: ${tableMetaRaw}');
-      var primaryKeysRaw = tableMetaRaw['primaryKeys'] as List;
-      //List<TsPrimaryKey> primaryKeys;
-      //if (primaryKeysRaw ! )
       return TsTableDescription(
-          tableMeta: TsTableDescriptionTableMeta(
-              tableName: tableName,
-              primaryKeys: nativePrimaryKeysRawToPrimaryKey(primaryKeysRaw)));
+          tableMeta: TsTableDescriptionTableMeta.fromMap(tableMetaRaw),
+          reservedThroughput: extra.reservedThroughput,
+          tableOptions: extra.tableOptions);
     });
   }
-}
-
-int columnTypeToSembast(TsColumnType type) {
-  switch (type) {
-    case TsColumnType.integer:
-      return 1;
-    case TsColumnType.string:
-      return 2;
-    case TsColumnType.binary:
-      return 3;
-  }
-  throw UnsupportedError('sembast type $type)');
-}
-
-TsColumnType sembastColumnTypeToColumnType(int type) {
-  switch (type) {
-    case 1:
-      return TsColumnType.integer;
-    case 2:
-      return TsColumnType.string;
-    case 3:
-      return TsColumnType.binary;
-  }
-  throw UnsupportedError('native type $type');
-}
-
-List<TsPrimaryKey> nativePrimaryKeysRawToPrimaryKey(List native) {
-  if (native != null) {
-    var keys = <TsPrimaryKey>[];
-    native.forEach((element) {
-      var primaryKeyRaw = element as Map;
-      keys.add(TsPrimaryKey(
-          name: primaryKeyRaw['name'],
-          type: sembastColumnTypeToColumnType(primaryKeyRaw['name'])));
-    });
-  }
-  return null;
 }

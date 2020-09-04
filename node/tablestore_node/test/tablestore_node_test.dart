@@ -1,3 +1,4 @@
+@TestOn('node')
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/tablestore_node.dart';
 import 'package:tekartik_aliyun_tablestore_universal/environment_client.dart';
