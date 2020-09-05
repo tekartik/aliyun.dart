@@ -21,7 +21,7 @@ class TsPutRowRequest {
   final String tableName;
   final List<TsKeyValue> primaryKeys;
   final TsCondition condition;
-  final Map<String, dynamic> data;
+  final List<TsAttribute> data;
 
   TsPutRowRequest(
       {@required this.tableName,

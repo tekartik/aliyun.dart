@@ -29,7 +29,10 @@ Map<String, dynamic> toPutRowParams(TsPutRowRequest getRowRequest) {
       'primaryKey': getRowRequest.primaryKeys
           .map(toPrimaryKeyValueParam)
           .toList(growable: false),
-    if (getRowRequest.data != null) 'attributeColumns': [getRowRequest.data],
+    if (getRowRequest.data != null)
+      'attributeColumns': getRowRequest.data
+          .map((e) => {e.name: e.value})
+          .toList(growable: false),
     'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey}
   });
   return map;

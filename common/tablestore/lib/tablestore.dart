@@ -30,4 +30,4 @@ export 'src/ts_row.dart'
         TsCondition;
 
 export 'src/ts_value_type.dart' show TsValueLong;
-export 'src/ts_column.dart' show TsKeyValue;
+export 'src/ts_column.dart' show TsKeyValue, TsAttribute;

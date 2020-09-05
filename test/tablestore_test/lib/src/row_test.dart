@@ -59,7 +59,7 @@ void rowTest(TsClient client) {
       var response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKeys: keys,
-          data: {'test': 'text'}));
+          data: [TsAttribute('test', 'text')]));
       expect(response.toDebugMap(), {
         'row': {
           'primaryKeys': [

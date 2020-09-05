@@ -74,7 +74,7 @@ void main() {
       r = TsPutRowRequest(
           tableName: 'test',
           primaryKeys: [TsKeyValue('key', 1)],
-          data: {'col1': 1, 'col2': 'value'});
+          data: [TsAttribute('col1', 1), TsAttribute('col2', 'value')]);
       expect(toPutRowParams(r), {
         'tableName': 'test',
         'primaryKey': [
