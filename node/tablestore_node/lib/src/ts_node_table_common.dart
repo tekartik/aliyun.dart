@@ -1,4 +1,5 @@
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore_common.dart';
 import 'package:tekartik_common_utils/model/model.dart';
 
 Map<String, dynamic> toCreateTableParams(TsTableDescription description) {
@@ -8,7 +9,7 @@ Map<String, dynamic> toCreateTableParams(TsTableDescription description) {
         'tableName': description.tableMeta.tableName,
         // !singular
         'primaryKey': description.tableMeta.primaryKeys.map((item) {
-          return {'name': item.name, 'type': colunTypeToNativeType(item.type)};
+          return {'name': item.name, 'type': columnTypeToNativeType(item.type)};
         })
       },
     if (description.reservedThroughput != null)
@@ -20,23 +21,23 @@ Map<String, dynamic> toCreateTableParams(TsTableDescription description) {
 }
 
 TsColumnType nativeTypeToColumnType(int type) {
-  if (type == 1) {
+  if (type == tsNodeCommon.primaryKeyType.INTEGER) {
     return TsColumnType.integer;
-  } else if (type == 2) {
+  } else if (type == tsNodeCommon.primaryKeyType.STRING) {
     return TsColumnType.string;
-  } else if (type == 3) {
+  } else if (type == tsNodeCommon.primaryKeyType.BINARY) {
     return TsColumnType.binary;
   }
   throw 'type $type not supported';
 }
 
-int colunTypeToNativeType(TsColumnType type) {
+int columnTypeToNativeType(TsColumnType type) {
   if (type == TsColumnType.integer) {
-    return 1;
+    return tsNodeCommon.primaryKeyType.INTEGER;
   } else if (type == TsColumnType.string) {
-    return 2;
+    return tsNodeCommon.primaryKeyType.STRING;
   } else if (type == TsColumnType.binary) {
-    return 3;
+    return tsNodeCommon.primaryKeyType.BINARY;
   }
   throw 'type $type not supported';
 }

@@ -1,7 +1,6 @@
 import 'package:tekartik_aliyun_tablestore_test/tablestore_test.dart';
-import 'package:tekartik_aliyun_tablestore_universal/environment_client.dart';
-import 'package:test/test.dart';
 import 'package:tekartik_app_node_utils/node_utils.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('tablestore', () {
@@ -15,7 +14,7 @@ void main() {
       // skip
       // return;
     }
-    tablestoreTest(tsClientOptionsFromEnv);
+    tablestoreTest(tsClientTest);
   });
   test('placeholder', () {});
 }

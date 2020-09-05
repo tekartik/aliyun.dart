@@ -1,5 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sembast/sembast.dart';
+import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/src/tablestore_sembast.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
@@ -33,6 +34,9 @@ class TsClientSembast implements TsClient {
           path = join(relativeTopPath, instanceName);
         } else {
           path = instanceName;
+        }
+        if (debugTs) {
+          print('[SBi] Openeing $path');
         }
         return tablestore.factory.openDatabase(path, version: 1,
             onVersionChanged: (db, oldVersion, newVersion) async {
@@ -74,7 +78,7 @@ class TsClientSembast implements TsClient {
           'table name different in meta');
     }
     await (await _db).transaction((txn) async {
-      var tableNames = await _listTableNames(txn);
+      var tableNames = List.from(await _listTableNames(txn));
 
       if (!tableNames.contains(name)) {
         var tableMetaRecord = getTableMetaRecord(name);
@@ -125,5 +129,17 @@ class TsClientSembast implements TsClient {
           reservedThroughput: extra.reservedThroughput,
           tableOptions: extra.tableOptions);
     });
+  }
+
+  @override
+  Future<TsGetRowResponse> getRow(TsGetRowRequest request) {
+    // TODO: implement getRow
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<TsPutRowResponse> putRow(TsPutRowRequest request) {
+    // TODO: implement putRow
+    throw UnimplementedError();
   }
 }

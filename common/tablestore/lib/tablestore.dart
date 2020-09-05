@@ -2,6 +2,11 @@
 ///
 /// More dartdocs go here.
 
-export 'src/tablestore_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/ts_client.dart';
+export 'src/ts_row.dart'
+    show
+        TsGetRowRequest,
+        TsGetRowResponse,
+        TsPutRowRequest,
+        TsPutRowResponse,
+        TsCondition;

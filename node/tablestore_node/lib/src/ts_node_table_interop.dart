@@ -3,17 +3,20 @@ library tekartik_aliyun_tablestore_node.ts_table_interop;
 
 import 'package:js/js.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
-
-import 'ts_interop.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
 
 @JS()
 @anonymous
 // // Key types: {INTEGER: 1, STRING: 2, BINARY: 3}
-abstract class PrimaryKeyTypeJs {
+abstract class PrimaryKeyTypeJs implements TsConstantPrimaryKey {
+  @override
   external int get INTEGER;
 
+  @override
   external int get STRING;
 
+  @override
   external int get BINARY;
 }
 
@@ -201,20 +204,11 @@ List<_TsClientPrimaryKey> tableMetaPrimaryKeys(
 @anonymous
 abstract class _TsClientTableDescriptionJs {
   external _TsClientTableDescriptionTableMetaJs get tableMeta;
+
   external _TsClientTableDescriptionReservedThroughputJs
       get reservedThroughputDetails;
-  external _TsClientTableDescriptionTableOptionsJs get tableOptions;
-}
 
-TsColumnType nativeTypeToColumnType(int type) {
-  if (type == tablestoreJs.PrimaryKeyType.INTEGER) {
-    return TsColumnType.integer;
-  } else if (type == tablestoreJs.PrimaryKeyType.STRING) {
-    return TsColumnType.string;
-  } else if (type == tablestoreJs.PrimaryKeyType.BINARY) {
-    return TsColumnType.binary;
-  }
-  throw 'type $type not supported';
+  external _TsClientTableDescriptionTableOptionsJs get tableOptions;
 }
 
 TsTableDescription tableDescriptionFromNative(dynamic nativeDesc) {

@@ -1,4 +1,4 @@
-import 'package:tekartik_aliyun_tablestore/src/tablestore_base.dart';
+import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/tablestore_sembast.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/tablestore_sembast_io.dart';
 

@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_common_utils/bool_utils.dart';
 import 'package:tekartik_common_utils/int_utils.dart';
 import 'package:tekartik_common_utils/model/model.dart';
@@ -84,6 +85,13 @@ class TsPrimaryKey {
     var autoIncrement = parseBool(model.getValue('autoIncrement'));
     return TsPrimaryKey(name: name, type: type, autoIncrement: autoIncrement);
   }
+}
+
+class TsPrimaryKeyValue {
+  final String name;
+  final dynamic value;
+
+  TsPrimaryKeyValue(this.name, this.value);
 }
 
 class TsTableDescriptionTableMeta {
@@ -256,6 +264,9 @@ abstract class TsClient {
   Future createTable(String tableName, TsTableDescription description);
 
   Future<TsTableDescription> describeTable(String tableName);
+
+  Future<TsPutRowResponse> putRow(TsPutRowRequest request);
+  Future<TsGetRowResponse> getRow(TsGetRowRequest request);
 }
 
 mixin TsClientMixin implements TsClient {
