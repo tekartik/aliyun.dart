@@ -53,14 +53,34 @@ void rowTest(TsClient client) {
       });
     });
 
-    test('putRow', () async {
-      var keys = [TsPrimaryKeyValue('key', 'value')];
+    test('put/getRow', () async {
+      var keys = [TsKeyValue('key', 'value')];
       await createKeyStringTable();
       var response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKeys: keys,
           data: {'test': 'text'}));
-      print(response);
-    }, skip: true);
+      expect(response.toDebugMap(), {
+        'row': {
+          'primaryKeys': [
+            {'key': 'value'}
+          ],
+          'attributes': []
+        }
+      });
+
+      var getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTable, primaryKeys: keys));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKeys': [
+            {'key': 'value'}
+          ],
+          'attributes': [
+            {'test': 'text'}
+          ]
+        }
+      });
+    });
   });
 }

@@ -2,6 +2,10 @@
 library tekartik_aliyun_tablestore_node.ts_row_interop;
 
 import 'package:js/js.dart';
+import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
+import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
+import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/interop/utils.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 
@@ -64,10 +68,165 @@ class TsNodeLongClassImpl implements TsNodeLongClass {
   }
 }
 
-class TsGetRowParamsJs {}
+@JS()
+@anonymous
+class TsRowPrimaryKeyValueJs {
+  external String get name;
 
-class TsGetRowResponseJs {}
+  external dynamic get value;
+}
+
+@JS()
+@anonymous
+class TsRowAttributeKeyValueJs {
+  external String get columnName;
+
+  external dynamic get columnValue;
+}
+
+class TsGetRowParamsJs {}
 
 class TsPutRowParamsJs {}
 
-class TsPutRowResponseJs {}
+//
+// Put Row
+//
+/*
+
+{
+  "consumed": {
+    "capacityUnit": {
+      "read": 0,
+      "write": 1
+    }
+  },
+  "row": {
+    "primaryKey": [
+      {
+        "name": "key",
+        "value": "value"
+      }
+    ],
+    "attributes": []
+  },
+  "RequestId": "0005ae92-7cca-c9e0-a5c1-720b0c8f1830"
+}
+ */
+
+// Response to native
+TsPutRowResponse putRowResponseFromNative(dynamic nativeResponseJs) {
+  if (nativeResponseJs != null) {
+    return TsPutRowResponseNode(nativeResponseJs);
+  }
+  return null;
+}
+
+//
+// Get Row
+//
+/*
+{
+  "consumed": {
+    "capacityUnit": {
+      "read": 1,
+      "write": 0
+    }
+  },
+  "row": {
+    "primaryKey": [
+      {
+        "name": "key",
+        "value": "value"
+      }
+    ],
+    "attributes": [
+      {
+        "columnName": "test",
+        "columnValue": "text",
+        "timestamp": {
+          "buffer": [
+            30,
+            20,
+            154,
+            94,
+            116,
+            1,
+            0,
+            0
+          ],
+          "offset": 0
+        }
+      }
+    ]
+  },
+  "RequestId": "0005ae91-b111-0dc7-2bc1-720b0b7a5163"
+}
+ */
+@JS()
+@anonymous
+class TsReadRowResponseJs {
+  external TsReadRowJs get row;
+}
+
+@JS()
+@anonymous
+class TsReadRowJs {
+  external List get primaryKey;
+
+  external List get attributes;
+}
+
+Iterable<TsRowPrimaryKeyValueJs> rowPrimaryKeyValuesJs(TsReadRowJs js) =>
+    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+
+Iterable<TsRowAttributeKeyValueJs> rowAttributeKeyValuesJs(TsReadRowJs js) =>
+    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
+
+// Response to native
+TsGetRowResponse getRowResponseFromNative(dynamic nativeResponseJs) {
+  if (nativeResponseJs != null) {
+    return TsGetRowResponseNode(nativeResponseJs);
+  }
+  return null;
+}
+
+class TsGetRowNode implements TsGetRow {
+  final TsReadRowJs rowJs;
+
+  TsGetRowNode(this.rowJs);
+
+  @override
+  List<TsKeyValue> get primaryKeys => rowPrimaryKeyValuesJs(rowJs).map((kvJs) {
+        return TsKeyValue(kvJs.name, tsDartify(kvJs.value));
+      }).toList();
+
+  @override
+  List<TsAttribute> get attributes =>
+      rowAttributeKeyValuesJs(rowJs).map((kvJs) {
+        return TsAttribute(kvJs.columnName, tsDartify(kvJs.columnValue));
+      }).toList();
+}
+
+abstract class TsReadRowResponseNode {
+  final TsReadRowResponseJs responseJs;
+
+  TsReadRowResponseNode(this.responseJs);
+
+  TsGetRow get row => TsGetRowNode(responseJs.row);
+}
+
+class TsGetRowResponseNode extends TsReadRowResponseNode
+    implements TsGetRowResponse {
+  TsGetRowResponseNode(TsReadRowResponseJs responseJs) : super(responseJs);
+
+  @override
+  String toString() => toDebugMap().toString();
+}
+
+class TsPutRowResponseNode extends TsReadRowResponseNode
+    implements TsPutRowResponse {
+  TsPutRowResponseNode(TsReadRowResponseJs responseJs) : super(responseJs);
+
+  @override
+  String toString() => toDebugMap().toString();
+}

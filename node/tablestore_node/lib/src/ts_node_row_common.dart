@@ -2,7 +2,7 @@ import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore_common.dart';
 import 'package:tekartik_common_utils/model/model.dart';
 
-Map<String, dynamic> toPrimaryKeyValueParam(TsPrimaryKeyValue keyValue) =>
+Map<String, dynamic> toPrimaryKeyValueParam(TsKeyValue keyValue) =>
     <String, dynamic>{keyValue.name: keyValue.value};
 
 Map<String, dynamic> toGetRowParams(TsGetRowRequest getRowRequest) {
@@ -22,7 +22,8 @@ Map<String, dynamic> toPutRowParams(TsPutRowRequest getRowRequest) {
   var map = Model({
     if (getRowRequest.tableName != null) 'tableName': getRowRequest.tableName,
     //TODO fix
-    'conditions': TsCondition(),
+    // Needed
+    'condition': TsCondition(),
     if (getRowRequest.primaryKeys != null)
       // !singular
       'primaryKey': getRowRequest.primaryKeys

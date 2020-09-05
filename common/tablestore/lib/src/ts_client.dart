@@ -87,13 +87,6 @@ class TsPrimaryKey {
   }
 }
 
-class TsPrimaryKeyValue {
-  final String name;
-  final dynamic value;
-
-  TsPrimaryKeyValue(this.name, this.value);
-}
-
 class TsTableDescriptionTableMeta {
   final String tableName;
   List<TsPrimaryKey> primaryKeys;
@@ -274,11 +267,3 @@ mixin TsClientMixin implements TsClient {
   Future<List<String>> listTableNames() =>
       throw UnsupportedError('listTableNames');
 }
-
-class TsTable {}
-
-abstract class Tablestore {
-  TsClient client({TsClientOptions options});
-}
-
-mixin TablestoreMixin implements Tablestore {}

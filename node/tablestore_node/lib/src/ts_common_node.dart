@@ -1,4 +1,6 @@
 // {'INTEGER': 1, 'STRING': 2, 'BINARY': 3}
+import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+
 abstract class TsConstantPrimaryKey {
   int get INTEGER;
 
@@ -25,7 +27,8 @@ abstract class TsConstantReturnType {
   int get AfterModify;
 }
 
-abstract class TsNodeLong {
+abstract class TsNodeLong implements TsValueLong {
+  @override
   int toNumber();
   @override
   String toString();

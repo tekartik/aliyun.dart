@@ -1,3 +1,4 @@
+import 'package:tekartik_aliyun_tablestore/src/ts_client.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:test/test.dart';
 

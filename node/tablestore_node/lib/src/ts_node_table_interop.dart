@@ -72,16 +72,6 @@ class _TsClientCreateTableParamsJs {
 
 @JS()
 @anonymous
-class _TsTableJs {}
-
-class TsTableNode implements TsTable {
-  final _TsTableJs native;
-
-  TsTableNode(this.native);
-}
-
-@JS()
-@anonymous
 abstract class TsClientListTableResponseJs {
   List<String> get tableNames;
 }

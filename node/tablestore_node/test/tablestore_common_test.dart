@@ -35,7 +35,7 @@ void main() {
           TsGetRowRequest(tableName: null, primaryKeys: null, columns: null);
       expect(toGetRowParams(getRowRequest), {});
       getRowRequest = TsGetRowRequest(
-          tableName: 'test', primaryKeys: [TsPrimaryKeyValue('key', 1)]);
+          tableName: 'test', primaryKeys: [TsKeyValue('key', 1)]);
       expect(toGetRowParams(getRowRequest), {
         'tableName': 'test',
         'primaryKey': [
@@ -44,7 +44,7 @@ void main() {
       });
       getRowRequest = TsGetRowRequest(
           tableName: 'test',
-          primaryKeys: [TsPrimaryKeyValue('key', 1)],
+          primaryKeys: [TsKeyValue('key', 1)],
           columns: ['col1', 'col2']);
       expect(toGetRowParams(getRowRequest), {
         'tableName': 'test',
@@ -63,7 +63,7 @@ void main() {
       });
 
       r = TsPutRowRequest(
-          tableName: 'test', primaryKeys: [TsPrimaryKeyValue('key', 1)]);
+          tableName: 'test', primaryKeys: [TsKeyValue('key', 1)]);
       expect(toPutRowParams(r), {
         'tableName': 'test',
         'primaryKey': [
@@ -73,7 +73,7 @@ void main() {
       });
       r = TsPutRowRequest(
           tableName: 'test',
-          primaryKeys: [TsPrimaryKeyValue('key', 1)],
+          primaryKeys: [TsKeyValue('key', 1)],
           data: {'col1': 1, 'col2': 'value'});
       expect(toPutRowParams(r), {
         'tableName': 'test',

@@ -9,10 +9,12 @@ import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_interop.dart';
-
+import 'import.dart';
 import 'interop/utils.dart';
 
 final tablestoreNode = TablestoreNode();
+
+typedef ErrDataCallback = dynamic Function(dynamic err, dynamic data);
 
 class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
   @override
@@ -93,6 +95,14 @@ class TsClientNode with TsClientMixin implements TsClient {
   @override
   Future createTable(String name, TsTableDescription description) async {
     var params = toCreateTableParams(description);
+    var nativeResponse = await _nativeOperationWithCallback((callback) {
+      // ignore: unused_local_variable
+      native.createTable(
+          _debugNativeRequestParams('createTable', jsify(params)), callback);
+    });
+    print(jsObjectToDebugString(nativeResponse));
+    return null;
+
     // devPrint(params);
     /*
     {
@@ -118,23 +128,6 @@ class TsClientNode with TsClientMixin implements TsClient {
     };
 
      */
-    var completer = Completer<List<String>>();
-    try {
-      native.createTable(jsify(params), allowInterop((err, data) {
-        if (err != null) {
-          _handleError(completer, err);
-        } else {
-          var response = data;
-          print(jsObjectToDebugString(response));
-          // {tableNames: [Exp1, Exp2], RequestId: 0005ae3d-8b60-c9d8-a4c1-720b0589c481}
-
-          _handleSuccess(completer, null);
-        }
-      }));
-    } catch (e) {
-      _handleError(completer, e);
-    }
-    return completer.future;
   }
 
   @override
@@ -193,6 +186,15 @@ class TsClientNode with TsClientMixin implements TsClient {
     try {
       action(allowInterop((err, data) {
         if (err != null) {
+          if (debugTs) {
+            if (data != null) {
+              try {
+                print('[TS!]: (data): ${jsObjectToDebugString(data)}');
+              } catch (_) {
+                print('err: some data');
+              }
+            }
+          }
           _handleError(completer, err);
         } else {
           // var response = data;
@@ -226,60 +228,26 @@ class TsClientNode with TsClientMixin implements TsClient {
     return tableDescriptionFromNative(nativeDesc);
   }
 
+  /*
+  {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":{"primaryKey":[{"name":"key","value":"value"}],"attributes":[{"columnName":"test","columnValue":"text","timestamp":{"buffer":[30,20,154,94,116,1,0,0],"offset":0}}]},"RequestId":"0005ae91-ac09-e850-e5c1-720b08a5216a"}
+   */
   @override
-  Future<TsGetRowResponse> getRow(TsGetRowRequest request) {
-    // TODO: implement getRow
-    throw UnimplementedError();
+  Future<TsGetRowResponse> getRow(TsGetRowRequest request) async {
+    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+      var params = toGetRowParams(request);
+      var jsParams = tsJsify(params);
+      native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
+    });
+    return getRowResponseFromNative(nativeResponseJs);
   }
 
   @override
   Future<TsPutRowResponse> putRow(TsPutRowRequest request) async {
-    var params = toPutRowParams(request);
-    // devPrint(params);
-    /*
-    {
-      'tableMeta': {
-        'tableName': name,
-        'primaryKey': [
-          {'name': 'gid', 'type': 'INTEGER'},
-          {'name': 'uid', 'type': 'INTEGER'}
-        ]
-      },
-      'reservedThroughput': {
-        'capacityUnit': {'read': 0, 'write': 0}
-      },
-      'tableOptions': {
-        'timeToLive':
-            -1, // 数据的过期时间, 单位秒, -1代表永不过期. 假如设置过期时间为一年, 即为 365 * 24 * 3600.
-        'maxVersions': 1 // 保存的最大版本数, 设置为1即代表每列上最多保存一个版本(保存最新的版本).
-      },
-      'streamSpecification': {
-        'enableStream': true, //开启Stream
-        'expirationTime': 24 //Stream的过期时间，单位是小时，最长为168，设置完以后不能修改
-      }
-    };
-
-     */
-
-    var completer = Completer<TsPutRowResponse>();
-    try {
+    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+      var params = toPutRowParams(request);
       var jsParams = tsJsify(params);
-      native.putRow(_debugNativeRequestParams('putRow', jsParams),
-          allowInterop((err, data) {
-        if (err != null) {
-          _handleError(completer, err);
-        } else {
-          var response = data;
-          print(jsObjectToDebugString(response));
-          // {tableNames: [Exp1, Exp2], RequestId: 0005ae3d-8b60-c9d8-a4c1-720b0589c481}
-
-          _handleSuccess(completer, null);
-        }
-      }));
-
-    } catch (e) {
-      _handleError(completer, e);
-    }
-    return completer.future;
+      native.putRow(_debugNativeRequestParams('putRow', jsParams), callback);
+    });
+    return putRowResponseFromNative(nativeResponseJs);
   }
 }

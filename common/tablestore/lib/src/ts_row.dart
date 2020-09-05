@@ -1,10 +1,10 @@
-import 'package:tekartik_aliyun_tablestore/src/ts_client.dart';
+import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_common_utils/model/model.dart';
 
 class TsGetRowRequest {
   final String tableName;
-  final List<TsPrimaryKeyValue> primaryKeys;
+  final List<TsKeyValue> primaryKeys;
   final List<String> columns;
 
   TsGetRowRequest(
@@ -19,7 +19,7 @@ class TsCondition {}
 
 class TsPutRowRequest {
   final String tableName;
-  final List<TsPrimaryKeyValue> primaryKeys;
+  final List<TsKeyValue> primaryKeys;
   final TsCondition condition;
   final Map<String, dynamic> data;
 
@@ -32,23 +32,37 @@ class TsPutRowRequest {
       this.data});
 }
 
-class TsRow {
-  Model toMap() {
-    return Model({});
-  }
+abstract class TsGetRow {
+  List<TsKeyValue> get primaryKeys;
+  List<TsAttribute> get attributes;
 }
 
 abstract class TsGetRowResponse {
-  TsRow row;
+  TsGetRow get row;
 }
 
 abstract class TsPutRowResponse {
-  TsRow get row;
+  TsGetRow get row;
+}
 
-  Model toMap() {
-    return Model({if (row != null) 'row': row.toMap()});
+extension TsGetRowResponseExt on TsGetRowResponse {
+  Model toDebugMap() {
+    return Model({})..setValue('row', row?.toDebugMap());
   }
+}
 
-  @override
-  String toString() => toMap().toString();
+extension TsPutRowResponseExt on TsPutRowResponse {
+  Model toDebugMap() {
+    return Model({})..setValue('row', row?.toDebugMap());
+  }
+}
+
+extension TsGetRowResponseRowExt on TsGetRow {
+  Model toDebugMap() {
+    return Model()
+      ..setValue('primaryKeys',
+          primaryKeys?.map((e) => e?.toDebugMap())?.toList(growable: false))
+      ..setValue('attributes',
+          attributes?.map((e) => e?.toDebugMap())?.toList(growable: false));
+  }
 }
