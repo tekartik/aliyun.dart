@@ -190,17 +190,48 @@ class TsClientSembast implements TsClient {
       var table = await getTableContext(txn, request.tableName);
       var row = table.row(request.primaryKey);
       var record = row.record(request.data);
-      // TODO for now simply delete and put, handle merge!
-      await record.delete();
+      var key = await _checkPutDeleteCondition(record, request.condition);
+      if (key != null) {
+        await record.delete();
+      }
       await record.put();
       return TsPutRowResponseSembast(row);
     });
   }
 
+  Future<int> _checkPutDeleteCondition(
+      TsRowRecordContextSembast record, TsCondition condition) async {
+    var key = await record.findKey();
+    switch (condition) {
+      case TsCondition.ignore:
+        break;
+      case TsCondition.expectExist:
+        if (key == null) {
+          throw TsExceptionSembast(
+              message: 'record not found', isConditionFailedError: true);
+        }
+        break;
+      case TsCondition.expectNotExist:
+        if (key != null) {
+          throw TsExceptionSembast(
+              message: 'record found', isConditionFailedError: true);
+        }
+    }
+    return key;
+  }
+
   @override
-  Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request) {
-    // TODO: implement deleteRow
-    throw UnimplementedError();
+  Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request) async {
+    return await (await _db).transaction((txn) async {
+      var table = await getTableContext(txn, request.tableName);
+      var row = table.row(request.primaryKey);
+      var record = row.record();
+      var key = await _checkPutDeleteCondition(record, request.condition);
+      if (key != null) {
+        await record.deleteByKey(key);
+      }
+      return TsDeleteRowResponseSembast();
+    });
   }
 }
 
@@ -286,6 +317,11 @@ class TsRowRecordContextSembast {
   Future delete() async {
     // delete previous
     await table.store.delete(table.client, finder: finder);
+  }
+
+  Future deleteByKey(int key) async {
+    // delete previous
+    await table.store.record(key).delete(table.client);
   }
 
   Future<int> findKey() async {
@@ -395,3 +431,5 @@ class TsPutRowResponseSembast extends TsReadRowResponseSembast
     implements TsPutRowResponse {
   TsPutRowResponseSembast(TsRowContextSembast rowContext) : super(rowContext);
 }
+
+class TsDeleteRowResponseSembast implements TsDeleteRowResponse {}

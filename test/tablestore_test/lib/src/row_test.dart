@@ -122,6 +122,7 @@ void rowTest(TsClient client) {
         fail('should fail');
       } on TsException catch (e) {
         expect(e.isConditionFailedError, isTrue);
+        expect(e.retryable, isFalse);
       }
 
       response = await client.putRow(TsPutRowRequest(
