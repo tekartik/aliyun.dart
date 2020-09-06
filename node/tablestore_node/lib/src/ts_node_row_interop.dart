@@ -5,7 +5,7 @@ import 'package:js/js.dart';
 import 'package:js/js_util.dart' as util;
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
-import 'package:tekartik_aliyun_tablestore_node/src/interop/utils.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/interop/utils_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
@@ -85,7 +85,7 @@ abstract class TsNodeLongClassJs implements TsNodeLongClass {
   external TsLongJs fromNumber(int value);
 
   @override
-  external TsLongJs fromText(String value);
+  external TsLongJs fromString(String value);
 }
 
 class TsNodeLongClassImpl implements TsNodeLongClass {
@@ -95,8 +95,8 @@ class TsNodeLongClassImpl implements TsNodeLongClass {
   }
 
   @override
-  TsNodeLong fromText(String value) {
-    return tablestoreJs.Long.fromText(value);
+  TsNodeLong fromString(String value) {
+    return tablestoreJs.Long.fromString(value);
   }
 }
 
@@ -329,3 +329,7 @@ dynamic tsConditionToNative(TsCondition condition) {
     columnConditionJs
   ]);
 }
+
+/// Value long (going though string to handle number at the limit
+dynamic tsValueLongToNative(TsValueLong value) =>
+    tablestoreJs.Long.fromString(value.toString());

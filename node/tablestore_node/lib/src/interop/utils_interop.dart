@@ -6,6 +6,7 @@ import 'js_node_interop.dart' as js;
 
 /// Returns Dart representation from JS Object.
 dynamic tsDartify(Object jsObject) {
+  // devPrint('js: ${jsObjectAsMap(jsObject)}');
   if (_isBasicType(jsObject)) {
     return jsObject;
   }
@@ -13,6 +14,10 @@ dynamic tsDartify(Object jsObject) {
   // Handle list
   if (jsObject is Iterable) {
     return jsObject.map(tsDartify).toList();
+  }
+  var jsLong = js.dartifyValueLong(jsObject);
+  if (jsLong != null) {
+    return jsLong;
   }
 
 /*  var jsDate = js.dartifyDate(jsObject);
@@ -70,7 +75,6 @@ dynamic jsifyList(Iterable list) {
 
 /// Returns the JS implementation from Dart Object.
 dynamic tsJsify(Object dartObject) {
-  // devPrint('dart: $dartObject');
   if (_isBasicType(dartObject)) {
     return dartObject;
   }
@@ -93,6 +97,10 @@ dynamic tsJsify(Object dartObject) {
 
   if (dartObject is TsCondition) {
     return tsConditionToNative(dartObject);
+  }
+
+  if (dartObject is TsValueLong) {
+    return tsValueLongToNative(dartObject);
   }
 
   print('Could not convert type ${dartObject?.runtimeType}, value $dartObject');

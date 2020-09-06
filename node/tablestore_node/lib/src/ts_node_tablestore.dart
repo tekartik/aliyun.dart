@@ -13,7 +13,7 @@ import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_interop.dart';
 import 'import.dart';
 import 'import_interop.dart';
-import 'interop/utils.dart';
+import 'interop/utils_interop.dart';
 
 final tablestoreNode = TablestoreNode();
 
@@ -243,9 +243,9 @@ class TsClientNode with TsClientMixin implements TsClient {
    */
   @override
   Future<TsGetRowResponse> getRow(TsGetRowRequest request) async {
+    var params = toGetRowParams(request);
+    var jsParams = tsJsify(params);
     var nativeResponseJs = await _nativeOperationWithCallback((callback) {
-      var params = toGetRowParams(request);
-      var jsParams = tsJsify(params);
       native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
     });
     return getRowResponseFromNative(nativeResponseJs);
@@ -253,9 +253,10 @@ class TsClientNode with TsClientMixin implements TsClient {
 
   @override
   Future<TsPutRowResponse> putRow(TsPutRowRequest request) async {
+    var params = toPutRowParams(request);
+    var jsParams = tsJsify(params);
+
     var nativeResponseJs = await _nativeOperationWithCallback((callback) {
-      var params = toPutRowParams(request);
-      var jsParams = tsJsify(params);
       native.putRow(_debugNativeRequestParams('putRow', jsParams), callback);
     });
     return putRowResponseFromNative(nativeResponseJs);
@@ -263,9 +264,10 @@ class TsClientNode with TsClientMixin implements TsClient {
 
   @override
   Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request) async {
+    var params = toDeleteRowParams(request);
+    var jsParams = tsJsify(params);
+
     var nativeResponseJs = await _nativeOperationWithCallback((callback) {
-      var params = toDeleteRowParams(request);
-      var jsParams = tsJsify(params);
       native.deleteRow(
           _debugNativeRequestParams('deleteRow', jsParams), callback);
     });

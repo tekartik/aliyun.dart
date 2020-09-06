@@ -1,5 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:path/path.dart';
 import 'package:sembast/sembast.dart';
+import 'package:sembast/blob.dart';
 import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
 import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
@@ -246,10 +249,28 @@ class TsGetRowSembast implements TsGetRow {
 }
 
 dynamic valueToSembastValue(dynamic value) {
+  assert(value == null ||
+      value is TsValueLong ||
+      value is String ||
+      value is Uint8List ||
+      value is double);
+  if (value is TsValueLong) {
+    return value.toNumber();
+  } else if (value is Uint8List) {
+    return Blob(value);
+  }
   return value;
 }
 
-dynamic sembastValueToValue(dynamic value) => value;
+dynamic sembastValueToValue(dynamic value) {
+  if (value is Blob) {
+    return value.bytes;
+  }
+  if (value is int) {
+    return TsValueLong.fromNumber(value);
+  }
+  return value;
+}
 
 class TsTableContextSembast {
   final DatabaseClient client;
@@ -271,7 +292,7 @@ class TsTableContextSembast {
 
 class KeyValueSembast {
   String key;
-  String value;
+  dynamic value;
 
   KeyValueSembast.from(TsKeyValue tsKeyValue) {
     key = tsKeyValue.name;

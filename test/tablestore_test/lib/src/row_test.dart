@@ -1,6 +1,7 @@
 import 'package:tekartik_aliyun_tablestore_test/tablestore_test.dart';
 import 'package:tekartik_aliyun_tablestore_universal/tablestore_universal.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
+import 'package:tekartik_common_utils/env_utils.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -69,6 +70,7 @@ void rowTest(TsClient client) {
         }
       });
 
+      // [{"columnName":"test","columnValue":"text","timestamp":{"buffer":[176,8,239,99,116,1,0,0],"offset":0}}]},
       var getResponse = await client
           .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
       expect(getResponse.toDebugMap(), {
@@ -210,6 +212,58 @@ void rowTest(TsClient client) {
           primaryKey: key));
 
       expect(response.toDebugMap(), {});
+    });
+
+    test('long', () async {
+      await createKeyStringTable();
+      var key = TsPrimaryKey([TsKeyValue('key', 'long')]);
+      await client.putRow(TsPutRowRequest(
+          tableName: keyStringTable,
+          primaryKey: key,
+          data: [TsAttribute.int('test', 1)]));
+
+      // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
+      var getResponse = await client
+          .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKeys': [
+            {'key': 'long'}
+          ],
+          'attributes': [
+            {'test': TsValueLong.fromNumber(1)}
+          ]
+        }
+      });
+
+      // max int 9007199254740991
+      await client.putRow(
+          TsPutRowRequest(tableName: keyStringTable, primaryKey: key, data: [
+        TsAttribute.long('test', TsValueLong.fromString('90071992547409910'))
+      ]));
+
+      // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
+      getResponse = await client
+          .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKeys': [
+            {'key': 'long'}
+          ],
+          'attributes': [
+            {'test': TsValueLong.fromString('90071992547409910')}
+          ]
+        }
+      });
+      var long = getResponse.toDebugMap()['row']['attributes'][0]['test']
+          as TsValueLong;
+      if (isRunningAsJavascript) {
+        expect(TsValueLong.fromNumber(long.toNumber()).toString(),
+            isNot('90071992547409910'));
+      } else {
+        expect(TsValueLong.fromNumber(long.toNumber()).toString(),
+            '90071992547409910');
+      }
     });
   });
 }

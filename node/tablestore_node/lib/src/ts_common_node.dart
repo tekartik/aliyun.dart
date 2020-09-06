@@ -58,7 +58,7 @@ abstract class TsNodeLong implements TsValueLong {
 
 abstract class TsNodeLongClass {
   TsNodeLong fromNumber(int value);
-  TsNodeLong fromText(String value);
+  TsNodeLong fromString(String value);
 }
 
 abstract class TsNodeCommon {

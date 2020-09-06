@@ -51,7 +51,7 @@ class TsNodeLongClassShim implements TsNodeLongClass {
   TsNodeLong fromNumber(int value) => TsNodeLongShim(value);
 
   @override
-  TsNodeLong fromText(String value) => TsNodeLongShim(int.parse(value));
+  TsNodeLong fromString(String value) => TsNodeLongShim(int.parse(value));
 }
 
 class TsNodeCommonShim implements TsNodeCommon {

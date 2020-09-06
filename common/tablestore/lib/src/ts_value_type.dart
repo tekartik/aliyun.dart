@@ -10,8 +10,21 @@ abstract class TsValueLong {
   String toString();
 }
 
+mixin _TsValueLongMixin implements TsValueLong {
+  @override
+  int get hashCode => toString().hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    if (other is TsValueLong) {
+      return other.toString() == toString();
+    }
+    return false;
+  }
+}
+
 // Only for valid js int(s)
-class _TsValueLongNumber implements TsValueLong {
+class _TsValueLongNumber with _TsValueLongMixin {
   final int value;
 
   _TsValueLongNumber(this.value);
@@ -24,7 +37,7 @@ class _TsValueLongNumber implements TsValueLong {
 }
 
 // Only for valid js int(s)
-class _TsValueLongString implements TsValueLong {
+class _TsValueLongString with _TsValueLongMixin {
   final String value;
 
   _TsValueLongString(this.value);
