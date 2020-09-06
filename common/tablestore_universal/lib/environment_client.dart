@@ -7,14 +7,30 @@ TsClientOptions _tsClientOptionsFromEnv;
 TsClientOptions get tsClientOptionsFromEnv => _tsClientOptionsFromEnv ??= () {
       if (isRunningAsJavascript) {
         var endpoint = _env['endpoint'];
+        var accessKeyId = _env['accessKeyId'];
+        var secretAccessKey = _env['secretAccessKey'];
+        var instanceName = _env['instanceName'];
         if (endpoint == null) {
-          print('Missing endpoint env variable in $_env');
+          print('Missing endpoint env variable');
+          return null;
+        }
+        if (accessKeyId == null) {
+          print('Missing accessKeyId env variable');
+          return null;
+        }
+        if (instanceName == null) {
+          print('Missing instanceName env variable');
+          return null;
+        }
+        if (secretAccessKey == null) {
+          print('Missing secretAccessKey env variable');
+          return null;
         }
         return TsClientOptions(
-            endpoint: _env['endpoint'],
-            accessKeyId: _env['accessKeyID'],
-            secretAccessKey: _env['accessKeySecret'],
-            instanceName: _env['instanceName']);
+            endpoint: endpoint,
+            accessKeyId: accessKeyId,
+            secretAccessKey: secretAccessKey,
+            instanceName: instanceName);
       } else {
         // io sim
         return TsClientOptions(

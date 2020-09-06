@@ -2,8 +2,6 @@ import 'package:meta/meta.dart';
 import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 
-
-
 /// Client options
 class TsClientOptions {
   /// Aliyun access key id
@@ -32,6 +30,7 @@ class TsClientOptions {
 
 abstract class TsClient {
   Future<List<String>> listTableNames();
+
   Future deleteTable(String name);
 
   Future createTable(String tableName, TsTableDescription description);
@@ -39,7 +38,9 @@ abstract class TsClient {
   Future<TsTableDescription> describeTable(String tableName);
 
   Future<TsPutRowResponse> putRow(TsPutRowRequest request);
+
   Future<TsGetRowResponse> getRow(TsGetRowRequest request);
+
   Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request);
 }
 

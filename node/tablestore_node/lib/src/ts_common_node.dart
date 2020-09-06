@@ -18,6 +18,28 @@ abstract class TsConstantRowExistenceExpectation {
   int get EXPECT_NOT_EXIST;
 }
 
+//   'EQUAL': 1,
+//         'NOT_EQUAL': 2,
+//         'GREATER_THAN': 3,
+//         'GREATER_EQUAL': 4,
+//         'LESS_THAN': 5,
+//         'LESS_EQUAL': 6
+abstract class TsConstantComparatorType {
+  int get EQUAL;
+  int get NOT_EQUAL;
+  int get GREATER_THAN;
+  int get GREATER_EQUAL;
+  int get LESS_THAN;
+  int get LESS_EQUAL;
+}
+
+//  {'NOT': 1, 'AND': 2, 'OR': 3}
+abstract class TsConstantLogicalOperator {
+  int get NOT;
+  int get AND;
+  int get OR;
+}
+
 // {'NONE': 0, 'Primarykey': 1, 'AfterModify': 2}
 abstract class TsConstantReturnType {
   int get NONE;
@@ -43,5 +65,7 @@ abstract class TsNodeCommon {
   TsConstantPrimaryKey get primaryKeyType;
   TsConstantRowExistenceExpectation get rowExistenceExpectation;
   TsConstantReturnType get returnType;
+  TsConstantComparatorType get comparatorType;
+  TsConstantLogicalOperator get logicalOperator;
   TsNodeLongClass get long;
 }

@@ -1,7 +1,6 @@
 import 'package:js/js_util.dart' as util;
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
-import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
-import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 
 import 'js_node_interop.dart' as js;
 
@@ -93,8 +92,7 @@ dynamic tsJsify(Object dartObject) {
   }
 
   if (dartObject is TsCondition) {
-    return util.callConstructor(
-        tablestoreJs.Condition, [tsConditionToNative(dartObject), null]);
+    return tsConditionToNative(dartObject);
   }
 
   print('Could not convert type ${dartObject?.runtimeType}, value $dartObject');

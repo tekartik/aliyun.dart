@@ -202,16 +202,17 @@ class TsClientSembast implements TsClient {
   Future<int> _checkPutDeleteCondition(
       TsRowRecordContextSembast record, TsCondition condition) async {
     var key = await record.findKey();
-    switch (condition) {
-      case TsCondition.ignore:
+
+    switch (condition?.rowExistenceExpectation) {
+      case TsConditionRowExistenceExpectation.ignore:
         break;
-      case TsCondition.expectExist:
+      case TsConditionRowExistenceExpectation.expectExist:
         if (key == null) {
           throw TsExceptionSembast(
               message: 'record not found', isConditionFailedError: true);
         }
         break;
-      case TsCondition.expectNotExist:
+      case TsConditionRowExistenceExpectation.expectNotExist:
         if (key != null) {
           throw TsExceptionSembast(
               message: 'record found', isConditionFailedError: true);

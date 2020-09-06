@@ -10,12 +10,12 @@ import 'package:tekartik_aliyun_tablestore_node/tablestore_node.dart';
 import 'package:tekartik_aliyun_tablestore_universal/environment_client.dart';
 import 'package:test/test.dart';
 
+TsClient get tsClientTest => tsClientOptionsFromEnv != null
+    ? tablestoreNode.client(options: tsClientOptionsFromEnv)
+    : null;
 void main() {
+  var client = tsClientTest; // ignore: unused_local_variable
   group('tablestore_node', () {
-    TsClient client; // ignore: unused_local_variable
-    setUpAll(() {
-      client = tablestoreNode.client(options: tsClientOptionsFromEnv);
-    });
     test('keyType', () {
       expect(tablestoreNode.primaryKeyType.INTEGER, 1);
       expect(tablestoreNode.primaryKeyType.STRING, 2);
@@ -48,6 +48,38 @@ void main() {
       expect(tsNodeCommon.returnType.AfterModify,
           tsNodeCommonShim.returnType.AfterModify);
     });
-  });
-  test('placeholder', () {});
+    test('ComparatorType', () {
+      expect(jsObjectAsMap(getProperty(tablestoreJs, 'ComparatorType')), {
+        'EQUAL': 1,
+        'NOT_EQUAL': 2,
+        'GREATER_THAN': 3,
+        'GREATER_EQUAL': 4,
+        'LESS_THAN': 5,
+        'LESS_EQUAL': 6
+      });
+      expect(tsNodeCommon.comparatorType.EQUAL,
+          tsNodeCommonShim.comparatorType.EQUAL);
+      expect(tsNodeCommon.comparatorType.NOT_EQUAL,
+          tsNodeCommonShim.comparatorType.NOT_EQUAL);
+      expect(tsNodeCommon.comparatorType.GREATER_THAN,
+          tsNodeCommonShim.comparatorType.GREATER_THAN);
+      expect(tsNodeCommon.comparatorType.GREATER_EQUAL,
+          tsNodeCommonShim.comparatorType.GREATER_EQUAL);
+      expect(tsNodeCommon.comparatorType.LESS_THAN,
+          tsNodeCommonShim.comparatorType.LESS_THAN);
+      expect(tsNodeCommon.comparatorType.LESS_EQUAL,
+          tsNodeCommonShim.comparatorType.LESS_EQUAL);
+    });
+
+    test('LogicalOperator', () {
+      expect(jsObjectAsMap(getProperty(tablestoreJs, 'LogicalOperator')),
+          {'NOT': 1, 'AND': 2, 'OR': 3});
+      expect(tsNodeCommon.logicalOperator.NOT,
+          tsNodeCommonShim.logicalOperator.NOT);
+      expect(tsNodeCommon.logicalOperator.AND,
+          tsNodeCommonShim.logicalOperator.AND);
+      expect(
+          tsNodeCommon.logicalOperator.OR, tsNodeCommonShim.logicalOperator.OR);
+    });
+  }, skip: client == null);
 }

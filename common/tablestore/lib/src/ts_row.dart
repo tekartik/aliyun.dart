@@ -16,7 +16,62 @@ class TsGetRowRequest {
 }
 
 // Condition for put and delete
-enum TsCondition {
+class TsCondition {
+  final TsConditionRowExistenceExpectation rowExistenceExpectation;
+  final TsColumnCondition columnCondition;
+
+  TsCondition({this.rowExistenceExpectation, this.columnCondition});
+
+  /// Helpers
+  static final TsCondition ignore = TsCondition(
+      rowExistenceExpectation: TsConditionRowExistenceExpectation.ignore);
+  static final TsCondition expectExist = TsCondition(
+      rowExistenceExpectation: TsConditionRowExistenceExpectation.expectExist);
+  static final TsCondition expectNotExist = TsCondition(
+      rowExistenceExpectation:
+          TsConditionRowExistenceExpectation.expectNotExist);
+}
+
+abstract class TsColumnCondition {
+  factory TsColumnCondition.equals(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.equals, name, value);
+  factory TsColumnCondition.or(List<TsColumnCondition> conditions) =>
+      TsColumnCompositeCondition(TsLogicalOperator.or, conditions);
+  factory TsColumnCondition.and(List<TsColumnCondition> conditions) =>
+      TsColumnCompositeCondition(TsLogicalOperator.and, conditions);
+}
+
+enum TsComparatorType {
+  equals,
+  notEquals,
+  greaterThan,
+  greatorThanOrEquals,
+  lessThan,
+  lessThanOrEquals,
+}
+
+enum TsLogicalOperator {
+  and,
+  or,
+  not,
+}
+
+class TsColumnSingleCondition implements TsColumnCondition {
+  final TsComparatorType operator;
+  final String name;
+  final dynamic value;
+
+  TsColumnSingleCondition(this.operator, this.name, this.value);
+}
+
+class TsColumnCompositeCondition implements TsColumnCondition {
+  final TsLogicalOperator operator;
+  final List<TsColumnCondition> list;
+
+  TsColumnCompositeCondition(this.operator, this.list);
+}
+
+enum TsConditionRowExistenceExpectation {
   ignore, // Upsert
   expectExist, // Update
   expectNotExist, // Add

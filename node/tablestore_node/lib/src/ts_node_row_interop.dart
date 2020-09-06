@@ -2,10 +2,13 @@
 library tekartik_aliyun_tablestore_node.ts_row_interop;
 
 import 'package:js/js.dart';
+import 'package:js/js_util.dart' as util;
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/interop/utils.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 
 @JS()
 @anonymous
@@ -19,6 +22,37 @@ abstract class TsRowExistenceExpectationJs
 
   @override
   external int get EXPECT_NOT_EXIST;
+}
+
+@JS()
+@anonymous
+abstract class TsConstantComparatorTypeJs implements TsConstantComparatorType {
+  @override
+  external int get EQUAL;
+  @override
+  external int get NOT_EQUAL;
+  @override
+  external int get GREATER_THAN;
+  @override
+  external int get GREATER_EQUAL;
+  @override
+  external int get LESS_THAN;
+  @override
+  external int get LESS_EQUAL;
+}
+
+@JS()
+@anonymous
+abstract class TsConstantLogicalOperatorJs
+    implements TsConstantLogicalOperator {
+  @override
+  external int get AND;
+
+  @override
+  external int get NOT;
+
+  @override
+  external int get OR;
 }
 
 @JS()
@@ -246,4 +280,52 @@ class TsDeleteRowResponseNode implements TsDeleteRowResponse {
   String toString() => toDebugMap().toString();
 
    */
+}
+
+dynamic tsSingleConditionToNative(TsColumnSingleCondition condition) {
+  var columnConditionJs = util.callConstructor(
+      tablestoreJs.SingleColumnCondition, [
+    condition.name,
+    condition.value,
+    tsComparatorTypeToNative(condition.operator)
+  ]);
+
+  return columnConditionJs;
+}
+
+@JS()
+@anonymous
+abstract class CompositeConditionJs {
+  external void addSubCondition(dynamic condition);
+}
+
+dynamic tsCompositeConditionToNative(TsColumnCompositeCondition condition) {
+  var columnConditionJs =
+      util.callConstructor(tablestoreJs.CompositeColumnCondition, [
+    // tsComparatorTypeToNative(condition.)];
+  ]);
+  return columnConditionJs;
+}
+
+dynamic tsColumnConditionToNative(TsColumnCondition columnCondition) {
+  if (columnCondition is TsColumnSingleCondition) {
+    return tsSingleConditionToNative(columnCondition);
+  } else if (columnCondition is TsColumnCompositeCondition) {
+    return tsCompositeConditionToNative(columnCondition);
+  } else {
+    throw UnsupportedError('invalid condition $columnCondition');
+  }
+}
+
+dynamic tsConditionToNative(TsCondition condition) {
+  dynamic columnConditionJs;
+  var columnCondition = condition.columnCondition;
+  if (columnCondition != null) {
+    columnConditionJs = tsColumnConditionToNative(columnCondition);
+  }
+  return util.callConstructor(tablestoreJs.Condition, [
+    tsConditionRowExistenceExpectationToNative(
+        condition.rowExistenceExpectation),
+    columnConditionJs
+  ]);
 }

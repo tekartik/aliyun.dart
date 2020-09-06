@@ -60,6 +60,7 @@ void main() {
       var r = TsPutRowRequest(tableName: null, primaryKey: null, data: null);
 
       expect(toPutRowParams(r), {
+        'condition': TsCondition.ignore,
         'returnContent': {'returnType': 1}
       });
 
@@ -67,6 +68,7 @@ void main() {
           tableName: 'test', primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]));
       expect(toPutRowParams(r), {
         'tableName': 'test',
+        'condition': TsCondition.ignore,
         'primaryKey': [
           {'key': 1}
         ],
@@ -77,11 +79,15 @@ void main() {
           primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]),
           data: [TsAttribute('col1', 1), TsAttribute('col2', 'value')]);
       expect(toPutRowParams(r), {
+        'condition': TsCondition.ignore,
         'tableName': 'test',
         'primaryKey': [
           {'key': 1}
         ],
-        'attributeColumns': {'col1': 1, 'col2': 'value'},
+        'attributeColumns': [
+          {'col1': 1},
+          {'col2': 'value'}
+        ],
         'returnContent': {'returnType': 1}
       });
     });

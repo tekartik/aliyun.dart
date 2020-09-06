@@ -2,7 +2,6 @@
 library tekartik_aliyun_tablestore_node.ts_interop;
 
 import 'package:js/js.dart';
-
 import 'package:node_interop/node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_exception.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
@@ -51,10 +50,20 @@ abstract class TablestoreJs {
 
   external TsReturnTypeJs get ReturnType;
 
+  external TsConstantComparatorTypeJs get ComparatorType;
+
+  external TsConstantLogicalOperatorJs get LogicalOperator;
+
   external TsNodeLongClassJs get Long;
 
-  /// Constructory
+  /// Constructors
   external dynamic get Condition;
+
+  /// Constructors
+  external dynamic get SingleColumnCondition;
+
+  /// Constructors
+  external dynamic get CompositeColumnCondition;
 }
 
 /// Wrap a native error

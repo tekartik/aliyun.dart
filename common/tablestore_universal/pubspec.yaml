@@ -8,6 +8,7 @@ environment:
 dependencies:
   tekartik_aliyun_tablestore:
     path: ../tablestore
+  dev_test: '>=0.13.3-dev.1'
   tekartik_app_node_build:
     git:
       url: git://github.com/tekartik/app_node_utils.dart

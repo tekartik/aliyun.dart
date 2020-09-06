@@ -21,18 +21,6 @@ typedef ErrDataCallback = dynamic Function(dynamic err, dynamic data);
 
 class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
   @override
-  TsConstantPrimaryKey get primaryKeyType => tablestoreJs.PrimaryKeyType;
-
-  @override
-  TsConstantRowExistenceExpectation get rowExistenceExpectation =>
-      tablestoreJs.RowExistenceExpectation;
-
-  @override
-  TsConstantReturnType get returnType => tablestoreJs.ReturnType;
-
-  @override
-  final long = TsNodeLongClassImpl();
-
   @override
   TsClient client({TsClientOptions options}) {
     var nativeClient = callConstructor(tablestoreJs.Client, [
@@ -63,6 +51,25 @@ class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
   String toString() {
     return 'TablestoreNode()';
   }
+
+  @override
+  TsConstantPrimaryKey get primaryKeyType => tablestoreJs.PrimaryKeyType;
+
+  @override
+  TsConstantRowExistenceExpectation get rowExistenceExpectation =>
+      tablestoreJs.RowExistenceExpectation;
+
+  @override
+  TsConstantReturnType get returnType => tablestoreJs.ReturnType;
+
+  @override
+  TsConstantComparatorType get comparatorType => tablestoreJs.ComparatorType;
+
+  @override
+  TsConstantLogicalOperator get logicalOperator => tablestoreJs.LogicalOperator;
+
+  @override
+  final long = TsNodeLongClassImpl();
 }
 
 class TsClientNode with TsClientMixin implements TsClient {

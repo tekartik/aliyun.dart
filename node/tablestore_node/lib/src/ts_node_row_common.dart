@@ -1,4 +1,5 @@
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore_common.dart';
 import 'package:tekartik_common_utils/model/model.dart';
 
@@ -50,14 +51,33 @@ Map<String, dynamic> toDeleteRowParams(TsDeleteRowRequest request) {
   return map;
 }
 
-int tsConditionToNative(TsCondition condition) {
-  switch (condition) {
-    case TsCondition.ignore:
+int tsConditionRowExistenceExpectationToNative(
+    TsConditionRowExistenceExpectation rowExistenceExpecation) {
+  switch (rowExistenceExpecation) {
+    case TsConditionRowExistenceExpectation.ignore:
       return tsNodeCommon.rowExistenceExpectation.IGNORE;
-    case TsCondition.expectExist:
+    case TsConditionRowExistenceExpectation.expectExist:
       return tsNodeCommon.rowExistenceExpectation.EXPECT_EXIST;
-    case TsCondition.expectNotExist:
+    case TsConditionRowExistenceExpectation.expectNotExist:
       return tsNodeCommon.rowExistenceExpectation.EXPECT_NOT_EXIST;
   }
-  throw 'condition $condition not supported';
+  throw 'condition $rowExistenceExpecation not supported';
+}
+
+int tsComparatorTypeToNative(TsComparatorType operatorType) {
+  switch (operatorType) {
+    case TsComparatorType.equals:
+      return tsNodeCommon.comparatorType.EQUAL;
+    case TsComparatorType.notEquals:
+      return tsNodeCommon.comparatorType.NOT_EQUAL;
+    case TsComparatorType.greaterThan:
+      return tsNodeCommon.comparatorType.GREATER_THAN;
+    case TsComparatorType.greatorThanOrEquals:
+      return tsNodeCommon.comparatorType.GREATER_EQUAL;
+    case TsComparatorType.lessThan:
+      return tsNodeCommon.comparatorType.LESS_THAN;
+    case TsComparatorType.lessThanOrEquals:
+      return tsNodeCommon.comparatorType.LESS_EQUAL;
+  }
+  throw 'condition $operatorType not supported';
 }

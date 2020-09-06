@@ -14,7 +14,9 @@ export 'src/ts_row.dart'
         TsPutRowResponseExt,
         TsGetRow,
         TsPrimaryKey,
-        TsCondition;
+        TsCondition,
+        TsColumnCondition,
+        TsConditionRowExistenceExpectation;
 export 'src/ts_table.dart'
     show
         TsTableDescription,

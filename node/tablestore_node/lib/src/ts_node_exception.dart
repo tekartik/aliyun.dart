@@ -23,7 +23,7 @@ class TsExceptionNode implements TsException {
   int get code => parseInt(_errMapValue('code'));
 
   @override
-  bool get retryable => parseBool(_errMapValue('retryable'));
+  bool get retryable => parseBool(_errMapValue('retryable')) ?? true;
 
   bool get isNotFound => code == httpStatusCodeNotFound;
   bool get isForbidden403 => code == httpStatusCodeForbidden;

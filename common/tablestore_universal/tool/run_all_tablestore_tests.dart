@@ -2,14 +2,11 @@ import 'package:dev_test/package.dart';
 
 Future main() async {
   for (var dir in [
-    'common/fc',
-    //'common/fc_universal',
-    'common/tablestore',
-    'common/tablestore_sembast',
-    'common/tablestore_universal',
-    //'node/fc_node',
-    'node/tablestore_node',
-    'test/tablestore_test',
+    '../../common/tablestore',
+    '../../common/tablestore_sembast',
+    '../../common/tablestore_universal',
+    '../../node/tablestore_node',
+    '../../test/tablestore_test',
   ]) {
     print('package: $dir');
     await ioPackageRunCi(dir);
