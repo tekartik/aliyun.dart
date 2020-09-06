@@ -295,5 +295,32 @@ void rowTest(TsClient client) {
       var binary = getResponse.toDebugMap()['row']['attributes'][0]['test'];
       expect(binary, const TypeMatcher<Uint8List>());
     });
+
+    test('range', () async {
+      await createKeyStringTable();
+      var key = TsPrimaryKey([TsKeyValue('key', 'range')]);
+      await client.putRow(TsPutRowRequest(
+          tableName: keyStringTable,
+          primaryKey: key,
+          data: [TsAttribute.int('test', 1)]));
+
+      // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
+      var getResponse = await client
+          .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKeys': [
+            {'key': 'binary'}
+          ],
+          'attributes': [
+            {
+              'test': [1, 2, 3]
+            }
+          ]
+        }
+      });
+      var binary = getResponse.toDebugMap()['row']['attributes'][0]['test'];
+      expect(binary, const TypeMatcher<Uint8List>());
+    });
   });
 }

@@ -33,6 +33,7 @@ class TsAttribute extends TsKeyValue {
   TsAttribute(String name, value) : super(name, value);
   TsAttribute.int(String name, int value) : super.int(name, value);
   TsAttribute.long(String name, TsValueLong value) : super.long(name, value);
-  TsAttribute.binary(String name, Uint8List value) : this(name, value);
-  TsAttribute.double(String name, double value) : this(name, value);
+  TsAttribute.binary(String name, Uint8List value) : super.binary(name, value);
+  TsAttribute.double(String name, double value) : super.double(name, value);
+  TsAttribute.string(String name, String value) : super.string(name, value);
 }

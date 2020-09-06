@@ -15,6 +15,28 @@ class TsGetRowRequest {
       this.columns});
 }
 
+class TsKeyBoundary {
+  final TsPrimaryKey value;
+  final bool inclusive;
+
+  TsKeyBoundary(this.value, this.inclusive);
+}
+
+class TsGetRangeRequest {
+  final String tableName;
+  TsKeyBoundary start;
+  TsKeyBoundary end;
+  final List<String> columns;
+
+  TsGetRangeRequest(
+      {@required this.tableName,
+      this.start,
+      this.end,
+
+      /// Optional
+      this.columns});
+}
+
 // Condition for put and delete
 class TsCondition {
   final TsConditionRowExistenceExpectation rowExistenceExpectation;
