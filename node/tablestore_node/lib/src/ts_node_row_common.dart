@@ -51,6 +51,14 @@ Map<String, dynamic> toDeleteRowParams(TsDeleteRowRequest request) {
   return map;
 }
 
+Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
+  var map = Model({
+    if (request.tableName != null) 'tableName': request.tableName,
+    if (request.columns != null) 'columnsToGet': request.columns,
+  });
+  return map;
+}
+
 int tsConditionRowExistenceExpectationToNative(
     TsConditionRowExistenceExpectation rowExistenceExpecation) {
   switch (rowExistenceExpecation) {

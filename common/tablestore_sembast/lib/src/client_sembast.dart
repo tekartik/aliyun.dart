@@ -237,6 +237,12 @@ class TsClientSembast implements TsClient {
       return TsDeleteRowResponseSembast();
     });
   }
+
+  @override
+  Future<TsGetRangeResponse> getRange(TsGetRangeRequest request) async {
+    // TODO: implement getRange
+    throw UnimplementedError();
+  }
 }
 
 class TsGetRowSembast implements TsGetRow {

@@ -149,6 +149,8 @@ abstract class TsPutRowResponse {
 
 abstract class TsDeleteRowResponse {}
 
+abstract class TsGetRangeResponse {}
+
 extension TsGetRowResponseExt on TsGetRowResponse {
   Model toDebugMap() {
     return Model({})..setValue('row', row?.toDebugMap());
@@ -158,6 +160,12 @@ extension TsGetRowResponseExt on TsGetRowResponse {
 extension TsPutRowResponseExt on TsPutRowResponse {
   Model toDebugMap() {
     return Model({})..setValue('row', row?.toDebugMap());
+  }
+}
+
+extension TsGetRangeResponseExt on TsGetRangeResponse {
+  Model toDebugMap() {
+    return Model({});
   }
 }
 

@@ -273,4 +273,14 @@ class TsClientNode with TsClientMixin implements TsClient {
     });
     return deleteRowResponseFromNative(nativeResponseJs);
   }
+
+  @override
+  Future<TsGetRangeResponse> getRange(TsGetRangeRequest request) async {
+    var params = toGetRangeParams(request);
+    var jsParams = tsJsify(params);
+    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+      native.getRow(_debugNativeRequestParams('getRange', jsParams), callback);
+    });
+    return getRangeResponseFromNative(nativeResponseJs);
+  }
 }

@@ -282,6 +282,25 @@ class TsDeleteRowResponseNode implements TsDeleteRowResponse {
    */
 }
 
+class TsGetRangeResponseNode implements TsGetRangeResponse {
+  final TsReadRowResponseJs responseJs;
+  TsGetRangeResponseNode(this.responseJs);
+
+/*
+  @override
+  String toString() => toDebugMap().toString();
+
+   */
+}
+
+// Response to native
+TsGetRangeResponse getRangeResponseFromNative(dynamic nativeResponseJs) {
+  if (nativeResponseJs != null) {
+    return TsGetRangeResponseNode(nativeResponseJs);
+  }
+  return null;
+}
+
 dynamic tsSingleConditionToNative(TsColumnSingleCondition condition) {
   var columnConditionJs = util.callConstructor(
       tablestoreJs.SingleColumnCondition, [

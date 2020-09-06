@@ -36,21 +36,22 @@ void main() {
           TsGetRowRequest(tableName: null, primaryKey: null, columns: null);
       expect(toGetRowParams(getRowRequest), {});
       getRowRequest = TsGetRowRequest(
-          tableName: 'test', primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]));
+          tableName: 'test',
+          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]));
       expect(toGetRowParams(getRowRequest), {
         'tableName': 'test',
         'primaryKey': [
-          {'key': 1}
+          {'key': TsValueLong.fromNumber(1)}
         ]
       });
       getRowRequest = TsGetRowRequest(
           tableName: 'test',
-          primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]),
+          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
           columns: ['col1', 'col2']);
       expect(toGetRowParams(getRowRequest), {
         'tableName': 'test',
         'primaryKey': [
-          {'key': 1}
+          {'key': TsValueLong.fromNumber(1)}
         ],
         'columnsToGet': ['col1', 'col2']
       });
@@ -65,27 +66,28 @@ void main() {
       });
 
       r = TsPutRowRequest(
-          tableName: 'test', primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]));
+          tableName: 'test',
+          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]));
       expect(toPutRowParams(r), {
         'tableName': 'test',
         'condition': TsCondition.ignore,
         'primaryKey': [
-          {'key': 1}
+          {'key': TsValueLong.fromNumber(1)},
         ],
         'returnContent': {'returnType': 1}
       });
       r = TsPutRowRequest(
           tableName: 'test',
-          primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]),
-          data: [TsAttribute('col1', 1), TsAttribute('col2', 'value')]);
+          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
+          data: [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')]);
       expect(toPutRowParams(r), {
         'condition': TsCondition.ignore,
         'tableName': 'test',
         'primaryKey': [
-          {'key': 1}
+          {'key': TsValueLong.fromNumber(1)}
         ],
         'attributeColumns': [
-          {'col1': 1},
+          {'col1': TsValueLong.fromNumber(1)},
           {'col2': 'value'}
         ],
         'returnContent': {'returnType': 1}
