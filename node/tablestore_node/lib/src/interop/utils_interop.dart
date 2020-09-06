@@ -1,19 +1,29 @@
+import 'dart:typed_data';
+
 import 'package:js/js_util.dart' as util;
+import 'package:node_interop/node_interop.dart' as node;
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 
 import 'js_node_interop.dart' as js;
 
 /// Returns Dart representation from JS Object.
-dynamic tsDartify(Object jsObject) {
-  // devPrint('js: ${jsObjectAsMap(jsObject)}');
+dynamic tsDartifyValue(Object jsObject) {
+  // devPrint('js: ${jsObjectAsCollection(jsObject)}');
   if (_isBasicType(jsObject)) {
     return jsObject;
   }
 
+  // Handle Buffer
+  if (jsObject is Uint8List) {
+    return jsObject;
+  }
   // Handle list
   if (jsObject is Iterable) {
-    return jsObject.map(tsDartify).toList();
+    // It is a Blob!
+    // return jsObject.map(tsDartifyValue).toList();
+    // No!
+    throw ArgumentError.value(jsObject, 'list not supported');
   }
   var jsLong = js.dartifyValueLong(jsObject);
   if (jsLong != null) {
@@ -64,7 +74,7 @@ Map<String, dynamic> dartifyMap(Object jsObject) {
   var keys = js.objectKeys(jsObject);
   var map = <String, dynamic>{};
   for (var key in keys) {
-    map[key] = tsDartify(util.getProperty(jsObject, key));
+    map[key] = tsDartifyValue(util.getProperty(jsObject, key));
   }
   return map;
 }
@@ -79,6 +89,11 @@ dynamic tsJsify(Object dartObject) {
     return dartObject;
   }
 
+  // Test before list
+  if (dartObject is Uint8List) {
+    // devPrint('blob $dartObject');
+    return node.Buffer.from(dartObject);
+  }
   /*if (dartObject is DateTime) {
     return TimestampJsImpl.fromMillis(dartObject.millisecondsSinceEpoch);
   }

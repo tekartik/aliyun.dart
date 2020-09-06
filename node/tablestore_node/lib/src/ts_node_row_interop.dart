@@ -238,13 +238,13 @@ class TsGetRowNode implements TsGetRow {
   @override
   TsPrimaryKey get primaryKey =>
       TsPrimaryKey(rowPrimaryKeyValuesJs(rowJs).map((kvJs) {
-        return TsKeyValue(kvJs.name, tsDartify(kvJs.value));
+        return TsKeyValue(kvJs.name, tsDartifyValue(kvJs.value));
       }).toList());
 
   @override
   List<TsAttribute> get attributes =>
       rowAttributeKeyValuesJs(rowJs).map((kvJs) {
-        return TsAttribute(kvJs.columnName, tsDartify(kvJs.columnValue));
+        return TsAttribute(kvJs.columnName, tsDartifyValue(kvJs.columnValue));
       }).toList();
 }
 

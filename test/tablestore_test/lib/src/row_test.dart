@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:tekartik_aliyun_tablestore_test/tablestore_test.dart';
 import 'package:tekartik_aliyun_tablestore_universal/tablestore_universal.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
@@ -264,6 +266,34 @@ void rowTest(TsClient client) {
         expect(TsValueLong.fromNumber(long.toNumber()).toString(),
             '90071992547409910');
       }
+    });
+
+    test('binary', () async {
+      await createKeyStringTable();
+      var key = TsPrimaryKey([TsKeyValue('key', 'binary')]);
+      var buffer = Uint8List.fromList([1, 2, 3]);
+      await client.putRow(TsPutRowRequest(
+          tableName: keyStringTable,
+          primaryKey: key,
+          data: [TsAttribute.binary('test', buffer)]));
+
+      // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
+      var getResponse = await client
+          .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKeys': [
+            {'key': 'binary'}
+          ],
+          'attributes': [
+            {
+              'test': [1, 2, 3]
+            }
+          ]
+        }
+      });
+      var binary = getResponse.toDebugMap()['row']['attributes'][0]['test'];
+      expect(binary, const TypeMatcher<Uint8List>());
     });
   });
 }
