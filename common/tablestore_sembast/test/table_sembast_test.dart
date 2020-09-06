@@ -43,8 +43,8 @@ void tablesTest(TsClientOptions options) {
               tableMeta: TsTableDescriptionTableMeta(
                   tableName: tableName,
                   primaryKeys: [
-                TsPrimaryKey(name: 'gid', type: TsColumnType.integer),
-                TsPrimaryKey(name: 'uid', type: TsColumnType.integer)
+                TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+                TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
               ])));
     }
     names = await client.listTableNames();

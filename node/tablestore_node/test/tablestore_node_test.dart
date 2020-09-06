@@ -1,8 +1,8 @@
+@TestOn('node')
 import 'dart:js_util';
 
-@TestOn('node')
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
-import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/import_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_shim.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/universal/ts_node_universal.dart';

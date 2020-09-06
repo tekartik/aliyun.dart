@@ -31,8 +31,8 @@ void tablesTest(TsClient client) {
             tableMeta: TsTableDescriptionTableMeta(
                 tableName: create1Table,
                 primaryKeys: [
-                  TsPrimaryKey(name: 'gid', type: TsColumnType.integer),
-                  TsPrimaryKey(name: 'uid', type: TsColumnType.integer)
+                  TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+                  TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
                 ]),
             reservedThroughput: tableCreateReservedThroughputDefault,
             tableOptions: tableCreateOptionsDefault);
@@ -75,10 +75,10 @@ void tablesTest(TsClient client) {
       var description = TsTableDescription(
           tableMeta:
               TsTableDescriptionTableMeta(tableName: workTable, primaryKeys: [
-            TsPrimaryKey(name: 'key1', type: TsColumnType.string),
-            TsPrimaryKey(name: 'key2', type: TsColumnType.integer),
-            TsPrimaryKey(name: 'key3', type: TsColumnType.string),
-            TsPrimaryKey(name: 'key4', type: TsColumnType.integer),
+            TsPrimaryKeyDef(name: 'key1', type: TsColumnType.string),
+            TsPrimaryKeyDef(name: 'key2', type: TsColumnType.integer),
+            TsPrimaryKeyDef(name: 'key3', type: TsColumnType.string),
+            TsPrimaryKeyDef(name: 'key4', type: TsColumnType.integer),
           ]),
           reservedThroughput: tableCreateReservedThroughputDefault,
           tableOptions: tableCreateOptionsDefault);

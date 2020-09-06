@@ -3,6 +3,7 @@ import 'package:sembast/sembast.dart';
 import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
 import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_sembast/src/client_sembast_exception.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/src/tablestore_sembast.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 
@@ -29,7 +30,7 @@ Future<TsTableDescriptionTableMeta> getTableMeta(
   var tableMetaRecord = getTableMetaRecord(tableName);
   var tableMetaRaw = await tableMetaRecord.get(client);
   if (tableMetaRaw == null) {
-    throw TsException('table $tableName does not exists');
+    throw TsExceptionSembast(message: 'table $tableName does not exists');
   }
   return TsTableDescriptionTableMeta.fromMap(tableMetaRaw);
 }
@@ -40,7 +41,7 @@ Future<TsTableContextSembast> getTableContext(
   var tableMetaRecord = getTableMetaRecord(tableName);
   var tableMetaRaw = await tableMetaRecord.get(client);
   if (tableMetaRaw == null) {
-    throw TsException('table $tableName does not exists');
+    throw TsExceptionSembast(message: 'table $tableName does not exists');
   }
   return TsTableContextSembast(
       client, TsTableDescriptionTableMeta.fromMap(tableMetaRaw));
@@ -95,7 +96,7 @@ class TsClientSembast implements TsClient {
         tableNames.remove(name);
         await tablesMetaRecord.put(txn, tableNames);
       } else {
-        throw TsException('table $name not found');
+        throw TsExceptionSembast(message: 'table $name not found');
       }
     });
   }
@@ -124,7 +125,7 @@ class TsClientSembast implements TsClient {
                     tableOptions: description.tableOptions)
                 .toMap());
       } else {
-        throw TsException('table $name already exists');
+        throw TsExceptionSembast(message: 'table $name already exists');
       }
     });
   }
@@ -145,7 +146,7 @@ class TsClientSembast implements TsClient {
       var tableMetaRaw = await tableMetaRecord.get(txn);
       TsTableDescription extra;
       if (tableMetaRaw == null) {
-        throw TsException('table $tableName does not exists');
+        throw TsExceptionSembast(message: 'table $tableName does not exists');
       }
       var tableExtraRaw = await tableExtraRecord.get(txn);
       if (tableExtraRaw != null) {
@@ -164,11 +165,10 @@ class TsClientSembast implements TsClient {
   Future<TsGetRowResponse> getRow(TsGetRowRequest request) async {
     return await (await _db).transaction((txn) async {
       var table = await getTableContext(txn, request.tableName);
-      var row = table.row(request.primaryKeys);
+      var row = table.row(request.primaryKey);
       var record = row.record();
       var result = await record.get();
-      return TsGetRowResponseSembast(
-          row, result.primaryKeys, result.attributes);
+      return TsGetRowResponseSembast(row, result.primaryKey, result.attributes);
       /*
       var tableExtraRaw = await tableExtraRecord.get(txn);
       if (tableExtraRaw != null) {
@@ -188,7 +188,7 @@ class TsClientSembast implements TsClient {
   Future<TsPutRowResponse> putRow(TsPutRowRequest request) async {
     return await (await _db).transaction((txn) async {
       var table = await getTableContext(txn, request.tableName);
-      var row = table.row(request.primaryKeys);
+      var row = table.row(request.primaryKey);
       var record = row.record(request.data);
       // TODO for now simply delete and put, handle merge!
       await record.delete();
@@ -196,13 +196,19 @@ class TsClientSembast implements TsClient {
       return TsPutRowResponseSembast(row);
     });
   }
+
+  @override
+  Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request) {
+    // TODO: implement deleteRow
+    throw UnimplementedError();
+  }
 }
 
 class TsGetRowSembast implements TsGetRow {
-  TsGetRowSembast(this.primaryKeys, this.attributes);
+  TsGetRowSembast(this.primaryKey, this.attributes);
 
   @override
-  final List<TsKeyValue> primaryKeys;
+  final TsPrimaryKey primaryKey;
   @override
   final List<TsAttribute> attributes;
 }
@@ -226,8 +232,8 @@ class TsTableContextSembast {
   List<String> get primaryKeyNames =>
       tableMeta.primaryKeys.map((e) => e.name).toList(growable: false);
 
-  TsRowContextSembast row(List<TsKeyValue> primaryKeys) {
-    return TsRowContextSembast(this, primaryKeys);
+  TsRowContextSembast row(TsPrimaryKey primaryKey) {
+    return TsRowContextSembast(this, primaryKey);
   }
 }
 
@@ -258,7 +264,7 @@ class TsRowRecordContextSembast {
   List<KeyValueSembast> _sembastAttributes;
 
   List<KeyValueSembast> get sembastPrimaryKeys => _sembastPrimaryKeys ??= () {
-        return toSembastKeyValues(row.primaryKeys);
+        return toSembastKeyValues(row.primaryKey.list);
       }();
 
   List<KeyValueSembast> get sembastAttributes => _sembastAttributes ??= () {
@@ -306,7 +312,7 @@ class TsRowRecordContextSembast {
   }
 
   // Return the primary key
-  Future<List<TsKeyValue>> put() async {
+  Future<TsPrimaryKey> put() async {
     _data.clear();
     _keys.clear();
     _add(sembastPrimaryKeys);
@@ -316,7 +322,7 @@ class TsRowRecordContextSembast {
 
     // ignore: unused_local_variable
     var result = await table.store.add(table.client, _data);
-    return row.primaryKeys;
+    return row.primaryKey;
   }
 
   TsRowRecordContextSembast(this.row, [this.attributes]);
@@ -345,9 +351,9 @@ class TsRowRecordContextSembast {
     var id = await findKey();
     if (id != null) {
       var result = await table.store.record(id).get(table.client);
-      var primaryKeys = read(result, table.primaryKeyNames);
+      var primaryKey = TsPrimaryKey(read(result, table.primaryKeyNames));
       var attributes = readAttributesBut(result, table.primaryKeyNames);
-      return TsGetRowSembast(primaryKeys, attributes);
+      return TsGetRowSembast(primaryKey, attributes);
     }
     return null;
   }
@@ -355,9 +361,9 @@ class TsRowRecordContextSembast {
 
 class TsRowContextSembast {
   final TsTableContextSembast table;
-  final List<TsKeyValue> primaryKeys;
+  final TsPrimaryKey primaryKey;
 
-  TsRowContextSembast(this.table, this.primaryKeys);
+  TsRowContextSembast(this.table, this.primaryKey);
 
   /// Null record for get
   TsRowRecordContextSembast record([List<TsAttribute> attributes]) =>
@@ -367,14 +373,14 @@ class TsRowContextSembast {
 class TsGetRowResponseSembast extends TsReadRowResponseSembast
     implements TsGetRowResponse {
   final List<TsAttribute> attributes;
-  final List<TsKeyValue> primaryKeys;
+  final TsPrimaryKey primaryKey;
 
   TsGetRowResponseSembast(
-      TsRowContextSembast rowContext, this.primaryKeys, this.attributes)
+      TsRowContextSembast rowContext, this.primaryKey, this.attributes)
       : super(rowContext);
 
   @override
-  TsGetRow get row => TsGetRowSembast(primaryKeys, attributes);
+  TsGetRow get row => TsGetRowSembast(primaryKey, attributes);
 }
 
 class TsReadRowResponseSembast {
@@ -382,7 +388,7 @@ class TsReadRowResponseSembast {
 
   TsReadRowResponseSembast(this.rowContext);
 
-  TsGetRow get row => TsGetRowSembast(rowContext.primaryKeys, []);
+  TsGetRow get row => TsGetRowSembast(rowContext.primaryKey, []);
 }
 
 class TsPutRowResponseSembast extends TsReadRowResponseSembast

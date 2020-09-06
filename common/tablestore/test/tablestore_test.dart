@@ -1,21 +1,20 @@
-import 'package:tekartik_aliyun_tablestore/src/ts_client.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('tablestore', () {
     test('key', () {
-      var key = TsPrimaryKey();
+      var key = TsPrimaryKeyDef();
       expect(key.toMap(), {});
-      key = TsPrimaryKey.fromMap(key.toMap());
+      key = TsPrimaryKeyDef.fromMap(key.toMap());
       expect(key.toMap(), {});
 
-      key = TsPrimaryKey(
+      key = TsPrimaryKeyDef(
           name: 'id', type: TsColumnType.integer, autoIncrement: true);
 
       expect(key.toMap(),
           {'name': 'id', 'type': 'integer', 'autoIncrement': true});
-      key = TsPrimaryKey.fromMap(key.toMap());
+      key = TsPrimaryKeyDef.fromMap(key.toMap());
       expect(key.toMap(),
           {'name': 'id', 'type': 'integer', 'autoIncrement': true});
     });
@@ -24,8 +23,8 @@ void main() {
           tableMeta: TsTableDescriptionTableMeta(
               tableName: 'test_create1',
               primaryKeys: [
-                TsPrimaryKey(name: 'gid', type: TsColumnType.integer),
-                TsPrimaryKey(name: 'uid', type: TsColumnType.integer)
+                TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+                TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
               ]),
           reservedThroughput: tableCreateReservedThroughputDefault,
           tableOptions: tableCreateOptionsDefault);

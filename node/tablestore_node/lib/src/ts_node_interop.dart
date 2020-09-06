@@ -2,15 +2,14 @@
 library tekartik_aliyun_tablestore_node.ts_interop;
 
 import 'package:js/js.dart';
+
 import 'package:node_interop/node_interop.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_exception.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_interop.dart'
     show PrimaryKeyTypeJs, TsClientListTableParamsJs, TsClientTableParamsJs;
 
-import 'package:tekartik_common_utils/int_utils.dart';
-import 'package:tekartik_http/http.dart';
-
-import 'import.dart';
+import 'import_interop.dart';
 
 bool debugTs = true; // devWarning(true); true for now until it works
 
@@ -58,36 +57,9 @@ abstract class TablestoreJs {
   external dynamic get Condition;
 }
 
-// JS:
-// {"message":"\n\u0011OTSObjectNotExist\u0012\u001fRequested table does not exist.","code":404,"headers":{"date":"Fri, 04 Sep 2020 08:20:18 GMT","transfer-encoding":"chunked","connection":"keep-alive","authorization":"OTS LTAI4GCzUBNEhUsjDMwxrpHs:mE9Ca6pH7IeIqUxFyOblMZVj9Lg=","x-ots-contentmd5":"e2enEqtXyX/3YTqhbiPDtw==","x-ots-contenttype":"protocol buffer","x-ots-date":"2020-09-04T08:20:18.991322Z","x-ots-requestid":"0005ae78-8a0d-52c0-e6c1-720b05604f7b"},"time":{},"retryable":false}
-class TablestoreNodeException implements Exception {
-  final String _message;
-  final Map /*?*/ map;
-
-  String get message =>
-      _message ?? _errMapValue('message')?.toString() ?? 'error';
-
-  dynamic _errMapValue(String key) => map != null ? map[key] : null;
-
-  // Message can be null
-  TablestoreNodeException({String /*?*/ message, this.map /*?*/
-      })
-      : _message = message;
-
-  // TableStoreNodeException(404:OTSObjec
-  int get code => parseInt(_errMapValue('code'));
-
-  bool get retryable => parseBool(_errMapValue('retryable'));
-
-  bool get isNotFound => code == httpStatusCodeNotFound;
-
-  @override
-  String toString() => 'TableStoreNodeException($message, $map)';
-}
-
 /// Wrap a native error
-TablestoreNodeException wrapNativeError(dynamic err) {
-  if (err is TablestoreNodeException) {
+TsExceptionNode wrapNativeError(dynamic err) {
+  if (err is TsExceptionNode) {
     return err;
   }
   Map errMap;
@@ -106,7 +78,7 @@ TablestoreNodeException wrapNativeError(dynamic err) {
       print('TS!: err: ${nativeDataToDebugString(err)}');
     }
   }
-  return TablestoreNodeException(message: message, map: errMap);
+  return TsExceptionNode(message: message, map: errMap);
 }
 
 @JS()
@@ -119,6 +91,8 @@ class TsClientJs {
   external void describeTable(TsClientTableParamsJs params, Function callback);
 
   external void putRow(dynamic params, Function callback);
+
+  external void deleteRow(dynamic params, Function callback);
 
   external void getRow(dynamic params, Function callback);
 

@@ -1,15 +1,18 @@
 import 'dart:js';
 import 'dart:js_util';
 
+import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_exception.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_interop.dart';
 import 'import.dart';
+import 'import_interop.dart';
 import 'interop/utils.dart';
 
 final tablestoreNode = TablestoreNode();
@@ -159,7 +162,7 @@ class TsClientNode with TsClientMixin implements TsClient {
         return await _nativeSingleOperationWithCallback(action);
       } catch (e) {
         // Do not retry if reponse says so
-        if (e is TablestoreNodeException && !e.retryable) {
+        if (e is TsExceptionNode && !e.retryable) {
           rethrow;
         }
         // Retry right away then in 1s
@@ -174,7 +177,7 @@ class TsClientNode with TsClientMixin implements TsClient {
         }
       }
     }
-    throw TablestoreNodeException(message: 'timeout');
+    throw TsExceptionNode(message: 'timeout');
   }
 
   /// The return value is native
@@ -249,5 +252,16 @@ class TsClientNode with TsClientMixin implements TsClient {
       native.putRow(_debugNativeRequestParams('putRow', jsParams), callback);
     });
     return putRowResponseFromNative(nativeResponseJs);
+  }
+
+  @override
+  Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request) async {
+    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+      var params = toDeleteRowParams(request);
+      var jsParams = tsJsify(params);
+      native.deleteRow(
+          _debugNativeRequestParams('deleteRow', jsParams), callback);
+    });
+    return deleteRowResponseFromNative(nativeResponseJs);
   }
 }

@@ -211,12 +211,12 @@ TsTableDescription tableDescriptionFromNative(dynamic nativeDesc) {
     TsTableDescriptionOptions tableOptions;
     TsTableDescriptionReservedThroughput reservedThroughPut;
     if (nativeTableMeta != null) {
-      List<TsPrimaryKey> primaryKeys;
+      List<TsPrimaryKeyDef> primaryKeys;
       var nativePrimaryKeys = tableMetaPrimaryKeys(nativeTableMeta);
       if (nativePrimaryKeys != null) {
-        primaryKeys = <TsPrimaryKey>[];
+        primaryKeys = <TsPrimaryKeyDef>[];
         nativePrimaryKeys.forEach((element) {
-          primaryKeys.add(TsPrimaryKey(
+          primaryKeys.add(TsPrimaryKeyDef(
               type: nativeTypeToColumnType(element.type), name: element.name));
         });
       }

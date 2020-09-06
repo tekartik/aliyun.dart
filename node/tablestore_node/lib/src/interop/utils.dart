@@ -1,7 +1,7 @@
 import 'package:js/js_util.dart' as util;
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
-import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 
 import 'js_node_interop.dart' as js;
 
@@ -93,31 +93,9 @@ dynamic tsJsify(Object dartObject) {
   }
 
   if (dartObject is TsCondition) {
-    return util.callConstructor(tablestoreJs.Condition,
-        [tablestoreNode.rowExistenceExpectation.IGNORE, null]);
+    return util.callConstructor(
+        tablestoreJs.Condition, [tsConditionToNative(dartObject), null]);
   }
-  /*
-
-  if (dartObject is DocumentReference) {
-    return dartObject.jsObject;
-  }
-
-  if (dartObject is FieldValue) {
-    return jsifyFieldValue(dartObject);
-  }
-
-  if (dartObject is Blob) {
-    return dartObject;
-  }
-
-  // NOTE: if the firestore JS lib is not imported, we'll get a DDC warning here
-  if (dartObject is GeoPoint) {
-    return dartObject;
-  }
-
-  if (dartObject is Function) {
-    return allowInterop(dartObject);
-  }*/
 
   print('Could not convert type ${dartObject?.runtimeType}, value $dartObject');
   throw ArgumentError.value(dartObject, 'dartObject', 'Could not convert');

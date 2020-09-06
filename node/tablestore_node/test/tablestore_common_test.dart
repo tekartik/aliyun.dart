@@ -1,4 +1,5 @@
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_exception.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
 import 'package:test/test.dart';
@@ -10,8 +11,8 @@ void main() {
           tableMeta: TsTableDescriptionTableMeta(
               tableName: 'test_create1',
               primaryKeys: [
-                TsPrimaryKey(name: 'gid', type: TsColumnType.integer),
-                TsPrimaryKey(name: 'uid', type: TsColumnType.integer)
+                TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+                TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
               ]),
           reservedThroughput: tableCreateReservedThroughputDefault,
           tableOptions: tableCreateOptionsDefault);
@@ -32,10 +33,10 @@ void main() {
 
     test('toGetRowParams', () {
       var getRowRequest =
-          TsGetRowRequest(tableName: null, primaryKeys: null, columns: null);
+          TsGetRowRequest(tableName: null, primaryKey: null, columns: null);
       expect(toGetRowParams(getRowRequest), {});
       getRowRequest = TsGetRowRequest(
-          tableName: 'test', primaryKeys: [TsKeyValue('key', 1)]);
+          tableName: 'test', primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]));
       expect(toGetRowParams(getRowRequest), {
         'tableName': 'test',
         'primaryKey': [
@@ -44,7 +45,7 @@ void main() {
       });
       getRowRequest = TsGetRowRequest(
           tableName: 'test',
-          primaryKeys: [TsKeyValue('key', 1)],
+          primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]),
           columns: ['col1', 'col2']);
       expect(toGetRowParams(getRowRequest), {
         'tableName': 'test',
@@ -56,14 +57,14 @@ void main() {
     });
 
     test('toPutRowParams', () {
-      var r = TsPutRowRequest(tableName: null, primaryKeys: null, data: null);
+      var r = TsPutRowRequest(tableName: null, primaryKey: null, data: null);
 
       expect(toPutRowParams(r), {
         'returnContent': {'returnType': 1}
       });
 
       r = TsPutRowRequest(
-          tableName: 'test', primaryKeys: [TsKeyValue('key', 1)]);
+          tableName: 'test', primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]));
       expect(toPutRowParams(r), {
         'tableName': 'test',
         'primaryKey': [
@@ -73,7 +74,7 @@ void main() {
       });
       r = TsPutRowRequest(
           tableName: 'test',
-          primaryKeys: [TsKeyValue('key', 1)],
+          primaryKey: TsPrimaryKey([TsKeyValue('key', 1)]),
           data: [TsAttribute('col1', 1), TsAttribute('col2', 'value')]);
       expect(toPutRowParams(r), {
         'tableName': 'test',
@@ -83,6 +84,12 @@ void main() {
         'attributeColumns': {'col1': 1, 'col2': 'value'},
         'returnContent': {'returnType': 1}
       });
+    });
+
+    test('Exception', () {
+      var exception = TsExceptionNode(
+          map: {'code': 403, 'message': '\u0017Condition check failed.'});
+      expect(exception.isConditionFailedError, isTrue);
     });
   });
 }

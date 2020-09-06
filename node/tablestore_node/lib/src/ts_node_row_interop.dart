@@ -2,8 +2,6 @@
 library tekartik_aliyun_tablestore_node.ts_row_interop;
 
 import 'package:js/js.dart';
-import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
-import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/interop/utils.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
@@ -121,6 +119,14 @@ TsPutRowResponse putRowResponseFromNative(dynamic nativeResponseJs) {
   return null;
 }
 
+// Response to native
+TsDeleteRowResponse deleteRowResponseFromNative(dynamic nativeResponseJs) {
+  if (nativeResponseJs != null) {
+    return TsDeleteRowResponseNode(nativeResponseJs);
+  }
+  return null;
+}
+
 //
 // Get Row
 //
@@ -196,9 +202,10 @@ class TsGetRowNode implements TsGetRow {
   TsGetRowNode(this.rowJs);
 
   @override
-  List<TsKeyValue> get primaryKeys => rowPrimaryKeyValuesJs(rowJs).map((kvJs) {
+  TsPrimaryKey get primaryKey =>
+      TsPrimaryKey(rowPrimaryKeyValuesJs(rowJs).map((kvJs) {
         return TsKeyValue(kvJs.name, tsDartify(kvJs.value));
-      }).toList();
+      }).toList());
 
   @override
   List<TsAttribute> get attributes =>
@@ -229,4 +236,14 @@ class TsPutRowResponseNode extends TsReadRowResponseNode
 
   @override
   String toString() => toDebugMap().toString();
+}
+
+class TsDeleteRowResponseNode implements TsDeleteRowResponse {
+  TsDeleteRowResponseNode(TsReadRowResponseJs responseJs);
+
+/*
+  @override
+  String toString() => toDebugMap().toString();
+
+   */
 }
