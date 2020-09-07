@@ -10,6 +10,7 @@ import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 
+// ignore_for_file: non_constant_identifier_names
 @JS()
 @anonymous
 abstract class TsRowExistenceExpectationJs
@@ -148,7 +149,7 @@ class TsPutRowParamsJs {}
 // Response to native
 TsPutRowResponse putRowResponseFromNative(dynamic nativeResponseJs) {
   if (nativeResponseJs != null) {
-    return TsPutRowResponseNode(nativeResponseJs);
+    return TsPutRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
   }
   return null;
 }
@@ -156,7 +157,7 @@ TsPutRowResponse putRowResponseFromNative(dynamic nativeResponseJs) {
 // Response to native
 TsDeleteRowResponse deleteRowResponseFromNative(dynamic nativeResponseJs) {
   if (nativeResponseJs != null) {
-    return TsDeleteRowResponseNode(nativeResponseJs);
+    return TsDeleteRowResponseNode();
   }
   return null;
 }
@@ -225,7 +226,7 @@ Iterable<TsRowAttributeKeyValueJs> rowAttributeKeyValuesJs(TsReadRowJs js) =>
 // Response to native
 TsGetRowResponse getRowResponseFromNative(dynamic nativeResponseJs) {
   if (nativeResponseJs != null) {
-    return TsGetRowResponseNode(nativeResponseJs);
+    return TsGetRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
   }
   return null;
 }
@@ -273,17 +274,11 @@ class TsPutRowResponseNode extends TsReadRowResponseNode
 }
 
 class TsDeleteRowResponseNode implements TsDeleteRowResponse {
-  TsDeleteRowResponseNode(TsReadRowResponseJs responseJs);
-
-/*
-  @override
-  String toString() => toDebugMap().toString();
-
-   */
+  TsDeleteRowResponseNode();
 }
 
 class TsGetRangeResponseNode implements TsGetRangeResponse {
-  final TsReadRowResponseJs responseJs;
+  final dynamic responseJs;
   TsGetRangeResponseNode(this.responseJs);
 
 /*

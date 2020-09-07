@@ -8,6 +8,8 @@ import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_interop.dart'
     show PrimaryKeyTypeJs, TsClientListTableParamsJs, TsClientTableParamsJs;
 
+// ignore_for_file: non_constant_identifier_names
+
 import 'import_interop.dart';
 
 bool debugTs = true; // devWarning(true); true for now until it works

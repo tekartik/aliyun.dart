@@ -1,7 +1,7 @@
 import 'dart:js';
 import 'dart:js_util';
 
-import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
+import 'package:tekartik_aliyun_tablestore/src/ts_row.dart'; // ignore: implementation_imports
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
@@ -44,7 +44,7 @@ class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
     // Key types: {INTEGER: 1, STRING: 2, BINARY: 3}
     // devPrint('Key types: ${jsObjectAsMap(getProperty(_tablestoreJs, 'PrimaryKeyType'))}');
 
-    return TsClientNode(nativeClient);
+    return TsClientNode(nativeClient as TsClientJs);
   }
 
   @override

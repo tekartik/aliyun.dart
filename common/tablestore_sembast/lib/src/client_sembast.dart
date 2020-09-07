@@ -1,10 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:path/path.dart';
-import 'package:sembast/sembast.dart';
 import 'package:sembast/blob.dart';
-import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
-import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
+import 'package:sembast/sembast.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/src/client_sembast_exception.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/src/tablestore_sembast.dart';
@@ -405,7 +403,7 @@ class TsRowRecordContextSembast {
     map.forEach((key, value) {
       if (!names.contains(key)) {
         var value = sembastValueToValue(map[key]);
-        list.add(TsAttribute(key, value));
+        list.add(TsAttribute(key as String, value));
       }
     });
     return list;

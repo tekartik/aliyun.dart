@@ -6,6 +6,7 @@ import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
 
+// ignore_for_file: non_constant_identifier_names
 @JS()
 @anonymous
 // // Key types: {INTEGER: 1, STRING: 2, BINARY: 3}

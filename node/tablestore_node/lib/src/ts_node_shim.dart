@@ -1,5 +1,6 @@
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 
+// ignore_for_file: non_constant_identifier_names
 class TsConstantPrimaryKeyShim implements TsConstantPrimaryKey {
   @override
   int get INTEGER => 1;

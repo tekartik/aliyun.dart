@@ -8,8 +8,8 @@ Future main() async {
     'common/tablestore_sembast',
     'common/tablestore_universal',
     //'node/fc_node',
-    'node/tablestore_node',
-    'test/tablestore_test',
+    //'node/tablestore_node',
+    //'test/tablestore_test',
   ]) {
     print('package: $dir');
     await ioPackageRunCi(dir);

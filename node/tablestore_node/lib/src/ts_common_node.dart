@@ -1,6 +1,8 @@
 // {'INTEGER': 1, 'STRING': 2, 'BINARY': 3}
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 
+// ignore_for_file: non_constant_identifier_names
+
 abstract class TsConstantPrimaryKey {
   int get INTEGER;
 
