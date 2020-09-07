@@ -1,11 +1,6 @@
-import 'package:tekartik_aliyun_tablestore_test/tablestore_test.dart';
-import 'package:tekartik_aliyun_tablestore_universal/tablestore_universal.dart';
+import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:test/test.dart';
-
-void main() {
-  tablesTest(tsClientTest);
-}
 
 void tablesTest(TsClient client) {
   group('table', () {

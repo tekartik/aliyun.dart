@@ -1,4 +1,4 @@
-import 'package:tekartik_aliyun_tablestore_test/tablestore_test.dart';
+import 'package:tekartik_aliyun_tablestore_universal_test/tablestore_test.dart';
 import 'package:tekartik_app_node_utils/node_utils.dart';
 import 'package:test/test.dart';
 

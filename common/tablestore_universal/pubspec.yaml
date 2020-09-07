@@ -7,7 +7,23 @@ environment:
 
 dependencies:
   tekartik_aliyun_tablestore:
-    path: ../tablestore
+    git:
+      url: git://github.com/tekartik/aliyun.dart
+      path: common/tablestore
+      ref: dart2
+    version: '>=0.1.0'
+  tekartik_aliyun_tablestore_node:
+    git:
+      url: git://github.com/tekartik/aliyun.dart
+      path: node/tablestore_node
+      ref: dart2
+    version: '>=0.1.0'
+  tekartik_aliyun_tablestore_sembast:
+    git:
+      url: git://github.com/tekartik/aliyun.dart
+      path: common/tablestore_sembast
+      ref: dart2
+    version: '>=0.1.0'
   dev_test: '>=0.13.3-dev.1'
   tekartik_app_node_build:
     git:
@@ -15,10 +31,6 @@ dependencies:
       path: app_build
       ref: dart2
     version: '>=0.1.0'
-  tekartik_aliyun_tablestore_node:
-    path: ../../node/tablestore_node
-  tekartik_aliyun_tablestore_sembast:
-    path: ../../common/tablestore_sembast
 
 dev_dependencies:
   pedantic: ^1.9.0
@@ -26,3 +38,11 @@ dev_dependencies:
   # Needed direct node dependencies
   build_node_compilers:
   build_runner:
+
+dependency_overrides:
+  tekartik_aliyun_tablestore:
+    path: ../tablestore
+  tekartik_aliyun_tablestore_node:
+    path: ../../node/tablestore_node
+  tekartik_aliyun_tablestore_sembast:
+    path: ../../common/tablestore_sembast
