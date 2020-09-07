@@ -75,6 +75,9 @@ class TsNodeCommonShim implements TsNodeCommon {
   @override
   TsConstantLogicalOperator get logicalOperator =>
       TsConstantLogicalOperatorShim();
+
+  @override
+  TsConstantDirection get direction => TsConstantDirectionShim();
 }
 
 class TsConstantComparatorTypeShim implements TsConstantComparatorType {
@@ -106,6 +109,14 @@ class TsConstantLogicalOperatorShim implements TsConstantLogicalOperator {
 
   @override
   int get OR => 3;
+}
+
+class TsConstantDirectionShim implements TsConstantDirection {
+  @override
+  String get BACKWARD => 'BACKWARD';
+
+  @override
+  String get FORWARD => 'FORWARD';
 }
 
 final tsNodeCommonShim = TsNodeCommonShim();

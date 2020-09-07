@@ -9,6 +9,7 @@ import 'package:tekartik_aliyun_tablestore_node/src/interop/utils_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore.dart';
 
 // ignore_for_file: non_constant_identifier_names
 @JS()
@@ -30,14 +31,19 @@ abstract class TsRowExistenceExpectationJs
 abstract class TsConstantComparatorTypeJs implements TsConstantComparatorType {
   @override
   external int get EQUAL;
+
   @override
   external int get NOT_EQUAL;
+
   @override
   external int get GREATER_THAN;
+
   @override
   external int get GREATER_EQUAL;
+
   @override
   external int get LESS_THAN;
+
   @override
   external int get LESS_EQUAL;
 }
@@ -54,6 +60,16 @@ abstract class TsConstantLogicalOperatorJs
 
   @override
   external int get OR;
+}
+
+@JS()
+@anonymous
+abstract class TsConstantDirectionJs implements TsConstantDirection {
+  @override
+  external String get FORWARD;
+
+  @override
+  external String get BACKWARD;
 }
 
 @JS()
@@ -211,6 +227,12 @@ class TsReadRowResponseJs {
 
 @JS()
 @anonymous
+class TsGetRangeResponseJs {
+  external List get rows;
+}
+
+@JS()
+@anonymous
 class TsReadRowJs {
   external List get primaryKey;
 
@@ -278,18 +300,19 @@ class TsDeleteRowResponseNode implements TsDeleteRowResponse {
 }
 
 class TsGetRangeResponseNode implements TsGetRangeResponse {
-  final dynamic responseJs;
+  final TsGetRangeResponseJs responseJs;
+
   TsGetRangeResponseNode(this.responseJs);
 
-/*
   @override
-  String toString() => toDebugMap().toString();
-
-   */
+  List<TsGetRow> get rows => responseJs.rows
+      ?.map((e) => TsGetRowNode(e as TsReadRowJs))
+      ?.toList(growable: false);
 }
 
 // Response to native
-TsGetRangeResponse getRangeResponseFromNative(dynamic nativeResponseJs) {
+TsGetRangeResponse getRangeResponseFromNative(
+    TsGetRangeResponseJs nativeResponseJs) {
   if (nativeResponseJs != null) {
     return TsGetRangeResponseNode(nativeResponseJs);
   }
@@ -331,6 +354,16 @@ dynamic tsColumnConditionToNative(TsColumnCondition columnCondition) {
   }
 }
 
+dynamic tsDirectionToNative(TsDirection direction) {
+  switch (direction) {
+    case TsDirection.forward:
+      return tablestoreNode.direction.FORWARD;
+    case TsDirection.backward:
+      return tablestoreNode.direction.BACKWARD;
+  }
+  throw UnsupportedError('invalid direction $direction');
+}
+
 dynamic tsConditionToNative(TsCondition condition) {
   dynamic columnConditionJs;
   var columnCondition = condition.columnCondition;
@@ -347,3 +380,14 @@ dynamic tsConditionToNative(TsCondition condition) {
 /// Value long (going though string to handle number at the limit
 dynamic tsValueLongToNative(TsValueLong value) =>
     tablestoreJs.Long.fromString(value.toString());
+
+/// Value infinite
+dynamic tsValueInfiniteToNative(TsValueInfinite value) {
+  if (value == TsValueInfinite.min) {
+    return tablestoreJs.INF_MIN;
+  }
+  if (value == TsValueInfinite.max) {
+    return tablestoreJs.INF_MAX;
+  }
+  throw 'Unsupported TsValueInfinite($value)';
+}

@@ -27,11 +27,15 @@ class TsGetRangeRequest {
   TsKeyBoundary start;
   TsKeyBoundary end;
   final List<String> columns;
+  final direction;
+  final int limit;
 
   TsGetRangeRequest(
       {@required this.tableName,
       this.start,
       this.end,
+        this.direction,
+        this.limit,
 
       /// Optional
       this.columns});
@@ -72,6 +76,10 @@ enum TsComparatorType {
   lessThanOrEquals,
 }
 
+enum TsDirection {
+  forward,
+  backward,
+}
 enum TsLogicalOperator {
   and,
   or,
@@ -104,6 +112,9 @@ class TsPrimaryKey {
   final List<TsKeyValue> list;
 
   TsPrimaryKey(this.list);
+
+  @override
+  String toString() => list.toString();
 }
 
 class TsPutRowRequest {
@@ -149,7 +160,9 @@ abstract class TsPutRowResponse {
 
 abstract class TsDeleteRowResponse {}
 
-abstract class TsGetRangeResponse {}
+abstract class TsGetRangeResponse {
+  List<TsGetRow> get rows;
+}
 
 extension TsGetRowResponseExt on TsGetRowResponse {
   Model toDebugMap() {
@@ -165,7 +178,7 @@ extension TsPutRowResponseExt on TsPutRowResponse {
 
 extension TsGetRangeResponseExt on TsGetRangeResponse {
   Model toDebugMap() {
-    return Model({});
+    return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
   }
 }
 
@@ -175,7 +188,7 @@ extension TsDeleteRowResponseExt on TsDeleteRowResponse {
   }
 }
 
-extension TsGetRowResponseRowExt on TsGetRow {
+extension TsGetRowExt on TsGetRow {
   Model toDebugMap() {
     return Model()
       ..setValue('primaryKeys',

@@ -293,29 +293,36 @@ void rowTest(TsClient client) {
 
     test('range', () async {
       await createKeyStringTable();
-      var key = TsPrimaryKey([TsKeyValue('key', 'range')]);
+      var key = TsPrimaryKey([TsKeyValue('key', 'range_1')]);
       await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKey: key,
           data: [TsAttribute.int('test', 1)]));
 
-      // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
-      var getResponse =
-          await client.getRange(TsGetRangeRequest(tableName: keyStringTable));
-      expect(getResponse.toDebugMap(), {
-        'row': {
-          'primaryKeys': [
-            {'key': 'binary'}
-          ],
-          'attributes': [
+      // {maxVersions: 1, limit: null, tableName: test_key_string, inclusiveStartPrimaryKey: [{key: INF_MIN}], exclusiveEndPrimaryKey: [{key: INF_MAX}], direction: TsDirection.forward}
+      // TSs: getRange {"maxVersions":1,"limit":null,"tableName":"test_key_string","inclusiveStartPrimaryKey":[{"key":{}}],"exclusiveEndPrimaryKey":[{"key":{}}],"direction":"FORWARD"}
+      // TSr: {"consumed":{"capacityUnit":{"read":1,"write":0}},"rows":[{"primaryKey":[{"name":"key","value":"binary"}],"attributes":[{"columnName":"test","columnValue":[1,2,3],"timestamp":{"buffer":[45,66,184,103,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"key1Js"}],"attributes":[{"columnName":"col1","columnValue":"表格存储","timestamp":{"buffer":[219,208,43,94,116,1,0,0],"offset":0}},{"columnName":"col2","columnValue":"2","timestamp":{"buffer":[28,208,43,94,116,1,0,0],"offset":0}},{"columnName":"col3","columnValue":3.1,"timestamp":{"buffer":[219,208,43,94,116,1,0,0],"offset":0}},{"columnName":"col4","columnValue":-0.32,"timestamp":{"buffer":[219,208,43,94,116,1,0,0],"offset":0}},{"columnName":"col5","columnValue":{"buffer":[21,205,91,7,0,0,0,0],"offset":0},"timestamp":{"buffer":[219,208,43,94,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"long"}],"attributes":[{"columnName":"test","columnValue":{"buffer":[246,255,255,255,255,255,63,1],"offset":0},"timestamp":{"buffer":[159,64,184,103,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"putRow"}],"attributes":[{"columnName":"test","columnValue":"text","timestamp":{"buffer":[188,58,184,103,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"put_row"}],"attributes":[{"columnName":"test","columnValue":"text","timestamp":{"buffer":[202,100,64,98,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"range"}],"attributes":[{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[23,255,189,103,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"range_1"}],"attributes":[{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[102,113,199,103,116,1,0,0],"offset":0}}]}],"nextStartPrimaryKey":null,"compressType":0,"dataBlockType":0,"nextToken":[],"RequestId":"0005aeb5-6315-e1be-a4c1-720b0bd8e513"}
+      var response = await client.getRange(TsGetRangeRequest(
+          tableName: keyStringTable,
+          start: TsKeyBoundary(
+              TsPrimaryKey([TsKeyValue('key', TsValueInfinite.min)]), true),
+          end: TsKeyBoundary(
+              TsPrimaryKey([TsKeyValue('key', TsValueInfinite.max)]), false)));
+      expect(
+          response.rows
+              .where(
+                  (element) => element.primaryKey.list.first.value == 'range_1')
+              .map((e) => e.toDebugMap()),
+          [
             {
-              'test': [1, 2, 3]
+              'primaryKeys': [
+                {'key': 'range_1'}
+              ],
+              'attributes': [
+                {'test': TsValueLong.fromNumber(1)}
+              ]
             }
-          ]
-        }
-      });
-      var binary = getResponse.toDebugMap()['row']['attributes'][0]['test'];
-      expect(binary, const TypeMatcher<Uint8List>());
+          ]);
     }, skip: true);
   });
 }

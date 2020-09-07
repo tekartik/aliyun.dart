@@ -238,8 +238,20 @@ class TsClientSembast implements TsClient {
 
   @override
   Future<TsGetRangeResponse> getRange(TsGetRangeRequest request) async {
-    // TODO: implement getRange
-    throw UnimplementedError();
+    return await (await _db).transaction((txn) async {
+      //var table = await getTableContext(txn, request.tableName);
+      /*
+      var row = table.row(request.primaryKey);
+      var record = row.record();
+      var key = await _checkPutDeleteCondition(record, request.condition);
+      if (key != null) {
+        await record.deleteByKey(key);
+      }
+
+       */
+      // return TsDeleteRowResponseSembast();
+      return null;
+    });
   }
 }
 
@@ -291,6 +303,10 @@ class TsTableContextSembast {
 
   TsRowContextSembast row(TsPrimaryKey primaryKey) {
     return TsRowContextSembast(this, primaryKey);
+  }
+
+  TsRangeContextSembast range(TsGetRangeRequest request) {
+    return null; // TODO
   }
 }
 
@@ -459,3 +475,10 @@ class TsPutRowResponseSembast extends TsReadRowResponseSembast
 }
 
 class TsDeleteRowResponseSembast implements TsDeleteRowResponse {}
+
+class TsRangeContextSembast {
+  final TsTableContextSembast table;
+  final TsGetRangeRequest request;
+
+  TsRangeContextSembast(this.table, this.request);
+}

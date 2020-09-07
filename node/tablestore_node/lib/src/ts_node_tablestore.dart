@@ -70,6 +70,9 @@ class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
 
   @override
   final long = TsNodeLongClassImpl();
+
+  @override
+  TsConstantDirection get direction => tablestoreJs.Direction;
 }
 
 class TsClientNode with TsClientMixin implements TsClient {
@@ -279,8 +282,9 @@ class TsClientNode with TsClientMixin implements TsClient {
     var params = toGetRangeParams(request);
     var jsParams = tsJsify(params);
     var nativeResponseJs = await _nativeOperationWithCallback((callback) {
-      native.getRow(_debugNativeRequestParams('getRange', jsParams), callback);
+      native.getRange(
+          _debugNativeRequestParams('getRange', jsParams), callback);
     });
-    return getRangeResponseFromNative(nativeResponseJs);
+    return getRangeResponseFromNative(nativeResponseJs as TsGetRangeResponseJs);
   }
 }

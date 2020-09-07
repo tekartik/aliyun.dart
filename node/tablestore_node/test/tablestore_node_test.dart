@@ -81,5 +81,19 @@ void main() {
       expect(
           tsNodeCommon.logicalOperator.OR, tsNodeCommonShim.logicalOperator.OR);
     });
+
+    test('Direction', () {
+      expect(jsObjectAsMap(getProperty(tablestoreJs, 'Direction')),
+          {'FORWARD': 'FORWARD', 'BACKWARD': 'BACKWARD'});
+      expect(
+          tsNodeCommon.direction.FORWARD, tsNodeCommonShim.direction.FORWARD);
+      expect(
+          tsNodeCommon.direction.BACKWARD, tsNodeCommonShim.direction.BACKWARD);
+    });
+
+    test('INF_MIN/MAX', () {
+      expect(jsObjectAsMap(getProperty(tablestoreJs, 'INF_MIN')), {});
+      expect(jsObjectAsMap(getProperty(tablestoreJs, 'INF_MAX')), {});
+    });
   }, skip: client == null);
 }

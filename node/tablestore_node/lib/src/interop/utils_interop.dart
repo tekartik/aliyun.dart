@@ -118,6 +118,14 @@ dynamic tsJsify(Object dartObject) {
     return tsValueLongToNative(dartObject);
   }
 
+  if (dartObject is TsValueInfinite) {
+    return tsValueInfiniteToNative(dartObject);
+  }
+
+  if (dartObject is TsDirection) {
+    return tsDirectionToNative(dartObject);
+  }
+
   print('Could not convert type ${dartObject?.runtimeType}, value $dartObject');
   throw ArgumentError.value(dartObject, 'dartObject', 'Could not convert');
 }

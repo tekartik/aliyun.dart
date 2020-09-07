@@ -35,6 +35,12 @@ abstract class TsConstantComparatorType {
   int get LESS_EQUAL;
 }
 
+// {'FORWARD': 'FORWARD', 'BACKWARD': 'BACKWARD'}
+abstract class TsConstantDirection {
+  String get FORWARD;
+  String get BACKWARD;
+}
+
 //  {'NOT': 1, 'AND': 2, 'OR': 3}
 abstract class TsConstantLogicalOperator {
   int get NOT;
@@ -69,5 +75,6 @@ abstract class TsNodeCommon {
   TsConstantReturnType get returnType;
   TsConstantComparatorType get comparatorType;
   TsConstantLogicalOperator get logicalOperator;
+  TsConstantDirection get direction;
   TsNodeLongClass get long;
 }

@@ -10,6 +10,7 @@ class TsKeyValue {
     assert(
         (value == null ||
             value is TsValueLong ||
+            value is TsValueInfinite ||
             value is String ||
             value is Uint8List ||
             value is double),

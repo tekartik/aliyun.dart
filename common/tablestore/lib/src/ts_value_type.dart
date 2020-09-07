@@ -10,6 +10,15 @@ abstract class TsValueLong {
   String toString();
 }
 
+class TsValueInfinite {
+  final String _label;
+  const TsValueInfinite._(this._label);
+  static const min = TsValueInfinite._('INF_MIN');
+  static const max = TsValueInfinite._('INF_MAX');
+  @override
+  String toString() => _label;
+}
+
 mixin _TsValueLongMixin implements TsValueLong {
   @override
   int get hashCode => toString().hashCode;

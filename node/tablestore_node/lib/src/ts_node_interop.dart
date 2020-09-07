@@ -56,7 +56,15 @@ abstract class TablestoreJs {
 
   external TsConstantLogicalOperatorJs get LogicalOperator;
 
+  external TsConstantDirectionJs get Direction;
+
   external TsNodeLongClassJs get Long;
+
+  /// key value min
+  external dynamic get INF_MIN;
+
+  /// key value min
+  external dynamic get INF_MAX;
 
   /// Constructors
   external dynamic get Condition;
@@ -106,6 +114,8 @@ class TsClientJs {
   external void deleteRow(dynamic params, Function callback);
 
   external void getRow(dynamic params, Function callback);
+
+  external void getRange(dynamic params, Function callback);
 
   external void createTable(dynamic params, Function callack);
 }
