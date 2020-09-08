@@ -41,6 +41,10 @@ abstract class TsClient {
 
   Future<TsGetRowResponse> getRow(TsGetRowRequest request);
 
+  Future<TsBatchGetRowsResponse> batchGetRows(TsBatchGetRowsRequest request);
+  Future<TsBatchWriteRowsResponse> batchWriteRows(
+      TsBatchWriteRowsRequest request);
+
   Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request);
 
   Future<TsGetRangeResponse> getRange(TsGetRangeRequest request);

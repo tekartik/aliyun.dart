@@ -291,12 +291,102 @@ void rowTest(TsClient client) {
       expect(binary, const TypeMatcher<Uint8List>());
     });
 
+    test('batch_read', () async {
+      await createKeyStringTable();
+
+      // Put single
+      var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_1')]);
+      //var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
+      //var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
+      await client.putRow(
+        TsPutRowRequest(
+            tableName: keyStringTable,
+            primaryKey: key1,
+            data: [TsAttribute.int('test', 1)]),
+      );
+
+      await client.batchGetRows(TsBatchGetRowsRequest(tables: [
+        TsBatchGetRowsRequestTable(
+            tableName: keyStringTable, primaryKeys: [key1], columns: ['test']),
+      ]));
+    }, skip: true);
+
+    test('batch_write', () async {
+      await createKeyStringTable();
+      var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_1')]);
+      //var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
+      //var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
+      await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+        TsBatchWriteRowsRequestTable(tableName: keyStringTable, rows: [
+          TsBatchWriteRowsRequestRow(
+              type: TsWriteRowType.put,
+              primaryKey: key1,
+              data: [TsAttribute.int('test', 1)]),
+        ])
+      ]));
+      /*
+      BatchWriteRowResponse {
+  tables:
+   [ { isOk: true,
+       errorCode: null,
+       errorMessage: null,
+       tableName: 'sampleTable',
+       capacityUnit: [CapacityUnit],
+       primaryKey: [Array],
+       attributes: [] },
+     { isOk: true,
+       errorCode: null,
+       errorMessage: null,
+       tableName: 'sampleTable',
+       capacityUnit: [CapacityUnit],
+       primaryKey: [Array],
+       attributes: [] } ],
+  RequestId: '0005aebb-8f18-0f8b-e6c1-720b0b29242f' }
+
+       */
+    }, skip: true);
+
+    test('no_batch', () async {
+      await createKeyStringTable();
+      var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_1')]);
+      // var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
+      // var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
+      await client.putRow(
+        TsPutRowRequest(
+            tableName: keyStringTable,
+            primaryKey: key1,
+            data: [TsAttribute.int('test', 1)]),
+      );
+      /*
+      BatchWriteRowResponse {
+  tables:
+   [ { isOk: true,
+       errorCode: null,
+       errorMessage: null,
+       tableName: 'sampleTable',
+       capacityUnit: [CapacityUnit],
+       primaryKey: [Array],
+       attributes: [] },
+     { isOk: true,
+       errorCode: null,
+       errorMessage: null,
+       tableName: 'sampleTable',
+       capacityUnit: [CapacityUnit],
+       primaryKey: [Array],
+       attributes: [] } ],
+  RequestId: '0005aebb-8f18-0f8b-e6c1-720b0b29242f' }
+
+       */
+    }, skip: true);
+
     test('range', () async {
       await createKeyStringTable();
-      var key = TsPrimaryKey([TsKeyValue('key', 'range_1')]);
+      var key1 = TsPrimaryKey([TsKeyValue('key', 'range_1')]);
+      // var key2 = TsPrimaryKey([TsKeyValue('key', 'range_2')]);
+      // var key3 = TsPrimaryKey([TsKeyValue('key', 'range_3')]);
       await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
-          primaryKey: key,
+          primaryKey: key1,
           data: [TsAttribute.int('test', 1)]));
 
       // {maxVersions: 1, limit: null, tableName: test_key_string, inclusiveStartPrimaryKey: [{key: INF_MIN}], exclusiveEndPrimaryKey: [{key: INF_MAX}], direction: TsDirection.forward}

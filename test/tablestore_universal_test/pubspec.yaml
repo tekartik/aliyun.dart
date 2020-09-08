@@ -25,6 +25,8 @@ dev_dependencies:
 
 dependency_overrides:
   # WARNING
+  tekartik_js_utils:
+    path: ../../../js_utils.dart/js_utils
   # tekartik_app_node_build:
   #  path: ../../../app_node_utils.dart/app_build
   tekartik_aliyun_tablestore_universal:

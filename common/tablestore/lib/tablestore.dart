@@ -22,7 +22,16 @@ export 'src/ts_row.dart'
         TsKeyBoundary,
         TsDirection,
         TsGetRowExt,
-        TsConditionRowExistenceExpectation;
+        TsConditionRowExistenceExpectation,
+        TsBatchGetRowsRequest,
+        TsBatchGetRowsRequestTable,
+        TsBatchGetRowsResponse,
+        TsBatchWriteRowsResponse,
+        TsBatchWriteRowsRequest,
+        TsBatchWriteRowsRequestRow,
+        TsBatchWriteRowsRequestTable,
+        TsWriteRowType;
+
 export 'src/ts_table.dart'
     show
         TsTableDescription,

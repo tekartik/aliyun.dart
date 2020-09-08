@@ -11,9 +11,7 @@ Map<String, dynamic> toGetRowParams(TsGetRowRequest request) {
     if (request.tableName != null) 'tableName': request.tableName,
     if (request.primaryKey != null)
       // !singular
-      'primaryKey': request.primaryKey.list
-          .map(toPrimaryKeyValueParam)
-          .toList(growable: false),
+      'primaryKey': tsPrimaryKeyParams(request.primaryKey),
     if (request.columns != null) 'columnsToGet': request.columns,
   });
   return map;
@@ -26,19 +24,72 @@ Map<String, dynamic> toPutRowParams(TsPutRowRequest request) {
     'condition': request.condition ?? TsCondition.ignore,
     if (request.primaryKey != null)
       // !singular
-      'primaryKey': request.primaryKey.list
-          .map(toPrimaryKeyValueParam)
-          .toList(growable: false),
+      'primaryKey': tsPrimaryKeyParams(request.primaryKey),
     if (request.data != null)
-      'attributeColumns':
-          request.data.map((e) => {e.name: e.value}).toList(growable: false),
+      'attributeColumns': tsAttributeColumnsParams(request.data),
     'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey}
   });
   return map;
 }
 
+List<dynamic> tsAttributeColumnsParams(List<TsAttribute> attributes) =>
+    attributes.map((e) => toPrimaryKeyValueParam(e)).toList();
+
+List<dynamic> tsPrimaryKeyParams(TsPrimaryKey primaryKey) =>
+    primaryKey.list.map(toPrimaryKeyValueParam).toList();
+//
+// {"tables":[
+//  {"tableName":"test_key_string","rows":[{"condition":{"rowExistenceExpectation":0,"columnCondition":null},"type":"PUT","primaryKey":[{"key":"batch_1"}],"attributeColumns":[{"test":{"buffer":[1,0,0,0,0,0,0,0],"offset":0}}]},{"condition":{"rowExistenceExpectation":0,"columnCondition":null},"type":"PUT","primaryKey":[{"key":"batch_2"}],"attributeColumns":[{"test":{"buffer":[2,0,0,0,0,0,0,0],"offset":0}}]}]}]}
+Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
+  var map = <String, dynamic>{
+    'tables': request.tables
+        .map((table) => <String, dynamic>{
+              if (table.tableName != null) 'tableName': table.tableName,
+              'rows': table.rows.map((row) => <String, dynamic>{
+                    // Needed
+                    'type': row.type,
+
+                    // Needed
+                    'condition': row.condition ?? TsCondition.ignore,
+
+                    if (row.primaryKey != null)
+                      // !singular
+                      'primaryKey': tsPrimaryKeyParams(row.primaryKey),
+
+                    if (row.data != null)
+                      'attributeColumns': tsAttributeColumnsParams(row.data),
+                    'returnContent': {
+                      'returnType': tsNodeCommon.returnType.Primarykey
+                    }
+                  }),
+            })
+        .toList(growable: false)
+  };
+
+  return map;
+}
+
+Map<String, dynamic> toBatchGetRowsParams(TsBatchGetRowsRequest request) {
+  var map = <String, dynamic>{
+    'tables': request.tables
+        .map((table) => <String, dynamic>{
+              if (table.tableName != null) 'tableName': table.tableName,
+
+              // exp: TODO not hardcode
+              'maxVersions': 1,
+              // !singular
+              'primaryKey': [...table.primaryKeys.map(tsPrimaryKeyParams)],
+              if (table.columns != null) 'columnsToGet': table.columns,
+            })
+        .toList()
+  };
+
+  return map;
+}
+
 List<Map<String, dynamic>> primaryKeyAsList(TsPrimaryKey primaryKey) =>
     primaryKey.list.map(toPrimaryKeyValueParam).toList(growable: false);
+
 Map<String, dynamic> toDeleteRowParams(TsDeleteRowRequest request) {
   var map = Model({
     if (request.tableName != null) 'tableName': request.tableName,

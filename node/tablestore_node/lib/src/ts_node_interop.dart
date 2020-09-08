@@ -109,6 +109,10 @@ class TsClientJs {
 
   external void describeTable(TsClientTableParamsJs params, Function callback);
 
+  external void batchWriteRow(dynamic params, Function callback);
+
+  external void batchGetRow(dynamic params, Function callback);
+
   external void putRow(dynamic params, Function callback);
 
   external void deleteRow(dynamic params, Function callback);

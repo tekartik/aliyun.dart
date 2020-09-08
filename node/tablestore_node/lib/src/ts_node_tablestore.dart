@@ -11,6 +11,7 @@ import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_interop.dart';
+
 import 'import.dart';
 import 'import_interop.dart';
 import 'interop/utils_interop.dart';
@@ -241,17 +242,27 @@ class TsClientNode with TsClientMixin implements TsClient {
     return tableDescriptionFromNative(nativeDesc);
   }
 
+  // new way
+  final useJs = true;
   /*
   {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":{"primaryKey":[{"name":"key","value":"value"}],"attributes":[{"columnName":"test","columnValue":"text","timestamp":{"buffer":[30,20,154,94,116,1,0,0],"offset":0}}]},"RequestId":"0005ae91-ac09-e850-e5c1-720b08a5216a"}
    */
   @override
   Future<TsGetRowResponse> getRow(TsGetRowRequest request) async {
-    var params = toGetRowParams(request);
-    var jsParams = tsJsify(params);
-    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
-      native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
-    });
-    return getRowResponseFromNative(nativeResponseJs);
+    if (useJs) {
+      var jsParams = toGetRowParamsJs(request);
+      var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+        native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
+      });
+      return getRowResponseFromNative(nativeResponseJs);
+    } else {
+      var params = toGetRowParams(request);
+      var jsParams = tsJsify(params);
+      var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+        native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
+      });
+      return getRowResponseFromNative(nativeResponseJs);
+    }
   }
 
   @override
@@ -286,5 +297,38 @@ class TsClientNode with TsClientMixin implements TsClient {
           _debugNativeRequestParams('getRange', jsParams), callback);
     });
     return getRangeResponseFromNative(nativeResponseJs as TsGetRangeResponseJs);
+  }
+
+  @override
+  Future<TsBatchGetRowsResponse> batchGetRows(
+      TsBatchGetRowsRequest request) async {
+    if (useJs) {
+      var jsParams = toBatchGetRowParamsJs2(request);
+      var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+        _debugNativeRequestParams('batchGetRow', jsParams);
+        callMethod(native, 'batchGetRow', [jsParams, callback]);
+      }) as TsBatchGetRowResponseJs;
+      return batchGetRowsResponseFromNative(nativeResponseJs);
+    } else {
+      var params = toBatchGetRowsParams(request);
+      var jsParams = tsJsify(params);
+      var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+        native.batchGetRow(
+            _debugNativeRequestParams('batchGetRow', jsParams), callback);
+      }) as TsBatchGetRowResponseJs;
+      return batchGetRowsResponseFromNative(nativeResponseJs);
+    }
+  }
+
+  @override
+  Future<TsBatchWriteRowsResponse> batchWriteRows(
+      TsBatchWriteRowsRequest request) async {
+    var params = toWriteRowsParams(request);
+    var jsParams = tsJsify(params);
+    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+      native.batchWriteRow(
+          _debugNativeRequestParams('batchWriteRow', jsParams), callback);
+    });
+    return batchWriteRowsResponseFromNative(nativeResponseJs);
   }
 }

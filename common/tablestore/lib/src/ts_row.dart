@@ -34,8 +34,8 @@ class TsGetRangeRequest {
       {@required this.tableName,
       this.start,
       this.end,
-        this.direction,
-        this.limit,
+      this.direction,
+      this.limit,
 
       /// Optional
       this.columns});
@@ -56,15 +56,28 @@ class TsCondition {
   static final TsCondition expectNotExist = TsCondition(
       rowExistenceExpectation:
           TsConditionRowExistenceExpectation.expectNotExist);
+
+  Model toDebugMap() {
+    return Model()
+      ..setValue('column', columnCondition?.toDebugMap())
+      ..setValue('rowExistence', rowExistenceExpectation);
+  }
+
+  @override
+  String toString() => toDebugMap().toString();
 }
 
 abstract class TsColumnCondition {
   factory TsColumnCondition.equals(String name, dynamic value) =>
       TsColumnSingleCondition(TsComparatorType.equals, name, value);
+
   factory TsColumnCondition.or(List<TsColumnCondition> conditions) =>
       TsColumnCompositeCondition(TsLogicalOperator.or, conditions);
+
   factory TsColumnCondition.and(List<TsColumnCondition> conditions) =>
       TsColumnCompositeCondition(TsLogicalOperator.and, conditions);
+
+  Model toDebugMap();
 }
 
 enum TsComparatorType {
@@ -91,6 +104,12 @@ class TsColumnSingleCondition implements TsColumnCondition {
   final String name;
   final dynamic value;
 
+  @override
+  Model toDebugMap() => Model()
+    ..setValue('name', name)
+    ..setValue('operator', operator)
+    ..setValue('value', value);
+
   TsColumnSingleCondition(this.operator, this.name, this.value);
 }
 
@@ -99,6 +118,12 @@ class TsColumnCompositeCondition implements TsColumnCondition {
   final List<TsColumnCondition> list;
 
   TsColumnCompositeCondition(this.operator, this.list);
+
+  @override
+  Model toDebugMap() => Model()
+    ..setValue('operator', operator)
+    ..setValue(
+        'list', list?.map((e) => e.toDebugMap())?.toList(growable: false));
 }
 
 enum TsConditionRowExistenceExpectation {
@@ -132,6 +157,57 @@ class TsPutRowRequest {
       this.data});
 }
 
+class TsBatchGetRowsRequest {
+  final List<TsBatchGetRowsRequestTable> tables;
+
+  TsBatchGetRowsRequest({
+    @required this.tables,
+  });
+}
+
+class TsBatchGetRowsRequestTable {
+  final String tableName;
+  final List<TsPrimaryKey> primaryKeys;
+  final List<String> columns;
+
+  TsBatchGetRowsRequestTable(
+      {@required this.tableName,
+      @required this.primaryKeys,
+
+      /// Optional
+      this.columns});
+}
+
+enum TsWriteRowType { put, update, delete }
+
+class TsBatchWriteRowsRequest {
+  final List<TsBatchWriteRowsRequestTable> tables;
+
+  TsBatchWriteRowsRequest({@required this.tables});
+}
+
+class TsBatchWriteRowsRequestTable {
+  final String tableName;
+  final List<TsBatchWriteRowsRequestRow> rows;
+
+  TsBatchWriteRowsRequestTable({@required this.tableName, @required this.rows});
+}
+
+class TsBatchWriteRowsRequestRow {
+  final TsWriteRowType type;
+  final TsPrimaryKey primaryKey;
+  final TsCondition condition;
+  final List<TsAttribute> data;
+
+  TsBatchWriteRowsRequestRow(
+      {@required this.type,
+      @required this.primaryKey,
+      this.condition,
+
+      /// Columns values
+      this.data});
+}
+
 class TsDeleteRowRequest {
   final String tableName;
   final TsPrimaryKey primaryKey;
@@ -147,6 +223,7 @@ class TsDeleteRowRequest {
 
 abstract class TsGetRow {
   TsPrimaryKey get primaryKey;
+
   List<TsAttribute> get attributes;
 }
 
@@ -162,6 +239,14 @@ abstract class TsDeleteRowResponse {}
 
 abstract class TsGetRangeResponse {
   List<TsGetRow> get rows;
+}
+
+class TsBatchGetRowsResponse {
+  // TsGetRow get row;
+}
+
+class TsBatchWriteRowsResponse {
+  // TsGetRow get row;
 }
 
 extension TsGetRowResponseExt on TsGetRowResponse {

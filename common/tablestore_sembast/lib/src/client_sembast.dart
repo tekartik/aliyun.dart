@@ -253,6 +253,19 @@ class TsClientSembast implements TsClient {
       return null;
     });
   }
+
+  @override
+  Future<TsBatchGetRowsResponse> batchGetRows(TsBatchGetRowsRequest request) {
+    // TODO: implement batchGetRows
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<TsBatchWriteRowsResponse> batchWriteRows(
+      TsBatchWriteRowsRequest request) {
+    // TODO: implement batchWriteRows
+    throw UnimplementedError();
+  }
 }
 
 class TsGetRowSembast implements TsGetRow {
