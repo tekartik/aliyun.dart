@@ -13,6 +13,7 @@ import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/universal/ts_node_universal.dart';
 
 // ignore_for_file: non_constant_identifier_names
 @JS()
@@ -715,4 +716,54 @@ dynamic tsValueInfiniteToNative(TsValueInfinite value) {
     return tablestoreJs.INF_MAX;
   }
   throw 'Unsupported TsValueInfinite($value)';
+}
+
+//
+// {"tables":[
+//  {"tableName":"test_key_string","rows":[{"condition":{"rowExistenceExpectation":0,"columnCondition":null},"type":"PUT","primaryKey":[{"key":"batch_1"}],"attributeColumns":[{"test":{"buffer":[1,0,0,0,0,0,0,0],"offset":0}}]},{"condition":{"rowExistenceExpectation":0,"columnCondition":null},"type":"PUT","primaryKey":[{"key":"batch_2"}],"attributeColumns":[{"test":{"buffer":[2,0,0,0,0,0,0,0],"offset":0}}]}]}]}
+Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
+  var map = <String, dynamic>{
+    'tables': request.tables
+        .map((table) => <String, dynamic>{
+              if (table.tableName != null) 'tableName': table.tableName,
+              'rows': TsArrayHack(table.rows.map((row) => <String, dynamic>{
+                    // Needed
+                    'type': row.type,
+
+                    // Needed
+                    'condition': row.condition ?? TsCondition.ignore,
+
+                    if (row.primaryKey != null)
+                      // !singular
+                      'primaryKey': tsPrimaryKeyParams(row.primaryKey),
+
+                    if (row.data != null)
+                      'attributeColumns': tsAttributeColumnsParams(row.data),
+                    'returnContent': {
+                      'returnType': tsNodeCommon.returnType.Primarykey
+                    }
+                  }))
+            })
+        .toList(growable: false)
+  };
+
+  return map;
+}
+
+Map<String, dynamic> toBatchGetRowsParams(TsBatchGetRowsRequest request) {
+  var map = <String, dynamic>{
+    'tables': request.tables
+        .map((table) => <String, dynamic>{
+              if (table.tableName != null) 'tableName': table.tableName,
+              // exp: TODO not hardcode
+              'maxVersions': 1,
+              // !singular
+              'primaryKey':
+                  TsArrayHack(table.primaryKeys.map(tsPrimaryKeyParams)),
+              if (table.columns != null) 'columnsToGet': table.columns,
+            })
+        .toList()
+  };
+
+  return map;
 }
