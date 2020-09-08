@@ -366,6 +366,13 @@ TsPutRowResponse putRowResponseFromNative(dynamic nativeResponseJs) {
   return null;
 }
 
+TsUpdateRowResponse updateRowResponseFromNative(dynamic nativeResponseJs) {
+  if (nativeResponseJs != null) {
+    return TsUpdateRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
+  }
+  return null;
+}
+
 // Response to native
 TsDeleteRowResponse deleteRowResponseFromNative(dynamic nativeResponseJs) {
   if (nativeResponseJs != null) {
@@ -500,6 +507,14 @@ class TsGetRowResponseNode extends TsReadRowResponseNode
 class TsPutRowResponseNode extends TsReadRowResponseNode
     implements TsPutRowResponse {
   TsPutRowResponseNode(TsReadRowResponseJs responseJs) : super(responseJs);
+
+  @override
+  String toString() => toDebugMap().toString();
+}
+
+class TsUpdateRowResponseNode extends TsReadRowResponseNode
+    implements TsUpdateRowResponse {
+  TsUpdateRowResponseNode(TsReadRowResponseJs responseJs) : super(responseJs);
 
   @override
   String toString() => toDebugMap().toString();

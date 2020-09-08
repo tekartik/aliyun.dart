@@ -115,6 +115,8 @@ class TsClientJs {
 
   external void putRow(dynamic params, Function callback);
 
+  external void updateRow(dynamic params, Function callback);
+
   external void deleteRow(dynamic params, Function callback);
 
   external void getRow(dynamic params, Function callback);

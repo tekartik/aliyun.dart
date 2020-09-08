@@ -32,9 +32,40 @@ Map<String, dynamic> toPutRowParams(TsPutRowRequest request) {
   return map;
 }
 
+Map<String, dynamic> toUpdateRowParams(TsUpdateRowRequest request) {
+  var map = Model({
+    if (request.tableName != null) 'tableName': request.tableName,
+    // Needed
+    'condition': request.condition ?? TsCondition.expectExist,
+    if (request.primaryKey != null)
+      // !singular
+      'primaryKey': tsPrimaryKeyParams(request.primaryKey),
+    if (request.data != null)
+      'updateOfAttributeColumns': tsUpdateAttributesParams(request.data),
+    'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey}
+  });
+  return map;
+}
+
 List<dynamic> tsAttributeColumnsParams(List<TsAttribute> attributes) =>
     attributes.map((e) => toPrimaryKeyValueParam(e)).toList();
 
+Map<String, dynamic> tsUpdateAttributeParams(
+    TsUpdateAttribute updateAttribute) {
+  if (updateAttribute is TsUpdateAttributePut) {
+    return <String, dynamic>{
+      'PUT': tsAttributeColumnsParams(updateAttribute.attributes)
+    };
+  } else if (updateAttribute is TsUpdateAttributeDelete) {
+    return <String, dynamic>{'DELETE_ALL': updateAttribute.fields};
+  } else {
+    throw UnsupportedError('Unsupported update attribute $updateAttribute');
+  }
+}
+
+List<Map<String, dynamic>> tsUpdateAttributesParams(
+        List<TsUpdateAttribute> attributes) =>
+    attributes.map((e) => tsUpdateAttributeParams(e)).toList();
 List<dynamic> tsPrimaryKeyParams(TsPrimaryKey primaryKey) =>
     primaryKey.list.map(toPrimaryKeyValueParam).toList();
 

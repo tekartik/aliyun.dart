@@ -333,4 +333,16 @@ class TsClientNode with TsClientMixin implements TsClient {
     return TsBatchWriteRowsResponseNode(
         responseJs as TsBatchWriteRowResponseJs);
   }
+
+  @override
+  Future<TsUpdateRowResponse> updateRow(TsUpdateRowRequest request) async {
+    var params = toUpdateRowParams(request);
+    var jsParams = tsJsify(params);
+
+    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+      native.updateRow(
+          _debugNativeRequestParams('updateRow', jsParams), callback);
+    });
+    return updateRowResponseFromNative(nativeResponseJs);
+  }
 }

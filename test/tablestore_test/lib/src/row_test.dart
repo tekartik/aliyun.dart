@@ -57,7 +57,7 @@ void rowTest(TsClient client) {
       var response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKey: key,
-          data: [TsAttribute('test', 'text')]));
+          data: TsAttributes([TsAttribute('test', 'text')])));
       expect(response.toDebugMap(), {
         'row': {
           'primaryKey': [
@@ -89,7 +89,7 @@ void rowTest(TsClient client) {
       var response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKey: key,
-          data: [TsAttribute('test', 'text')]));
+          data: TsAttributes([TsAttribute('test', 'text')])));
       expect(response.toDebugMap(), {
         'row': {
           'primaryKey': [
@@ -117,7 +117,7 @@ void rowTest(TsClient client) {
             tableName: keyStringTable,
             condition: TsCondition.expectExist,
             primaryKey: key,
-            data: [TsAttribute('test', 'text')]));
+            data: TsAttributes([TsAttribute('test', 'text')])));
         fail('should fail');
       } on TsException catch (e) {
         expect(e.isConditionFailedError, isTrue);
@@ -128,7 +128,7 @@ void rowTest(TsClient client) {
           tableName: keyStringTable,
           condition: TsCondition.ignore,
           primaryKey: key,
-          data: [TsAttribute('test', 'text')]));
+          data: TsAttributes([TsAttribute('test', 'text')])));
       expect(response.toDebugMap(), {
         'row': {
           'primaryKey': [
@@ -143,7 +143,7 @@ void rowTest(TsClient client) {
           tableName: keyStringTable,
           condition: TsCondition.ignore,
           primaryKey: key,
-          data: [TsAttribute('test', 'text')]));
+          data: TsAttributes([TsAttribute('test', 'text')])));
       expect(response.toDebugMap(), {
         'row': {
           'primaryKey': [
@@ -158,12 +158,132 @@ void rowTest(TsClient client) {
             tableName: keyStringTable,
             condition: TsCondition.expectNotExist,
             primaryKey: key,
-            data: [TsAttribute('test', 'text')]));
+            data: TsAttributes([TsAttribute('test', 'text')])));
         fail('should fail');
       } on TsException catch (e) {
         expect(e.isConditionFailedError, isTrue);
       }
     });
+
+    test('updateRow', () async {
+      await createKeyStringTable();
+      var key = TsPrimaryKey([TsKeyValue('key', 'updateRow')]);
+
+      // Delete first
+      await client.deleteRow(
+          TsDeleteRowRequest(tableName: keyStringTable, primaryKey: key));
+
+      /*
+      try {
+        // Default should faild (fail if not exists is the default
+        await client.updateRow(TsUpdateRowRequest(
+            tableName: keyStringTable,
+            primaryKey: key,
+            data: TsUpdateAttributes([
+              TsUpdateAttributePut(TsAttributes(
+                  [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')])),
+              TsUpdateAttributeDelete(['col3', 'col4'])
+            ])));
+      } on TsException catch (e) {
+        expect(e.isConditionFailedError, isTrue);
+      }*/
+
+      // Tmp try to create first - remove if needed
+      await client.putRow(TsPutRowRequest(
+          tableName: keyStringTable,
+          condition: TsCondition.ignore,
+          primaryKey: key,
+          data: TsAttributes([TsAttribute('test', 'text')])));
+
+      // ignore: unused_local_variable
+      var response = await client.updateRow(TsUpdateRowRequest(
+          tableName: keyStringTable,
+          condition: TsCondition(
+              rowExistenceExpectation:
+                  TsConditionRowExistenceExpectation.ignore),
+          primaryKey: key,
+          data: TsUpdateAttributes([
+            TsUpdateAttributePut(TsAttributes(
+                [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')])),
+            // TsUpdateAttributeDelete(['col3', 'col4'])
+          ])));
+
+      // {"consumed":{"capacityUnit":{"read":0,"write":1}},"row":{"primaryKey":[{"name":"key","value":"updateRow"}],"attributes":[]},"RequestId":"0005aecc-876c-4878-a4c1-720b0ea2c3fd"}
+      var getResponse = await client
+          .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKey': [
+            {'key': 'value'}
+          ],
+          'attributes': [
+            {'col1': TsValueLong.fromNumber(1)},
+            {'col2': 'value'},
+            {'test': 'text'}
+          ]
+        }
+      });
+
+      /*  data: TsUpdateAttributes([
+            TsUpdateAttributePut(TsAttributes(
+                [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')])),
+            TsUpdateAttributeDelete(['col3', 'col4'])*/
+      /*
+      TsPutRowResponse response;
+      try {
+        response = await client.putRow(TsPutRowRequest(
+            tableName: keyStringTable,
+            condition: TsCondition.expectExist,
+            primaryKey: key,
+            data: TsAttributes([TsAttribute('test', 'text')])));
+        fail('should fail');
+      } on TsException catch (e) {
+        expect(e.isConditionFailedError, isTrue);
+        expect(e.retryable, isFalse);
+      }
+
+      response = await client.putRow(TsPutRowRequest(
+          tableName: keyStringTable,
+          condition: TsCondition.ignore,
+          primaryKey: key,
+          data: TsAttributes([TsAttribute('test', 'text')])));
+      expect(response.toDebugMap(), {
+        'row': {
+          'primaryKey': [
+            {'key': 'putRow'}
+          ],
+          'attributes': []
+        }
+      });
+
+      await createKeyStringTable();
+      response = await client.putRow(TsPutRowRequest(
+          tableName: keyStringTable,
+          condition: TsCondition.ignore,
+          primaryKey: key,
+          data: TsAttributes([TsAttribute('test', 'text')])));
+      expect(response.toDebugMap(), {
+        'row': {
+          'primaryKey': [
+            {'key': 'putRow'}
+          ],
+          'attributes': []
+        }
+      });
+
+      try {
+        response = await client.putRow(TsPutRowRequest(
+            tableName: keyStringTable,
+            condition: TsCondition.expectNotExist,
+            primaryKey: key,
+            data: TsAttributes([TsAttribute('test', 'text')])));
+        fail('should fail');
+      } on TsException catch (e) {
+        expect(e.isConditionFailedError, isTrue);
+      }
+
+       */
+    }, skip: true);
 
     test('deleteRow', () async {
       await createKeyStringTable();
@@ -172,7 +292,7 @@ void rowTest(TsClient client) {
       await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKey: key,
-          data: [TsAttribute('test', 'text')]));
+          data: TsAttributes([TsAttribute('test', 'text')])));
 
       TsDeleteRowResponse response;
       try {
@@ -217,7 +337,7 @@ void rowTest(TsClient client) {
       await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKey: key,
-          data: [TsAttribute.int('test', 1)]));
+          data: TsAttributes([TsAttribute.int('test', 1)])));
 
       // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
       var getResponse = await client
@@ -234,10 +354,13 @@ void rowTest(TsClient client) {
       });
 
       // max int 9007199254740991
-      await client.putRow(
-          TsPutRowRequest(tableName: keyStringTable, primaryKey: key, data: [
-        TsAttribute.long('test', TsValueLong.fromString('90071992547409910'))
-      ]));
+      await client.putRow(TsPutRowRequest(
+          tableName: keyStringTable,
+          primaryKey: key,
+          data: TsAttributes([
+            TsAttribute.long(
+                'test', TsValueLong.fromString('90071992547409910'))
+          ])));
 
       // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
       getResponse = await client
@@ -270,7 +393,7 @@ void rowTest(TsClient client) {
       await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKey: key,
-          data: [TsAttribute.binary('test', buffer)]));
+          data: TsAttributes([TsAttribute.binary('test', buffer)])));
 
       // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
       var getResponse = await client
@@ -302,7 +425,7 @@ void rowTest(TsClient client) {
         TsPutRowRequest(
             tableName: keyStringTable,
             primaryKey: key1,
-            data: [TsAttribute.int('test', 1)]),
+            data: TsAttributes([TsAttribute.int('test', 1)])),
       );
 
       var response = await client.batchGetRows(TsBatchGetRowsRequest(tables: [
@@ -395,7 +518,7 @@ void rowTest(TsClient client) {
         TsPutRowRequest(
             tableName: keyStringTable,
             primaryKey: key1,
-            data: [TsAttribute.int('test', 1)]),
+            data: TsAttributes([TsAttribute.int('test', 1)])),
       );
       /*
       BatchWriteRowResponse {
@@ -427,7 +550,7 @@ void rowTest(TsClient client) {
       await client.putRow(TsPutRowRequest(
           tableName: keyStringTable,
           primaryKey: key1,
-          data: [TsAttribute.int('test', 1)]));
+          data: TsAttributes([TsAttribute.int('test', 1)])));
 
       // {maxVersions: 1, limit: null, tableName: test_key_string, inclusiveStartPrimaryKey: [{key: INF_MIN}], exclusiveEndPrimaryKey: [{key: INF_MAX}], direction: TsDirection.forward}
       // TSs: getRange {"maxVersions":1,"limit":null,"tableName":"test_key_string","inclusiveStartPrimaryKey":[{"key":{}}],"exclusiveEndPrimaryKey":[{"key":{}}],"direction":"FORWARD"}

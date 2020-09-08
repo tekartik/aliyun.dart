@@ -316,6 +316,12 @@ class TsClientSembast implements TsClient {
       return TsBatchWriteRowsResponseSembast(rows);
     });
   }
+
+  @override
+  Future<TsUpdateRowResponse> updateRow(TsUpdateRowRequest request) {
+    // TODO: implement updateRow
+    throw UnimplementedError();
+  }
 }
 
 class TsBatchGetRowsResponseSembast implements TsBatchGetRowsResponse {
@@ -341,6 +347,7 @@ class TsBatchGetRowResponseRowSembast implements TsBatchGetRowsResponseRow {
       this.errorMessage,
       this.isOk,
       this.rowContext});
+
   @override
   final TsAttributes attributes;
 

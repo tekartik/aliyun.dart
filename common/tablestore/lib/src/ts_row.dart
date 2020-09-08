@@ -149,7 +149,7 @@ class TsPutRowRequest {
   final String tableName;
   final TsPrimaryKey primaryKey;
   final TsCondition condition;
-  final List<TsAttribute> data;
+  final TsAttributes data;
 
   TsPutRowRequest(
       {@required this.tableName,
@@ -157,7 +157,22 @@ class TsPutRowRequest {
       this.condition,
 
       /// Columns values
-      this.data});
+      @required this.data});
+}
+
+class TsUpdateRowRequest {
+  final String tableName;
+  final TsPrimaryKey primaryKey;
+  final TsCondition condition;
+  final TsUpdateAttributes data;
+
+  TsUpdateRowRequest(
+      {@required this.tableName,
+      @required this.primaryKey,
+      this.condition,
+
+      /// Columns values
+      @required this.data});
 }
 
 class TsBatchGetRowsRequest {
@@ -238,6 +253,10 @@ abstract class TsPutRowResponse {
   TsGetRow get row;
 }
 
+abstract class TsUpdateRowResponse {
+  TsGetRow get row;
+}
+
 abstract class TsDeleteRowResponse {}
 
 abstract class TsGetRangeResponse {
@@ -315,6 +334,12 @@ extension TsBatchGetRowsResponseRowExt on TsBatchGetRowsResponseRow {
 }
 
 extension TsDeleteRowResponseExt on TsDeleteRowResponse {
+  Model toDebugMap() {
+    return Model({});
+  }
+}
+
+extension TsUpdateRowResponseExt on TsUpdateRowResponse {
   Model toDebugMap() {
     return Model({});
   }

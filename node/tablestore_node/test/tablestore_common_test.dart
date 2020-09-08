@@ -66,6 +66,8 @@ void main() {
       });
 
       r = TsPutRowRequest(
+          // Not supported for real...
+          data: null,
           tableName: 'test',
           primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]));
       expect(toPutRowParams(r), {
@@ -74,12 +76,13 @@ void main() {
         'primaryKey': [
           {'key': TsValueLong.fromNumber(1)},
         ],
-        'returnContent': {'returnType': 1}
+        'returnContent': {'returnType': 1},
       });
       r = TsPutRowRequest(
           tableName: 'test',
           primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
-          data: [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')]);
+          data: TsAttributes(
+              [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')]));
       expect(toPutRowParams(r), {
         'condition': TsCondition.ignore,
         'tableName': 'test',
@@ -89,6 +92,56 @@ void main() {
         'attributeColumns': [
           {'col1': TsValueLong.fromNumber(1)},
           {'col2': 'value'}
+        ],
+        'returnContent': {'returnType': 1}
+      });
+    });
+
+    test('toUpdateRowParams', () {
+      var r = TsUpdateRowRequest(tableName: null, primaryKey: null, data: null);
+
+      expect(toUpdateRowParams(r), {
+        'condition': TsCondition.expectExist,
+        'returnContent': {'returnType': 1}
+      });
+
+      r = TsUpdateRowRequest(
+          // Not supported for real...
+          data: null,
+          tableName: 'test',
+          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]));
+      expect(toUpdateRowParams(r), {
+        'tableName': 'test',
+        'condition': TsCondition.expectExist,
+        'primaryKey': [
+          {'key': TsValueLong.fromNumber(1)},
+        ],
+        'returnContent': {'returnType': 1},
+      });
+      r = TsUpdateRowRequest(
+          tableName: 'test',
+          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
+          data: TsUpdateAttributes([
+            TsUpdateAttributePut(TsAttributes(
+                [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')])),
+            TsUpdateAttributeDelete(['col3', 'col4'])
+          ]));
+      expect(toUpdateRowParams(r), {
+        'condition': TsCondition.expectExist,
+        'tableName': 'test',
+        'primaryKey': [
+          {'key': TsValueLong.fromNumber(1)}
+        ],
+        'updateOfAttributeColumns': [
+          {
+            'PUT': [
+              {'col1': TsValueLong.fromNumber(1)},
+              {'col2': 'value'}
+            ]
+          },
+          {
+            'DELETE_ALL': ['col3', 'col4']
+          }
         ],
         'returnContent': {'returnType': 1}
       });
