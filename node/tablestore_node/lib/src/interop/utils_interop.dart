@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:js/js_util.dart' as util;
 import 'package:node_interop/node_interop.dart' as node;
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
-// import 'package:tekartik_aliyun_tablestore_node/src/import_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 
 import 'js_node_interop.dart' as js;
@@ -129,6 +128,11 @@ dynamic tsJsify(Object dartObject) {
 
   if (dartObject is TsWriteRowType) {
     return tsWriteRowTypeToNative(dartObject);
+  }
+
+  if (dartObject is TsArrayHack) {
+    // devPrint('converting $dartObject');
+    return dartObject.toJs(tsJsify);
   }
 
   print('Could not convert type ${dartObject?.runtimeType}, value $dartObject');

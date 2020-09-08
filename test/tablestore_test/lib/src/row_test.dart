@@ -60,7 +60,7 @@ void rowTest(TsClient client) {
           data: [TsAttribute('test', 'text')]));
       expect(response.toDebugMap(), {
         'row': {
-          'primaryKeys': [
+          'primaryKey': [
             {'key': 'value'}
           ],
           'attributes': []
@@ -72,7 +72,7 @@ void rowTest(TsClient client) {
           .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
       expect(getResponse.toDebugMap(), {
         'row': {
-          'primaryKeys': [
+          'primaryKey': [
             {'key': 'value'}
           ],
           'attributes': [
@@ -92,7 +92,7 @@ void rowTest(TsClient client) {
           data: [TsAttribute('test', 'text')]));
       expect(response.toDebugMap(), {
         'row': {
-          'primaryKeys': [
+          'primaryKey': [
             {'key': 'value'}
           ],
           'attributes': []
@@ -131,7 +131,7 @@ void rowTest(TsClient client) {
           data: [TsAttribute('test', 'text')]));
       expect(response.toDebugMap(), {
         'row': {
-          'primaryKeys': [
+          'primaryKey': [
             {'key': 'putRow'}
           ],
           'attributes': []
@@ -146,7 +146,7 @@ void rowTest(TsClient client) {
           data: [TsAttribute('test', 'text')]));
       expect(response.toDebugMap(), {
         'row': {
-          'primaryKeys': [
+          'primaryKey': [
             {'key': 'putRow'}
           ],
           'attributes': []
@@ -224,7 +224,7 @@ void rowTest(TsClient client) {
           .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
       expect(getResponse.toDebugMap(), {
         'row': {
-          'primaryKeys': [
+          'primaryKey': [
             {'key': 'long'}
           ],
           'attributes': [
@@ -244,7 +244,7 @@ void rowTest(TsClient client) {
           .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
       expect(getResponse.toDebugMap(), {
         'row': {
-          'primaryKeys': [
+          'primaryKey': [
             {'key': 'long'}
           ],
           'attributes': [
@@ -277,7 +277,7 @@ void rowTest(TsClient client) {
           .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
       expect(getResponse.toDebugMap(), {
         'row': {
-          'primaryKeys': [
+          'primaryKey': [
             {'key': 'binary'}
           ],
           'attributes': [
@@ -296,7 +296,7 @@ void rowTest(TsClient client) {
 
       // Put single
       var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_1')]);
-      //var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
+      var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
       //var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
       await client.putRow(
         TsPutRowRequest(
@@ -305,18 +305,44 @@ void rowTest(TsClient client) {
             data: [TsAttribute.int('test', 1)]),
       );
 
-      await client.batchGetRows(TsBatchGetRowsRequest(tables: [
+      var response = await client.batchGetRows(TsBatchGetRowsRequest(tables: [
         TsBatchGetRowsRequestTable(
             tableName: keyStringTable, primaryKeys: [key1], columns: ['test']),
       ]));
-    }, skip: true);
+
+      // devPrint(jsonPretty(response.toDebugMap()));
+      expect(response.toDebugMap(), {
+        'tables': [
+          [
+            {
+              'isOk': true,
+              'tableName': 'test_key_string',
+              'primaryKey': [
+                {'key': 'batch_1'}
+              ],
+              'attributes': [
+                {'test': TsValueLong.fromNumber(1)}
+              ]
+            },
+          ]
+        ]
+      });
+
+      response = await client.batchGetRows(TsBatchGetRowsRequest(tables: [
+        TsBatchGetRowsRequestTable(
+            tableName: keyStringTable,
+            primaryKeys: [key1, key2],
+            columns: ['test']),
+      ]));
+    });
 
     test('batch_write', () async {
       await createKeyStringTable();
       var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_1')]);
       //var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
       //var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
-      await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+      var response =
+          await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
         TsBatchWriteRowsRequestTable(tableName: keyStringTable, rows: [
           TsBatchWriteRowsRequestRow(
               type: TsWriteRowType.put,
@@ -324,6 +350,20 @@ void rowTest(TsClient client) {
               data: [TsAttribute.int('test', 1)]),
         ])
       ]));
+      //devPrint(jsonPretty(response.toDebugMap()));
+      expect(response.toDebugMap(), {
+        'rows': [
+          {
+            'isOk': true,
+            'tableName': 'test_key_string',
+            'primaryKey': [
+              {'key': 'batch_1'}
+            ],
+            'attributes': []
+          }
+        ]
+      });
+
       /*
       BatchWriteRowResponse {
   tables:
@@ -344,7 +384,7 @@ void rowTest(TsClient client) {
   RequestId: '0005aebb-8f18-0f8b-e6c1-720b0b29242f' }
 
        */
-    }, skip: true);
+    });
 
     test('no_batch', () async {
       await createKeyStringTable();

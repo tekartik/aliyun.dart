@@ -1,5 +1,5 @@
 export 'src/ts_client.dart' show TsClient, TsClientOptions;
-export 'src/ts_column.dart' show TsKeyValue, TsAttribute;
+export 'src/ts_column.dart' show TsKeyValue, TsAttribute, TsAttributes;
 export 'src/ts_exception.dart' show TsException;
 export 'src/ts_row.dart'
     show
@@ -26,7 +26,11 @@ export 'src/ts_row.dart'
         TsBatchGetRowsRequest,
         TsBatchGetRowsRequestTable,
         TsBatchGetRowsResponse,
+        TsBatchGetRowsResponseRow,
+        TsBatchGetRowsResponseExt,
+        TsBatchGetRowsResponseRowExt,
         TsBatchWriteRowsResponse,
+        TsBatchWriteRowsResponseExt,
         TsBatchWriteRowsRequest,
         TsBatchWriteRowsRequestRow,
         TsBatchWriteRowsRequestTable,

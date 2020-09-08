@@ -140,6 +140,9 @@ class TsPrimaryKey {
 
   @override
   String toString() => list.toString();
+
+  ModelList toDebugList() =>
+      ModelList(list.map((e) => e?.toDebugMap())?.toList(growable: false));
 }
 
 class TsPutRowRequest {
@@ -224,7 +227,7 @@ class TsDeleteRowRequest {
 abstract class TsGetRow {
   TsPrimaryKey get primaryKey;
 
-  List<TsAttribute> get attributes;
+  TsAttributes get attributes;
 }
 
 abstract class TsGetRowResponse {
@@ -241,12 +244,24 @@ abstract class TsGetRangeResponse {
   List<TsGetRow> get rows;
 }
 
-class TsBatchGetRowsResponse {
-  // TsGetRow get row;
+// {isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string,
+// capacityUnit: {read: 1, write: 0}, primaryKey: [{name: key, value: batch_1}],
+// attributes: [{columnName: test, columnValue: {buffer: [1, 0, 0, 0, 0, 0, 0, 0], offset: 0}
+abstract class TsBatchGetRowsResponseRow {
+  bool get isOk;
+  int get errorCode;
+  String get errorMessage;
+  String get tableName;
+  TsPrimaryKey get primaryKey;
+  TsAttributes get attributes;
 }
 
-class TsBatchWriteRowsResponse {
-  // TsGetRow get row;
+abstract class TsBatchGetRowsResponse {
+  List<List<TsBatchGetRowsResponseRow>> get tables;
+}
+
+abstract class TsBatchWriteRowsResponse {
+  List<TsBatchGetRowsResponseRow> get rows;
 }
 
 extension TsGetRowResponseExt on TsGetRowResponse {
@@ -267,6 +282,38 @@ extension TsGetRangeResponseExt on TsGetRangeResponse {
   }
 }
 
+extension TsBatchGetRowsResponseExt on TsBatchGetRowsResponse {
+  Model toDebugMap() {
+    return Model({})
+      ..setValue(
+          'tables',
+          tables
+              ?.map((table) =>
+                  table.map((row) => row.toDebugMap()).toList(growable: false))
+              ?.toList(growable: false));
+  }
+}
+
+extension TsBatchWriteRowsResponseExt on TsBatchWriteRowsResponse {
+  Model toDebugMap() {
+    return Model({})
+      ..setValue('rows',
+          rows?.map((row) => row.toDebugMap())?.toList(growable: false));
+  }
+}
+
+extension TsBatchGetRowsResponseRowExt on TsBatchGetRowsResponseRow {
+  Model toDebugMap() {
+    return Model({})
+      ..setValue('isOk', isOk)
+      ..setValue('errorMessage', errorCode)
+      ..setValue('errorCode', errorCode)
+      ..setValue('tableName', tableName)
+      ..setValue('primaryKey', primaryKey?.toDebugList())
+      ..setValue('attributes', attributes?.toDebugList());
+  }
+}
+
 extension TsDeleteRowResponseExt on TsDeleteRowResponse {
   Model toDebugMap() {
     return Model({});
@@ -276,9 +323,7 @@ extension TsDeleteRowResponseExt on TsDeleteRowResponse {
 extension TsGetRowExt on TsGetRow {
   Model toDebugMap() {
     return Model()
-      ..setValue('primaryKeys',
-          primaryKey.list?.map((e) => e?.toDebugMap())?.toList(growable: false))
-      ..setValue('attributes',
-          attributes?.map((e) => e?.toDebugMap())?.toList(growable: false));
+      ..setValue('primaryKey', primaryKey?.toDebugList())
+      ..setValue('attributes', attributes?.toDebugList());
   }
 }

@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:tekartik_aliyun_tablestore/src/ts_value_type.dart';
+import 'package:tekartik_common_utils/common_utils_import.dart';
+import 'package:tekartik_common_utils/model/model.dart';
 
 class TsKeyValue {
   final String name;
@@ -27,6 +29,24 @@ class TsKeyValue {
 
   @override
   String toString() => toDebugMap().toString();
+}
+
+class TsAttributes with ListMixin<TsAttribute> {
+  final List<TsAttribute> list;
+
+  TsAttributes(this.list);
+
+  @override
+  int length;
+
+  @override
+  TsAttribute operator [](int index) => list[index];
+
+  @override
+  void operator []=(int index, TsAttribute value) => list[index] = value;
+
+  ModelList toDebugList() =>
+      ModelList(list.map((e) => e.toDebugMap()).toList(growable: false));
 }
 
 // Read only

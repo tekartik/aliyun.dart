@@ -169,7 +169,8 @@ class TsClientSembast implements TsClient {
       var row = table.row(request.primaryKey);
       var record = row.record();
       var result = await record.get();
-      return TsGetRowResponseSembast(row, result.primaryKey, result.attributes);
+      return TsGetRowResponseSembast(
+          row, result.primaryKey, result?.attributes);
       /*
       var tableExtraRaw = await tableExtraRecord.get(txn);
       if (tableExtraRaw != null) {
@@ -255,17 +256,108 @@ class TsClientSembast implements TsClient {
   }
 
   @override
-  Future<TsBatchGetRowsResponse> batchGetRows(TsBatchGetRowsRequest request) {
-    // TODO: implement batchGetRows
-    throw UnimplementedError();
+  Future<TsBatchGetRowsResponse> batchGetRows(
+      TsBatchGetRowsRequest request) async {
+    return await (await _db).transaction((txn) async {
+      var tables = <List<TsBatchGetRowResponseRowSembast>>[];
+      for (var requestTable in request.tables) {
+        var rows = <TsBatchGetRowResponseRowSembast>[];
+        var table = await getTableContext(txn, requestTable.tableName);
+        for (var primaryKey in requestTable.primaryKeys) {
+          var row = table.row(primaryKey);
+
+          var record = row.record();
+          var result = await record.get();
+          // return TsGetRowResponseSembast(row, result.primaryKey, result.attributes);
+          var isOk = true;
+
+          rows.add(TsBatchGetRowResponseRowSembast(
+              rowContext: row, attributes: result?.attributes, isOk: isOk));
+        }
+        tables.add(rows);
+      }
+      return TsBatchGetRowsResponseSembast(tables);
+    });
   }
 
   @override
   Future<TsBatchWriteRowsResponse> batchWriteRows(
-      TsBatchWriteRowsRequest request) {
-    // TODO: implement batchWriteRows
-    throw UnimplementedError();
+      TsBatchWriteRowsRequest request) async {
+    return await (await _db).transaction((txn) async {
+      var rows = <TsBatchGetRowResponseRowSembast>[];
+      for (var requestTable in request.tables) {
+        var table = await getTableContext(txn, requestTable.tableName);
+        for (var requestRow in requestTable.rows) {
+          var row = table.row(requestRow.primaryKey);
+          var record = row.record(requestRow.data);
+          var isOk = true;
+          String errorMessage;
+          // int errorCode;
+          try {
+            var key =
+                await _checkPutDeleteCondition(record, requestRow.condition);
+            if (key != null) {
+              await record.delete();
+            }
+          } on TsExceptionSembast catch (e) {
+            isOk = false;
+            errorMessage = e.message;
+            // errorCode = e.
+
+          }
+          await record.put();
+          rows.add(TsBatchGetRowResponseRowSembast(
+              rowContext: row,
+              attributes: TsAttributes([]),
+              isOk: isOk,
+              errorMessage: errorMessage));
+        }
+      }
+      return TsBatchWriteRowsResponseSembast(rows);
+    });
   }
+}
+
+class TsBatchGetRowsResponseSembast implements TsBatchGetRowsResponse {
+  @override
+  final List<List<TsBatchGetRowsResponseRow>> tables;
+
+  TsBatchGetRowsResponseSembast(this.tables);
+}
+
+class TsBatchWriteRowsResponseSembast implements TsBatchWriteRowsResponse {
+  TsBatchWriteRowsResponseSembast(this.rows);
+
+  @override
+  final List<TsBatchGetRowsResponseRow> rows;
+}
+
+class TsBatchGetRowResponseRowSembast implements TsBatchGetRowsResponseRow {
+  final TsRowContextSembast rowContext;
+
+  TsBatchGetRowResponseRowSembast(
+      {this.attributes,
+      this.errorCode,
+      this.errorMessage,
+      this.isOk,
+      this.rowContext});
+  @override
+  final TsAttributes attributes;
+
+  @override
+  final int errorCode;
+
+  @override
+  final String errorMessage;
+
+  @override
+  final bool isOk;
+
+  @override
+  TsPrimaryKey get primaryKey => rowContext.primaryKey;
+
+  @override
+  String get tableName => rowContext.tableName;
 }
 
 class TsGetRowSembast implements TsGetRow {
@@ -274,7 +366,7 @@ class TsGetRowSembast implements TsGetRow {
   @override
   final TsPrimaryKey primaryKey;
   @override
-  final List<TsAttribute> attributes;
+  final TsAttributes attributes;
 }
 
 dynamic valueToSembastValue(dynamic value) {
@@ -443,7 +535,8 @@ class TsRowRecordContextSembast {
     if (id != null) {
       var result = await table.store.record(id).get(table.client);
       var primaryKey = TsPrimaryKey(read(result, table.primaryKeyNames));
-      var attributes = readAttributesBut(result, table.primaryKeyNames);
+      var attributes =
+          TsAttributes(readAttributesBut(result, table.primaryKeyNames));
       return TsGetRowSembast(primaryKey, attributes);
     }
     return null;
@@ -456,6 +549,8 @@ class TsRowContextSembast {
 
   TsRowContextSembast(this.table, this.primaryKey);
 
+  String get tableName => table.tableName;
+
   /// Null record for get
   TsRowRecordContextSembast record([List<TsAttribute> attributes]) =>
       TsRowRecordContextSembast(this, attributes);
@@ -463,7 +558,7 @@ class TsRowContextSembast {
 
 class TsGetRowResponseSembast extends TsReadRowResponseSembast
     implements TsGetRowResponse {
-  final List<TsAttribute> attributes;
+  final TsAttributes attributes;
   final TsPrimaryKey primaryKey;
 
   TsGetRowResponseSembast(
@@ -479,7 +574,7 @@ class TsReadRowResponseSembast {
 
   TsReadRowResponseSembast(this.rowContext);
 
-  TsGetRow get row => TsGetRowSembast(rowContext.primaryKey, []);
+  TsGetRow get row => TsGetRowSembast(rowContext.primaryKey, TsAttributes([]));
 }
 
 class TsPutRowResponseSembast extends TsReadRowResponseSembast

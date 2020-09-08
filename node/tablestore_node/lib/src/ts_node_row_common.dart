@@ -1,5 +1,6 @@
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore_common.dart';
 import 'package:tekartik_common_utils/model/model.dart';
 
@@ -45,7 +46,7 @@ Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
     'tables': request.tables
         .map((table) => <String, dynamic>{
               if (table.tableName != null) 'tableName': table.tableName,
-              'rows': table.rows.map((row) => <String, dynamic>{
+              'rows': TsArrayHack(table.rows.map((row) => <String, dynamic>{
                     // Needed
                     'type': row.type,
 
@@ -61,7 +62,7 @@ Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
                     'returnContent': {
                       'returnType': tsNodeCommon.returnType.Primarykey
                     }
-                  }),
+                  }))
             })
         .toList(growable: false)
   };
@@ -74,11 +75,11 @@ Map<String, dynamic> toBatchGetRowsParams(TsBatchGetRowsRequest request) {
     'tables': request.tables
         .map((table) => <String, dynamic>{
               if (table.tableName != null) 'tableName': table.tableName,
-
               // exp: TODO not hardcode
               'maxVersions': 1,
               // !singular
-              'primaryKey': [...table.primaryKeys.map(tsPrimaryKeyParams)],
+              'primaryKey':
+                  TsArrayHack(table.primaryKeys.map(tsPrimaryKeyParams)),
               if (table.columns != null) 'columnsToGet': table.columns,
             })
         .toList()

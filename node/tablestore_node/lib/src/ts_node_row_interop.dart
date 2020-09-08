@@ -157,10 +157,50 @@ class TsBatchGetRowParamsTableJs {
       {int maxVersions, String tableName, dynamic primaryKey});
 }
 
+// {tables: [[{isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string, capacityUnit: {read: 1, write: 0}, primaryKey: [{name: key, value: batch_1}], attributes: [{columnName: test, columnValue: {buffer: [1, 0, 0, 0, 0, 0, 0, 0], offset: 0}, timestamp: {buffer: [105, 65, 90, 108, 116, 1, 0, 0], offset: 0}}]}, {isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string, capacityUnit: {read: 1, write: 0}, primaryKey: null, attributes: null}]], RequestId: 0005aec7-4095-ae6b-e5c1-720b0b23b32a}
 @JS()
 @anonymous
 abstract class TsBatchGetRowResponseJs {
-  List tables;
+  List/*<List<TsBatchGetRowResponseRowJs>>*/ tables;
+}
+
+extension TsBatchGetRowResponseJsExt on TsBatchGetRowResponseJs {
+  List<List<TsBatchGetRowResponseRowJs>> get extTables => tables
+      .map((e) => (e as List)
+          .map((e) => e as TsBatchGetRowResponseRowJs)
+          .toList(growable: false))
+      .toList(growable: false);
+}
+
+@JS()
+@anonymous
+abstract class TsBatchGetRowResponseRowJs {
+  bool get isOk;
+  int get errorCode;
+  String get errorMessage;
+  String get tableName;
+  List get primaryKey;
+  List get attributes;
+}
+
+Iterable<TsRowPrimaryKeyValueJs> batchRowPrimaryKeyValuesJs(
+        TsBatchGetRowResponseRowJs js) =>
+    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
+
+Iterable<TsRowAttributeKeyValueJs> batchRowAttributeKeyValuesJs(
+        TsBatchGetRowResponseRowJs js) =>
+    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
+
+@JS()
+@anonymous
+abstract class TsBatchWriteRowResponseJs {
+  List/*<TsBatchGetRowResponseRowJs>*/ tables;
+}
+
+extension TsBatchWriteRowResponseJsExt on TsBatchWriteRowResponseJs {
+  List<TsBatchGetRowResponseRowJs> get rows => tables
+      .map((e) => e as TsBatchGetRowResponseRowJs)
+      .toList(growable: false);
 }
 
 // Empty we set propery on it
@@ -199,36 +239,8 @@ TsGetRowParamsJs toGetRowParamsJs(TsGetRowRequest request) {
       primaryKey: tsPrimaryKeyToNative(request.primaryKey));
 }
 
-TsBatchGetRowParamsJs toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
-  return TsBatchGetRowParamsJs(
-    tables: request.tables.map((t) {
-      var primaryKeysJs = JsArray();
-      t.primaryKeys.forEach((pk) {
-        var keyList = JsArray();
-        pk.list.forEach((element) {
-          keyList.add(tsKeyValueToNative(element));
-        });
-        primaryKeysJs.add(keyList);
-      });
-      var tableJs = TsBatchGetRowParamsTableJs(
-        tableName: t.tableName,
-        // maxVersions: 1,
-        // primaryKey:
-        // primaryKeysJs // t.primaryKeys.map(tsPrimaryKeyToNative).toList(),
-      );
-      util.setProperty(tableJs, 'primaryKey', primaryKeysJs);
-      return tableJs;
-    }).toList(),
-  );
-  /*
-      maxVersions: 1,
-      tableName: request.tableName,
-      primaryKey: request.primaryKey.list
-          .map((kv) => {kv.name: tsJsify(kv.value)})
-          .toList());
-
-   */
-}
+@JS('Object.keys')
+external void jsObjectDefineProperty(Object obj, String name, dynamic property);
 
 class JsArrayWrapper<T> {
   dynamic native = util.newObject();
@@ -253,17 +265,31 @@ class JsArrayWrapper<T> {
     _setLength(length + 1);
   }
 
-  void addAll(List<T> list) {
+  void addAll(Iterable<T> list) {
     list.forEach((element) {
       add(element);
     });
   }
 }
 
-@JS('Object.keys')
-external void jsObjectDefineProperty(Object obj, String name, dynamic property);
+// Experiment array that will be converted as a map to support
+// for..in
+class TsArrayHack<T> {
+  final Iterable<T> list;
 
-dynamic toBatchGetRowParamsJs2(TsBatchGetRowsRequest request) {
+  TsArrayHack(this.list);
+
+  // Convert to javascript!
+  dynamic toJs(dynamic Function(dynamic) jsify) {
+    var wrapper = JsArrayWrapper();
+    for (var item in list) {
+      wrapper.add(jsify(item));
+    }
+    return wrapper.native;
+  }
+}
+
+dynamic toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
   var requestJs = util.newObject();
 
   var tablesJs = [];
@@ -302,51 +328,7 @@ dynamic toBatchGetRowParamsJs2(TsBatchGetRowsRequest request) {
   arrayW.add({'test': 456});
   print('#3 ${jsObjectKeys(arrayW.native)}');
   return requestJs;
-  /*
-  return TsBatchGetRowParamsJs(
-    tables: request.tables.map((t) {
-      var primaryKeysJs = JsArray();
-      t.primaryKeys.forEach((pk) {
-        var keyList = JsArray();
-        pk.list.forEach((element) {
-          keyList.add(tsKeyValueToNative(element));
-        });
-        primaryKeysJs.add(keyList);
-      });
-      var tableJs = TsBatchGetRowParamsTableJs(
-        tableName: t.tableName,
-        // maxVersions: 1,
-        // primaryKey:
-        // primaryKeysJs // t.primaryKeys.map(tsPrimaryKeyToNative).toList(),
-      );
-      util.setProperty(tableJs, 'primaryKey', primaryKeysJs);
-      return tableJs;
-    }).toList(),
-  );
-
-   */
-  /*
-      maxVersions: 1,
-      tableName: request.tableName,
-      primaryKey: request.primaryKey.list
-          .map((kv) => {kv.name: tsJsify(kv.value)})
-          .toList());
-
-   */
 }
-
-var jsParams = tsJsify({
-  'tables': [
-    {
-      'tableName': 'test_key_string',
-      'primaryKey': [
-        [
-          {'key': 'batch_1'}
-        ]
-      ]
-    }
-  ]
-});
 
 class TsPutRowParamsJs {}
 
@@ -379,25 +361,6 @@ class TsPutRowParamsJs {}
 TsPutRowResponse putRowResponseFromNative(dynamic nativeResponseJs) {
   if (nativeResponseJs != null) {
     return TsPutRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
-  }
-  return null;
-}
-
-// Response to native
-TsBatchWriteRowsResponse batchWriteRowsResponseFromNative(
-    dynamic nativeResponseJs) {
-  if (nativeResponseJs != null) {
-    return TsBatchWriteRowsResponseNode(
-        nativeResponseJs as TsReadRowResponseJs);
-  }
-  return null;
-}
-
-// Response to native
-TsBatchGetRowsResponse batchGetRowsResponseFromNative(
-    TsBatchGetRowResponseJs nativeResponseJs) {
-  if (nativeResponseJs != null) {
-    return TsBatchGetRowsResponseNode(nativeResponseJs);
   }
   return null;
 }
@@ -492,15 +455,29 @@ class TsGetRowNode implements TsGetRow {
 
   @override
   TsPrimaryKey get primaryKey =>
-      TsPrimaryKey(rowPrimaryKeyValuesJs(rowJs).map((kvJs) {
-        return TsKeyValue(kvJs.name, tsDartifyValue(kvJs.value));
-      }).toList());
+      fromNativePrimaryKey(rowPrimaryKeyValuesJs(rowJs));
 
   @override
-  List<TsAttribute> get attributes =>
-      rowAttributeKeyValuesJs(rowJs).map((kvJs) {
-        return TsAttribute(kvJs.columnName, tsDartifyValue(kvJs.columnValue));
-      }).toList();
+  TsAttributes get attributes =>
+      fromNativeAttributes(rowAttributeKeyValuesJs(rowJs));
+}
+
+TsAttributes fromNativeAttributes(Iterable<TsRowAttributeKeyValueJs> native) {
+  if (native == null) {
+    return null;
+  }
+  return TsAttributes(native.map((kvJs) {
+    return TsAttribute(kvJs.columnName, tsDartifyValue(kvJs.columnValue));
+  }).toList());
+}
+
+TsPrimaryKey fromNativePrimaryKey(Iterable<TsRowPrimaryKeyValueJs> native) {
+  if (native == null) {
+    return null;
+  }
+  return TsPrimaryKey(native.map((kvJs) {
+    return TsKeyValue(kvJs.name, tsDartifyValue(kvJs.value));
+  }).toList());
 }
 
 abstract class TsReadRowResponseNode {
@@ -532,21 +509,107 @@ class TsDeleteRowResponseNode implements TsDeleteRowResponse {
 }
 
 class TsBatchWriteRowsResponseNode implements TsBatchWriteRowsResponse {
-  final dynamic responseJs;
+  final TsBatchWriteRowResponseJs responseJs;
 
-  TsBatchWriteRowsResponseNode(this.responseJs);
+  TsBatchWriteRowsResponseNode(this.responseJs) {
+    rows = responseJs.rows
+        .map((e) => fromBatchGetRowResponseRowNative(e))
+        .toList(growable: false);
+  }
+
+  @override
+  List<TsBatchGetRowsResponseRow> rows;
 }
 
 class TsBatchGetRowsResponseNode implements TsBatchGetRowsResponse {
   final TsBatchGetRowResponseJs responseJs;
 
   TsBatchGetRowsResponseNode(this.responseJs) {
-    if (responseJs.tables.isNotEmpty) {
-      var table1 = responseJs.tables.first;
-      print(table1.toString());
-      print(jsObjectAsCollection(table1));
-    }
+    tables = responseJs.extTables
+        .map((rows) => rows
+            .map((e) => fromBatchGetRowResponseRowNative(e))
+            .toList(growable: false))
+        .toList(growable: false);
   }
+
+  @override
+  List<List<TsBatchGetRowsResponseRow>> tables;
+
+  @override
+  String toString() => toDebugMap().toString();
+}
+
+/*
+class TsBatchGetRowsResponseRowNode implements TsBatchGetRowsResponseRow {
+  final TsBatchGetRowResponseRowJs rowJs;
+
+  TsBatchGetRowsResponseRowNode(this.rowJs);
+
+  @override
+  // TODO: implement attributes
+  TsAttributes get attributes => throw UnimplementedError();
+
+  @override
+  int get errorCode => rowJs.errorCode;
+
+  @override
+  String get errorMessage => rowJs.errorMessage;
+
+  @override
+  bool get isOk => rowJs.isOk;
+
+  @override
+  // TODO: implement primaryKey
+  TsPrimaryKey get primaryKey => throw UnimplementedError();
+
+  @override
+  String get tableName => rowJs.tableName;
+
+  @override
+  String toString() => toDebugMap().toString();
+}
+*/
+TsBatchGetRowsResponseRow fromBatchGetRowResponseRowNative(
+    TsBatchGetRowResponseRowJs rowJs) {
+  return TsBatchGetRowsResponseRowImpl(
+      isOk: rowJs.isOk,
+      errorCode: rowJs.errorCode,
+      errorMessage: rowJs.errorMessage,
+      tableName: rowJs.tableName,
+      primaryKey: fromNativePrimaryKey(batchRowPrimaryKeyValuesJs(rowJs)),
+      attributes: fromNativeAttributes(batchRowAttributeKeyValuesJs(rowJs)));
+}
+
+/// It seems we cannot use Js here
+class TsBatchGetRowsResponseRowImpl implements TsBatchGetRowsResponseRow {
+  TsBatchGetRowsResponseRowImpl(
+      {this.errorCode,
+      this.errorMessage,
+      this.tableName,
+      this.isOk,
+      this.attributes,
+      this.primaryKey});
+
+  @override
+  String toString() => toDebugMap().toString();
+
+  @override
+  final TsAttributes attributes;
+
+  @override
+  final int errorCode;
+
+  @override
+  final String errorMessage;
+
+  @override
+  final bool isOk;
+
+  @override
+  final TsPrimaryKey primaryKey;
+
+  @override
+  final String tableName;
 }
 
 class TsGetRangeResponseNode implements TsGetRangeResponse {
