@@ -2,6 +2,7 @@ import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_exception.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore_common.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -140,7 +141,7 @@ void main() {
             ]
           },
           {
-            'DELETE_ALL': ['col3', 'col4']
+            'DELETE_ALL': TsArrayHack(['col3', 'col4'])
           }
         ],
         'returnContent': {'returnType': 1}

@@ -14,6 +14,7 @@ dependencies:
       path: common/tablestore
       ref: dart2
     version: '>=0.1.0'
+  collection:
 
 dev_dependencies:
   dev_test: '>=0.13.3-dev.1'

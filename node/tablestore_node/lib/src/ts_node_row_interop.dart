@@ -1,8 +1,6 @@
 @JS()
 library tekartik_aliyun_tablestore_node.ts_row_interop;
 
-import 'dart:js';
-
 import 'package:js/js.dart';
 import 'package:js/js_util.dart' as util;
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
@@ -177,10 +175,15 @@ extension TsBatchGetRowResponseJsExt on TsBatchGetRowResponseJs {
 @anonymous
 abstract class TsBatchGetRowResponseRowJs {
   bool get isOk;
+
   int get errorCode;
+
   String get errorMessage;
+
   String get tableName;
+
   List get primaryKey;
+
   List get attributes;
 }
 
@@ -273,23 +276,6 @@ class JsArrayWrapper<T> {
   }
 }
 
-// Experiment array that will be converted as a map to support
-// for..in
-class TsArrayHack<T> {
-  final Iterable<T> list;
-
-  TsArrayHack(this.list);
-
-  // Convert to javascript!
-  dynamic toJs(dynamic Function(dynamic) jsify) {
-    var wrapper = JsArrayWrapper();
-    for (var item in list) {
-      wrapper.add(jsify(item));
-    }
-    return wrapper.native;
-  }
-}
-
 dynamic toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
   var requestJs = util.newObject();
 
@@ -319,6 +305,7 @@ dynamic toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
   });
   util.setProperty(requestJs, 'tables', tablesJs);
 
+  /*
   var array = JsArray.from([
     {'test': 1}
   ]);
@@ -328,6 +315,8 @@ dynamic toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
   arrayW.add({'test': 123});
   arrayW.add({'test': 456});
   print('#3 ${jsObjectKeys(arrayW.native)}');
+
+   */
   return requestJs;
 }
 
@@ -468,6 +457,9 @@ class TsGetRowNode implements TsGetRow {
   @override
   TsAttributes get attributes =>
       fromNativeAttributes(rowAttributeKeyValuesJs(rowJs));
+
+  @override
+  String toString() => toDebugMap().toString();
 }
 
 TsAttributes fromNativeAttributes(Iterable<TsRowAttributeKeyValueJs> native) {

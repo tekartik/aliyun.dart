@@ -57,7 +57,7 @@ Map<String, dynamic> tsUpdateAttributeParams(
       'PUT': tsAttributeColumnsParams(updateAttribute.attributes)
     };
   } else if (updateAttribute is TsUpdateAttributeDelete) {
-    return <String, dynamic>{'DELETE_ALL': updateAttribute.fields};
+    return <String, dynamic>{'DELETE_ALL': TsArrayHack(updateAttribute.fields)};
   } else {
     throw UnsupportedError('Unsupported update attribute $updateAttribute');
   }

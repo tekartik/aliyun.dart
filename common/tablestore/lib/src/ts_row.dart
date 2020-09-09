@@ -295,6 +295,12 @@ extension TsPutRowResponseExt on TsPutRowResponse {
   }
 }
 
+extension TsUpdateRowResponseExt on TsUpdateRowResponse {
+  Model toDebugMap() {
+    return Model({})..setValue('row', row?.toDebugMap());
+  }
+}
+
 extension TsGetRangeResponseExt on TsGetRangeResponse {
   Model toDebugMap() {
     return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
@@ -334,12 +340,6 @@ extension TsBatchGetRowsResponseRowExt on TsBatchGetRowsResponseRow {
 }
 
 extension TsDeleteRowResponseExt on TsDeleteRowResponse {
-  Model toDebugMap() {
-    return Model({});
-  }
-}
-
-extension TsUpdateRowResponseExt on TsUpdateRowResponse {
   Model toDebugMap() {
     return Model({});
   }

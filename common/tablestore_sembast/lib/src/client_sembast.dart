@@ -318,9 +318,33 @@ class TsClientSembast implements TsClient {
   }
 
   @override
-  Future<TsUpdateRowResponse> updateRow(TsUpdateRowRequest request) {
-    // TODO: implement updateRow
-    throw UnimplementedError();
+  Future<TsUpdateRowResponse> updateRow(TsUpdateRowRequest request) async {
+    return await (await _db).transaction((txn) async {
+      var table = await getTableContext(txn, request.tableName);
+      var row = table.row(request.primaryKey);
+      var record = row.record();
+      var key = await _checkPutDeleteCondition(record, request.condition);
+
+      var list = <TsAttribute>[];
+      if (key != null) {
+        list.addAll((await record.get())?.attributes);
+      }
+      // Merge!
+      for (var update in request.data) {
+        if (update is TsUpdateAttributePut) {
+          for (var attribute in update.attributes) {
+            list.removeWhere((element) => element.name == attribute.name);
+            list.add(attribute);
+          }
+        } else if (update is TsUpdateAttributeDelete) {
+          list.removeWhere((element) => update.fields.contains(element.name));
+        }
+      }
+      record = row.record(list);
+      await record.delete();
+      await record.put();
+      return TsUpdateRowResponseSembast(row);
+    });
   }
 }
 
@@ -590,6 +614,12 @@ class TsPutRowResponseSembast extends TsReadRowResponseSembast
 }
 
 class TsDeleteRowResponseSembast implements TsDeleteRowResponse {}
+
+class TsUpdateRowResponseSembast extends TsReadRowResponseSembast
+    implements TsUpdateRowResponse {
+  TsUpdateRowResponseSembast(TsRowContextSembast rowContext)
+      : super(rowContext);
+}
 
 class TsRangeContextSembast {
   final TsTableContextSembast table;
