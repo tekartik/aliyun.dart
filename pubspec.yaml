@@ -8,7 +8,7 @@ environment:
 
 dev_dependencies:
   test: ">=1.2.0"
-  dev_test: '>=0.12.0-dev.1'
+  dev_test: '>=0.13-3-dev.3'
   grinder:
   tekartik_build_utils:
     git:
@@ -16,3 +16,11 @@ dev_dependencies:
       ref: dart2
     version: '>=0.5.8'
   process_run: '>=0.10.2'
+
+dependency_overrides:
+  dev_test:
+    git:
+      url: git://github.com/tekartik/dev_test.dart
+      path: dev_test
+      ref: develop
+    version: '>=0.13.3+2'

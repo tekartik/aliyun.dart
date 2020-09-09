@@ -7,6 +7,10 @@ Future run({TsClientOptions options}) async {
   print('tablestore: $tablestore');
   var client = tablestore.client(options: options);
   print('client: $client');
-  var tables = await client.listTableNames();
-  print(tables);
+  var tableNames = await client.listTableNames();
+  print(tableNames);
+  for (var tableName in tableNames) {
+    var desc = await client.describeTable(tableName);
+    print(desc);
+  }
 }

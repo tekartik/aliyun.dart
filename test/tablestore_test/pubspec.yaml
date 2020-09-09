@@ -9,8 +9,13 @@ environment:
 dependencies:
   path: ^1.7.0
   test:
-  tekartik_aliyun_tablestore_universal:
-    path: ../../common/tablestore_universal
+  dev_test: '>=0.13.3-dev.1'
+  tekartik_aliyun_tablestore:
+    git:
+      url: git://github.com/tekartik/aliyun.dart
+      path: common/tablestore
+      ref: dart2
+    version: '>=0.1.0'
 
 dev_dependencies:
   pedantic: ^1.9.0
@@ -23,3 +28,7 @@ dev_dependencies:
     version: '>=0.1.0'
   build_node_compilers:
   build_runner:
+
+dependency_overrides:
+  tekartik_aliyun_tablestore:
+    path: ../../common/tablestore

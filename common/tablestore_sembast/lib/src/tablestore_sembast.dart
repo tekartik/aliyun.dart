@@ -2,6 +2,9 @@ import 'package:sembast/sembast.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:sembast/sembast_memory.dart';
 import 'package:meta/meta.dart';
+import 'package:tekartik_aliyun_tablestore_sembast/src/client_sembast.dart';
+import 'package:tekartik_aliyun_tablestore_sembast/src/import.dart';
+import 'package:tekartik_common_utils/common_utils_import.dart';
 
 class TablestoreSembast with TablestoreMixin implements Tablestore {
   final DatabaseFactory factory;
@@ -9,8 +12,7 @@ class TablestoreSembast with TablestoreMixin implements Tablestore {
   TablestoreSembast({@required this.factory});
   @override
   TsClient client({TsClientOptions options}) {
-    // TODO: implement client
-    throw UnimplementedError();
+    return TsClientSembast(this, options);
   }
 
   @override
@@ -26,3 +28,5 @@ final tablestoreSembastMemory =
 /// To call only once (per factory)
 Tablestore getTablestoreSembast({@required DatabaseFactory factory}) =>
     TablestoreSembast(factory: factory);
+
+final debugTs = true; // devWarning(true); true for now
