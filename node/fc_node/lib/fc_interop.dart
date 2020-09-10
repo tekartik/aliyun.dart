@@ -86,6 +86,7 @@ class FcHttpRequestJs implements FcHttpRequest {
 
   String get url => req.url;
 
+  @override
   String get path => getProperty(req, 'path');
 
   String get method => getProperty(req, 'method');

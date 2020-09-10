@@ -2,12 +2,18 @@ Table universal import.
 
 ## Setup
 
-```yaml
-dependencies:
-  tekartik_aliyun_tablestore_universal:
-    git:
-      url: git://github.com/tekartik/aliyun.dart
-      path: common/tablestore_universal
-      ref: dart2
-    version: '>=0.1.0'
-```
+# Setup
+
+- Follow the [node app setup](https://github.com/tekartik/app_node_utils.dart/tree/master/app_build) instructions
+
+- Add the follwing dependency:
+
+  ```yaml
+  dependencies:
+    tekartik_aliyun_tablestore_universal:
+      git:
+        url: git://github.com/tekartik/aliyun.dart
+        path: common/tablestore_universal
+        ref: dart2
+      version: '>=0.1.0'
+  ```

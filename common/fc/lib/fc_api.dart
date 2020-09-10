@@ -1,4 +1,8 @@
-class FcHttpRequest {}
+abstract class FcHttpRequest {
+  String get path;
+  String get url;
+  String get method;
+}
 
 typedef FcRequestHandler = void Function(FcHttpRequest request);
 
