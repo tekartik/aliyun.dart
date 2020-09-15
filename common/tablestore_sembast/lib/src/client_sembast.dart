@@ -240,18 +240,12 @@ class TsClientSembast implements TsClient {
   @override
   Future<TsGetRangeResponse> getRange(TsGetRangeRequest request) async {
     return await (await _db).transaction((txn) async {
-      //var table = await getTableContext(txn, request.tableName);
-      /*
-      var row = table.row(request.primaryKey);
-      var record = row.record();
-      var key = await _checkPutDeleteCondition(record, request.condition);
-      if (key != null) {
-        await record.deleteByKey(key);
-      }
+      //var range = await getTableContext(client, tableName)
+      var table = await getTableContext(txn, request.tableName);
+      var range = table.range(request);
+      var rows = await range.get();
 
-       */
-      // return TsDeleteRowResponseSembast();
-      return null;
+      return TsGetRangeResponseSembast(rows);
     });
   }
 
@@ -348,6 +342,12 @@ class TsClientSembast implements TsClient {
   }
 }
 
+class TsGetRangeResponseSembast implements TsGetRangeResponse {
+  @override
+  final List<TsGetRowSembast> rows;
+  TsGetRangeResponseSembast(this.rows);
+}
+
 class TsBatchGetRowsResponseSembast implements TsBatchGetRowsResponse {
   @override
   final List<List<TsBatchGetRowsResponseRow>> tables;
@@ -442,7 +442,7 @@ class TsTableContextSembast {
   }
 
   TsRangeContextSembast range(TsGetRangeRequest request) {
-    return null; // TODO
+    return TsRangeContextSembast(this, request);
   }
 }
 
@@ -458,6 +458,26 @@ class KeyValueSembast {
 
 List<KeyValueSembast> toSembastKeyValues(List<TsKeyValue> tsKeyValues) =>
     tsKeyValues.map((e) => KeyValueSembast.from(e)).toList(growable: false);
+
+List<TsKeyValue> readKeyValues(Map map, List<String> names) {
+  var list = <TsKeyValue>[];
+  for (var name in names) {
+    var value = sembastValueToValue(map[name]);
+    list.add(TsKeyValue(name, value));
+  }
+  return list;
+}
+
+List<TsAttribute> readAttributesBut(Map map, List<String> names) {
+  var list = <TsAttribute>[];
+  map.forEach((key, value) {
+    if (!names.contains(key)) {
+      var value = sembastValueToValue(map[key]);
+      list.add(TsAttribute(key as String, value));
+    }
+  });
+  return list;
+}
 
 class TsRowRecordContextSembast {
   final TsRowContextSembast row;
@@ -541,31 +561,12 @@ class TsRowRecordContextSembast {
 
   TsRowRecordContextSembast(this.row, [this.attributes]);
 
-  List<TsKeyValue> read(Map map, List<String> names) {
-    var list = <TsKeyValue>[];
-    for (var name in names) {
-      var value = sembastValueToValue(map[name]);
-      list.add(TsKeyValue(name, value));
-    }
-    return list;
-  }
-
-  List<TsAttribute> readAttributesBut(Map map, List<String> names) {
-    var list = <TsAttribute>[];
-    map.forEach((key, value) {
-      if (!names.contains(key)) {
-        var value = sembastValueToValue(map[key]);
-        list.add(TsAttribute(key as String, value));
-      }
-    });
-    return list;
-  }
-
   Future<TsGetRowSembast> get() async {
     var id = await findKey();
     if (id != null) {
       var result = await table.store.record(id).get(table.client);
-      var primaryKey = TsPrimaryKey(read(result, table.primaryKeyNames));
+      var primaryKey =
+          TsPrimaryKey(readKeyValues(result, table.primaryKeyNames));
       var attributes =
           TsAttributes(readAttributesBut(result, table.primaryKeyNames));
       return TsGetRowSembast(primaryKey, attributes);
@@ -626,4 +627,59 @@ class TsRangeContextSembast {
   final TsGetRangeRequest request;
 
   TsRangeContextSembast(this.table, this.request);
+
+  Filter _addFilter(Filter base, Filter added) {
+    if (base == null) {
+      return added;
+    }
+    return Filter.and([base, added]);
+  }
+
+  Filter _and(Filter filter1, Filter filter2) {
+    if (filter1 == null) {
+      return filter2;
+    } else if (filter2 == null) {
+      return filter1;
+    }
+    return Filter.and([filter1, filter2]);
+  }
+
+  Future<List<TsGetRowSembast>> get() async {
+    Filter startFilter;
+    Filter endFilter;
+    var startPrimaryKey = request.start;
+    if (startPrimaryKey != null) {
+      for (var kv in startPrimaryKey.value.list) {
+        if (kv.value != TsValueInfinite.min) {
+          startFilter = _addFilter(
+              startFilter,
+              Filter.greaterThanOrEquals(
+                  kv.name, valueToSembastValue(kv.value)));
+        }
+      }
+    }
+    var endPrimaryKey = request.end;
+    if (endPrimaryKey != null) {
+      for (var kv in endPrimaryKey.value.list) {
+        if (kv.value != TsValueInfinite.max) {
+          endFilter = _addFilter(startFilter,
+              Filter.lessThan(kv.name, valueToSembastValue(kv.value)));
+        }
+      }
+    }
+
+    var finder = Finder(filter: _and(startFilter, endFilter));
+    var records = await table.store.find(table.client, finder: finder);
+
+    var rows = records.map((snapshot) {
+      var result = snapshot.value;
+      var primaryKey =
+          TsPrimaryKey(readKeyValues(result, table.primaryKeyNames));
+      var attributes =
+          TsAttributes(readAttributesBut(result, table.primaryKeyNames));
+
+      return TsGetRowSembast(primaryKey, attributes);
+    }).toList(growable: false);
+    return rows;
+  }
 }

@@ -84,11 +84,13 @@ class FcHttpRequestJs implements FcHttpRequest {
     return jsObjectAsMap(getProperty(req, 'queries'));
   }
 
+  @override
   String get url => req.url;
 
   @override
   String get path => getProperty(req, 'path');
 
+  @override
   String get method => getProperty(req, 'method');
 
   dynamic get headers => getProperty(req, 'headers');

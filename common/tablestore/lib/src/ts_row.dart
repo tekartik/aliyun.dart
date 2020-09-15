@@ -15,7 +15,15 @@ class TsGetRowRequest {
       this.columns});
 }
 
-class TsKeyBoundary {
+class TsKeyStartBoundary extends TsKeyBoundary {
+  TsKeyStartBoundary(TsPrimaryKey value) : super(value, true);
+}
+
+class TsKeyEndBoundary extends TsKeyBoundary {
+  TsKeyEndBoundary(TsPrimaryKey value) : super(value, false);
+}
+
+abstract class TsKeyBoundary {
   final TsPrimaryKey value;
   final bool inclusive;
 
@@ -24,8 +32,8 @@ class TsKeyBoundary {
 
 class TsGetRangeRequest {
   final String tableName;
-  TsKeyBoundary start;
-  TsKeyBoundary end;
+  TsKeyStartBoundary start;
+  TsKeyEndBoundary end;
   final List<String> columns;
   final direction;
   final int limit;

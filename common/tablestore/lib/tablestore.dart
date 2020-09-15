@@ -28,6 +28,8 @@ export 'src/ts_row.dart'
         TsCondition,
         TsColumnCondition,
         TsKeyBoundary,
+        TsKeyStartBoundary,
+        TsKeyEndBoundary,
         TsDirection,
         TsGetRowExt,
         TsConditionRowExistenceExpectation,
