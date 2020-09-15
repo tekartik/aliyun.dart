@@ -432,10 +432,10 @@ class TsReadRowJs {
 }
 
 Iterable<TsRowPrimaryKeyValueJs> rowPrimaryKeyValuesJs(TsReadRowJs js) =>
-    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
 Iterable<TsRowAttributeKeyValueJs> rowAttributeKeyValuesJs(TsReadRowJs js) =>
-    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
+    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
 
 // Response to native
 TsGetRowResponse getRowResponseFromNative(dynamic nativeResponseJs) {
@@ -460,6 +460,9 @@ class TsGetRowNode implements TsGetRow {
 
   @override
   String toString() => toDebugMap().toString();
+
+  @override
+  bool get exists => primaryKey != null;
 }
 
 TsAttributes fromNativeAttributes(Iterable<TsRowAttributeKeyValueJs> native) {

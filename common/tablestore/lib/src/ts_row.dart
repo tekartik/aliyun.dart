@@ -248,6 +248,9 @@ class TsDeleteRowRequest {
 }
 
 abstract class TsGetRow {
+  bool get exists;
+
+  /// Null if the record was not found
   TsPrimaryKey get primaryKey;
 
   TsAttributes get attributes;

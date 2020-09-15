@@ -42,7 +42,9 @@ Future<TsTableContextSembast> getTableContext(
   var tableMetaRecord = getTableMetaRecord(tableName);
   var tableMetaRaw = await tableMetaRecord.get(client);
   if (tableMetaRaw == null) {
-    throw TsExceptionSembast(message: 'table $tableName does not exists');
+    throw TsExceptionSembast(
+        message: 'table $tableName does not exists',
+        isTableNotExistError: true);
   }
   return TsTableContextSembast(
       client, TsTableDescriptionTableMeta.fromMap(tableMetaRaw));
@@ -169,20 +171,9 @@ class TsClientSembast implements TsClient {
       var row = table.row(request.primaryKey);
       var record = row.record();
       var result = await record.get();
+      var exists = result != null;
       return TsGetRowResponseSembast(
-          row, result.primaryKey, result?.attributes);
-      /*
-      var tableExtraRaw = await tableExtraRecord.get(txn);
-      if (tableExtraRaw != null) {
-        // Everything but tableMeta
-        extra = TsTableDescription.fromMap(tableExtraRaw);
-      }
-
-      return TsTableDescription(
-          tableMeta: TsTableDescriptionTableMeta.fromMap(tableMetaRaw),
-          reservedThroughput: extra.reservedThroughput,
-          tableOptions: extra.tableOptions);
-          */
+          row, exists, result?.primaryKey, result?.attributes);
     });
   }
 
@@ -345,6 +336,7 @@ class TsClientSembast implements TsClient {
 class TsGetRangeResponseSembast implements TsGetRangeResponse {
   @override
   final List<TsGetRowSembast> rows;
+
   TsGetRangeResponseSembast(this.rows);
 }
 
@@ -392,7 +384,10 @@ class TsBatchGetRowResponseRowSembast implements TsBatchGetRowsResponseRow {
 }
 
 class TsGetRowSembast implements TsGetRow {
-  TsGetRowSembast(this.primaryKey, this.attributes);
+  @override
+  final bool exists;
+
+  TsGetRowSembast(this.exists, this.primaryKey, this.attributes);
 
   @override
   final TsPrimaryKey primaryKey;
@@ -569,7 +564,8 @@ class TsRowRecordContextSembast {
           TsPrimaryKey(readKeyValues(result, table.primaryKeyNames));
       var attributes =
           TsAttributes(readAttributesBut(result, table.primaryKeyNames));
-      return TsGetRowSembast(primaryKey, attributes);
+      var exists = result != null;
+      return TsGetRowSembast(exists, primaryKey, attributes);
     }
     return null;
   }
@@ -593,25 +589,28 @@ class TsGetRowResponseSembast extends TsReadRowResponseSembast
   final TsAttributes attributes;
   final TsPrimaryKey primaryKey;
 
-  TsGetRowResponseSembast(
-      TsRowContextSembast rowContext, this.primaryKey, this.attributes)
-      : super(rowContext);
+  TsGetRowResponseSembast(TsRowContextSembast rowContext, bool exists,
+      this.primaryKey, this.attributes)
+      : super(rowContext, exists);
 
   @override
-  TsGetRow get row => TsGetRowSembast(primaryKey, attributes);
+  TsGetRow get row => TsGetRowSembast(exists, primaryKey, attributes);
 }
 
 class TsReadRowResponseSembast {
+  final bool exists;
   final TsRowContextSembast rowContext;
 
-  TsReadRowResponseSembast(this.rowContext);
+  TsReadRowResponseSembast(this.rowContext, this.exists);
 
-  TsGetRow get row => TsGetRowSembast(rowContext.primaryKey, TsAttributes([]));
+  TsGetRow get row =>
+      TsGetRowSembast(exists, rowContext.primaryKey, TsAttributes([]));
 }
 
 class TsPutRowResponseSembast extends TsReadRowResponseSembast
     implements TsPutRowResponse {
-  TsPutRowResponseSembast(TsRowContextSembast rowContext) : super(rowContext);
+  TsPutRowResponseSembast(TsRowContextSembast rowContext)
+      : super(rowContext, true);
 }
 
 class TsDeleteRowResponseSembast implements TsDeleteRowResponse {}
@@ -619,7 +618,7 @@ class TsDeleteRowResponseSembast implements TsDeleteRowResponse {}
 class TsUpdateRowResponseSembast extends TsReadRowResponseSembast
     implements TsUpdateRowResponse {
   TsUpdateRowResponseSembast(TsRowContextSembast rowContext)
-      : super(rowContext);
+      : super(rowContext, true);
 }
 
 class TsRangeContextSembast {
@@ -678,7 +677,7 @@ class TsRangeContextSembast {
       var attributes =
           TsAttributes(readAttributesBut(result, table.primaryKeyNames));
 
-      return TsGetRowSembast(primaryKey, attributes);
+      return TsGetRowSembast(true, primaryKey, attributes);
     }).toList(growable: false);
     return rows;
   }

@@ -82,6 +82,31 @@ void rowTest(TsClient client) {
       });
     });
 
+    test('getRow missing table', () async {
+      var key = TsPrimaryKey([TsKeyValue('key', 'value')]);
+
+      try {
+        // OTSParameterInvalidRequest table not exist, code: 400,
+        await client.getRow(TsGetRowRequest(
+            tableName: 'dummy_table_that_should_not_exist', primaryKey: key));
+        fail('should fail');
+      } on TsException catch (e) {
+        expect(e.isTableNotExistError, isTrue);
+        expect(e.retryable, isFalse);
+      }
+    });
+
+    test('getRow missing record', () async {
+      var key =
+          TsPrimaryKey([TsKeyValue('key', 'dummy_key_that_should_not_exist')]);
+      await createKeyStringTable();
+
+      //  {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":{},"RequestId":"0005af5a-da0c-7e1b-e6c1-720b15164f6e"}
+      var response = await client
+          .getRow(TsGetRowRequest(tableName: keyStringTable, primaryKey: key));
+      expect(response.row.primaryKey, isNull);
+    });
+
     test('put/deleteRow', () async {
       var key = TsPrimaryKey([TsKeyValue('key', 'value')]);
 

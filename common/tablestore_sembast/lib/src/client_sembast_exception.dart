@@ -6,6 +6,9 @@ class TsExceptionSembast implements TsException {
   final bool isConditionFailedError;
 
   @override
+  final bool isTableNotExistError;
+
+  @override
   final String message;
 
   /// Default. to true
@@ -14,6 +17,7 @@ class TsExceptionSembast implements TsException {
 
   TsExceptionSembast(
       {this.isConditionFailedError = false,
+      this.isTableNotExistError = false,
       @required this.message,
       this.retryable = false});
 
