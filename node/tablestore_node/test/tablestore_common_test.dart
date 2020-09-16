@@ -20,10 +20,10 @@ void main() {
       expect(toCreateTableParams(description), {
         'tableMeta': {
           'tableName': 'test_create1',
-          'primaryKey': [
+          'primaryKey': TsArrayHack([
             {'name': 'gid', 'type': 1},
             {'name': 'uid', 'type': 1}
-          ]
+          ])
         },
         'reservedThroughput': {
           'capacityUnit': {'read': 0, 'write': 0}

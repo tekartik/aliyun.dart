@@ -2,35 +2,59 @@ import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:test/test.dart';
 
-var table1Name = 'test_create1';
+var twoKeysTable = 'test_create';
 bool _table1Created = false;
 Future createTable1(TsClient client) async {
   if (!_table1Created) {
     var names = await client.listTableNames();
-    if (!names.contains(table1Name)) {
+    if (!names.contains(twoKeysTable)) {
       await client.createTable(
-          table1Name,
+          twoKeysTable,
           TsTableDescription(
               tableMeta: TsTableDescriptionTableMeta(
-                  tableName: table1Name,
+                  tableName: twoKeysTable,
                   primaryKeys: [
                 TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
                 TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
               ])));
     }
     names = await client.listTableNames();
-    expect(names, contains(table1Name));
+    expect(names, contains(twoKeysTable));
     _table1Created = true;
   }
 }
 
+var keyStringTableName = 'test_key_string';
+
+var _keyStringTableCreated = false;
+Future createKeyStringTable(TsClient client, {String name}) async {
+  if (name != null || !_keyStringTableCreated) {
+    // We are limited in the number of create, test it well and sometimes delete!
+    var tableName = name ?? keyStringTableName;
+    var names = await client.listTableNames();
+    if (!names.contains(tableName)) {
+      var description = TsTableDescription(
+          tableMeta:
+              TsTableDescriptionTableMeta(tableName: tableName, primaryKeys: [
+            TsPrimaryKeyDef(name: 'key', type: TsColumnType.string),
+          ]),
+          reservedThroughput: tableCreateReservedThroughputDefault,
+          tableOptions: tableCreateOptionsDefault);
+      await client.createTable(tableName, description);
+    }
+    if (name == null) {
+      _keyStringTableCreated = true;
+    }
+  }
+}
+
 bool _tableWorkCreated = false;
-var workTable = 'test_work2';
+var workTableName = 'test_work';
 Future createWorkTable(TsClient client) async {
   if (!_tableWorkCreated) {
     var description = TsTableDescription(
         tableMeta:
-            TsTableDescriptionTableMeta(tableName: workTable, primaryKeys: [
+            TsTableDescriptionTableMeta(tableName: workTableName, primaryKeys: [
           TsPrimaryKeyDef(name: 'key1', type: TsColumnType.string),
           TsPrimaryKeyDef(name: 'key2', type: TsColumnType.integer),
           TsPrimaryKeyDef(name: 'key3', type: TsColumnType.string),
@@ -39,19 +63,20 @@ Future createWorkTable(TsClient client) async {
         reservedThroughput: tableCreateReservedThroughputDefault,
         tableOptions: tableCreateOptionsDefault);
     var names = await client.listTableNames();
-    if (!names.contains(workTable)) {
-      await client.createTable(workTable, description);
+    if (!names.contains(workTableName)) {
+      await client.createTable(workTableName, description);
     }
     _tableWorkCreated = true;
   }
 }
 
-TsPrimaryKey getWorkTableKey(String col1, int col2, String col3, int col4) {
+TsPrimaryKey getWorkTableKey(
+    String col1, dynamic col2, String col3, dynamic col4) {
   return TsPrimaryKey([
     TsKeyValue('key1', col1),
-    TsKeyValue('key2', TsValueLong.fromNumber(col2)),
+    TsKeyValue('key2', col2 is int ? TsValueLong.fromNumber(col2) : col2),
     TsKeyValue('key3', col3),
-    TsKeyValue('key4', TsValueLong.fromNumber(col4))
+    TsKeyValue('key4', col4 is int ? TsValueLong.fromNumber(col4) : col4)
   ]);
 }
 
@@ -88,7 +113,39 @@ void tablesTest(TsClient client) {
       }
     }
 
-    test('createTable', () async {
+    test('createKeyStringTable', () async {
+      // We are limited in the number of create, test it well and sometimes delete!
+      await createKeyStringTable(client);
+      var names = await client.listTableNames();
+      expect(names, contains(keyStringTableName));
+    });
+
+    test('createTableAlways', () async {
+      var tablePrefix = 'create_table_';
+      var idMax = 0;
+      var names = (await client.listTableNames())
+          .where((name) => name.startsWith(tablePrefix));
+      for (var name in names) {
+        var id = parseInt(name.substring(tablePrefix.length));
+        if (id != null && id > idMax) {
+          idMax = id;
+        }
+        await client.deleteTable(name);
+      }
+      var name = '$tablePrefix${idMax + 1}';
+      // We are limited in the number of create, test it well and sometimes delete!
+      await createKeyStringTable(client, name: name);
+      names = await client.listTableNames();
+      expect(names, contains(name));
+      expect((await client.describeTable(name)).tableMeta.toMap(), {
+        'name': name,
+        'primaryKeys': [
+          {'name': 'key', 'type': 'string'}
+        ]
+      });
+    });
+
+    test('createTable1', () async {
       // We are limited in the number of create, test it well and sometimes delete!
       await createTableCreate1();
       var names = await client.listTableNames();
@@ -119,10 +176,10 @@ void tablesTest(TsClient client) {
 
     test('createWorkTable', () async {
       await createWorkTable(client);
-      var tableDescription = await client.describeTable(workTable);
+      var tableDescription = await client.describeTable(workTableName);
       var tableMeta = tableDescription.tableMeta;
       expect(tableMeta.toMap(), {
-        'name': 'test_work2',
+        'name': workTableName,
         'primaryKeys': [
           {'name': 'key1', 'type': 'string'},
           {'name': 'key2', 'type': 'integer'},

@@ -7,10 +7,10 @@ Map<String, dynamic> toCreateTableParams(TsTableDescription description) {
     if (description.tableMeta != null)
       'tableMeta': {
         'tableName': description.tableMeta.tableName,
-        // !singular
-        'primaryKey': description.tableMeta.primaryKeys.map((item) {
+        // TsArrayHack needed
+        'primaryKey': TsArrayHack(description.tableMeta.primaryKeys.map((item) {
           return {'name': item.name, 'type': columnTypeToNativeType(item.type)};
-        })
+        }))
       },
     if (description.reservedThroughput != null)
       'reservedThroughput': description.reservedThroughput.toMap(),

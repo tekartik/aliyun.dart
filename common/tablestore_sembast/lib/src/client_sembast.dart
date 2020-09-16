@@ -694,47 +694,59 @@ class TsRangeContextSembast {
 
   TsRangeContextSembast(this.table, this.request);
 
-  Filter _addFilter(Filter base, Filter added) {
-    if (base == null) {
-      return added;
-    }
-    return Filter.and([base, added]);
-  }
-
-  Filter _and(Filter filter1, Filter filter2) {
-    if (filter1 == null) {
-      return filter2;
-    } else if (filter2 == null) {
-      return filter1;
-    }
-    return Filter.and([filter1, filter2]);
-  }
-
   Future<List<TsGetRowSembast>> get() async {
-    Filter startFilter;
-    Filter endFilter;
-    var startPrimaryKey = request.start;
-    if (startPrimaryKey != null) {
-      for (var kv in startPrimaryKey.value.list) {
-        if (kv.value != TsValueInfinite.min) {
-          startFilter = _addFilter(
-              startFilter,
-              Filter.greaterThanOrEquals(
-                  kv.name, valueToSembastValue(kv.value)));
-        }
-      }
-    }
-    var endPrimaryKey = request.end;
-    if (endPrimaryKey != null) {
-      for (var kv in endPrimaryKey.value.list) {
-        if (kv.value != TsValueInfinite.max) {
-          endFilter = _addFilter(startFilter,
-              Filter.lessThan(kv.name, valueToSembastValue(kv.value)));
-        }
-      }
-    }
+    var finder = Finder(
+        filter: Filter.custom((record) {
+          var startPrimaryKey = request.start;
+          if (startPrimaryKey != null) {
+            for (var kv in startPrimaryKey.value.list) {
+              var field = kv.name;
+              if (kv.value == TsValueInfinite.min) {
+                break;
+              } else if (kv.value == TsValueInfinite.max) {
+                return false;
+              } else {
+                var value = record[field] as Comparable;
+                var cmp = value.compareTo(valueToSembastValue(kv.value));
+                if (cmp < 0) {
+                  return false;
+                } else if (cmp > 0) {
+                  break;
+                }
+                // equals continue!
+              }
+            }
+          }
+          var endPrimaryKey = request.end;
+          if (endPrimaryKey != null) {
+            for (var i = 0; i < endPrimaryKey.value.list.length; i++) {
+              var kv = endPrimaryKey.value.list[i];
+              var field = kv.name;
+              if (kv.value == TsValueInfinite.min) {
+                return false;
+              } else if (kv.value == TsValueInfinite.max) {
+                break;
+              } else {
+                var value = record[field] as Comparable;
+                var cmp = value.compareTo(valueToSembastValue(kv.value));
+                if (cmp > 0) {
+                  return false;
+                } else if (cmp < 0) {
+                  break;
+                }
+                // Last field make it strict
+                if (i == endPrimaryKey.value.list.length - 1) {
+                  return false;
+                }
+              }
+            }
+          }
+          return true;
+        }),
+        sortOrders:
+            table.tableMeta.primaryKeys.map((e) => SortOrder(e.name)).toList(),
+        limit: request.limit);
 
-    var finder = Finder(filter: _and(startFilter, endFilter));
     var records = await table.store.find(table.client, finder: finder);
 
     var rows = records.map((snapshot) {
