@@ -74,6 +74,7 @@ class FcHttpRequestJs implements FcHttpRequest {
         promiseToFuture(_getRawBodyFn(req, jsify({'encoding': encoding})));
   }
 
+  @override
   Future<String> getBodyString() async {
     var buff = await _getRawBody(encoding: true);
     // print('rawbody ${buff.runtimeType}');
