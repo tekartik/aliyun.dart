@@ -84,7 +84,6 @@ dynamic jsifyList(Iterable list) {
   return js.toJSArray(list.map(tsJsify).toList());
 }
 
-
 dynamic tsValueToNative(dynamic value) {
   // Test before list
   if (value is Uint8List) {
