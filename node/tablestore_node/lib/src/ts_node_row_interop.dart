@@ -216,7 +216,7 @@ class TsKeyValueJs {
 
 TsKeyValueJs tsKeyValueToNative(TsKeyValue keyValue) {
   var kvJs = TsKeyValueJs();
-  util.setProperty(kvJs, keyValue.name, tsJsify(keyValue.value));
+  util.setProperty(kvJs, keyValue.name, tsValueToNative(keyValue.value));
   return kvJs;
 }
 
@@ -671,10 +671,10 @@ TsGetRangeResponse getRangeResponseFromNative(
 }
 
 dynamic tsSingleConditionToNative(TsColumnSingleCondition condition) {
-  var columnConditionJs = util.callConstructor(
-      tablestoreJs.SingleColumnCondition, [
+  var columnConditionJs =
+      util.callConstructor(tablestoreJs.SingleColumnCondition, [
     condition.name,
-    condition.value,
+    tsValueToNative(condition.value),
     tsComparatorTypeToNative(condition.operator)
   ]);
 
@@ -688,10 +688,13 @@ abstract class CompositeConditionJs {
 }
 
 dynamic tsCompositeConditionToNative(TsColumnCompositeCondition condition) {
-  var columnConditionJs =
-      util.callConstructor(tablestoreJs.CompositeColumnCondition, [
-    // tsComparatorTypeToNative(condition.)];
-  ]);
+  var columnConditionJs = util.callConstructor(tablestoreJs.CompositeCondition,
+          [tsLogicalOperatorTypeToNative(condition.operator)])
+      as CompositeConditionJs;
+  for (var sub in condition.list) {
+    columnConditionJs.addSubCondition(tsColumnConditionToNative(sub));
+  }
+
   return columnConditionJs;
 }
 

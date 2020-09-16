@@ -35,18 +35,20 @@ class TsGetRangeRequest {
   TsKeyStartBoundary start;
   TsKeyEndBoundary end;
   final List<String> columns;
-  final direction;
+  final TsDirection direction;
   final int limit;
+  final TsColumnCondition columnCondition;
 
   TsGetRangeRequest(
       {@required this.tableName,
+
+      /// Optional
       this.start,
       this.end,
       this.direction,
       this.limit,
-
-      /// Optional
-      this.columns});
+      this.columns,
+      this.columnCondition});
 }
 
 // Condition for put and delete
@@ -79,6 +81,22 @@ abstract class TsColumnCondition {
   factory TsColumnCondition.equals(String name, dynamic value) =>
       TsColumnSingleCondition(TsComparatorType.equals, name, value);
 
+  factory TsColumnCondition.notEquals(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.notEquals, name, value);
+
+  factory TsColumnCondition.lessThan(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.lessThan, name, value);
+
+  factory TsColumnCondition.lessThanOrEquals(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.lessThanOrEquals, name, value);
+
+  factory TsColumnCondition.greaterThan(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.greaterThan, name, value);
+
+  factory TsColumnCondition.greaterThanOrEquals(String name, dynamic value) =>
+      TsColumnSingleCondition(
+          TsComparatorType.greaterThanOrEquals, name, value);
+
   factory TsColumnCondition.or(List<TsColumnCondition> conditions) =>
       TsColumnCompositeCondition(TsLogicalOperator.or, conditions);
 
@@ -92,7 +110,7 @@ enum TsComparatorType {
   equals,
   notEquals,
   greaterThan,
-  greatorThanOrEquals,
+  greaterThanOrEquals,
   lessThan,
   lessThanOrEquals,
 }

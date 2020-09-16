@@ -688,61 +688,121 @@ class TsUpdateRowResponseSembast extends TsReadRowResponseSembast
       : super(rowContext, true);
 }
 
+Filter tsConditionToSembastFilter(TsColumnCondition condition) {
+  if (condition == null) {
+    return null;
+  }
+  if (condition is TsColumnCompositeCondition) {
+    switch (condition.operator) {
+      case TsLogicalOperator.and:
+        assert(condition.list.length > 1);
+        return Filter.and(
+            condition.list.map(tsConditionToSembastFilter).toList());
+      case TsLogicalOperator.or:
+        assert(condition.list.length > 1);
+        return Filter.or(
+            condition.list.map(tsConditionToSembastFilter).toList());
+      case TsLogicalOperator.not:
+        assert(condition.list.length == 1);
+        throw UnsupportedError('\'not\' not supported yet');
+    }
+  } else if (condition is TsColumnSingleCondition) {
+    switch (condition.operator) {
+      case TsComparatorType.equals:
+        return Filter.equals(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.notEquals:
+        return Filter.notEquals(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.greaterThan:
+        return Filter.greaterThan(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.greaterThanOrEquals:
+        return Filter.greaterThanOrEquals(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.lessThan:
+        return Filter.lessThan(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.lessThanOrEquals:
+        return Filter.lessThanOrEquals(
+            condition.name, valueToSembastValue(condition.value));
+    }
+  }
+  throw 'Unsupported condition $condition';
+}
+
 class TsRangeContextSembast {
   final TsTableContextSembast table;
   final TsGetRangeRequest request;
 
   TsRangeContextSembast(this.table, this.request);
 
+  Filter _and(Filter filter1, Filter filter2) {
+    if (filter1 == null) {
+      return filter2;
+    } else if (filter2 == null) {
+      return filter1;
+    }
+    return Filter.and([filter1, filter2]);
+  }
+
   Future<List<TsGetRowSembast>> get() async {
+    Filter boundaryFilter;
+    var columnFilter = tsConditionToSembastFilter(request.columnCondition);
+    var startPrimaryKey = request.start;
+    var endPrimaryKey = request.end;
+
+    if (startPrimaryKey != null || endPrimaryKey != null) {
+      boundaryFilter = Filter.custom((record) {
+        if (startPrimaryKey != null) {
+          for (var kv in startPrimaryKey.value.list) {
+            var field = kv.name;
+            if (kv.value == TsValueInfinite.min) {
+              break;
+            } else if (kv.value == TsValueInfinite.max) {
+              return false;
+            } else {
+              var value = record[field] as Comparable;
+              var cmp = value.compareTo(valueToSembastValue(kv.value));
+              if (cmp < 0) {
+                return false;
+              } else if (cmp > 0) {
+                break;
+              }
+              // equals continue!
+            }
+          }
+        }
+
+        if (endPrimaryKey != null) {
+          for (var i = 0; i < endPrimaryKey.value.list.length; i++) {
+            var kv = endPrimaryKey.value.list[i];
+            var field = kv.name;
+            if (kv.value == TsValueInfinite.min) {
+              return false;
+            } else if (kv.value == TsValueInfinite.max) {
+              break;
+            } else {
+              var value = record[field] as Comparable;
+              var cmp = value.compareTo(valueToSembastValue(kv.value));
+              if (cmp > 0) {
+                return false;
+              } else if (cmp < 0) {
+                break;
+              }
+              // Last field make it strict
+              if (i == endPrimaryKey.value.list.length - 1) {
+                return false;
+              }
+            }
+          }
+        }
+        // Condition
+        return true;
+      });
+    }
     var finder = Finder(
-        filter: Filter.custom((record) {
-          var startPrimaryKey = request.start;
-          if (startPrimaryKey != null) {
-            for (var kv in startPrimaryKey.value.list) {
-              var field = kv.name;
-              if (kv.value == TsValueInfinite.min) {
-                break;
-              } else if (kv.value == TsValueInfinite.max) {
-                return false;
-              } else {
-                var value = record[field] as Comparable;
-                var cmp = value.compareTo(valueToSembastValue(kv.value));
-                if (cmp < 0) {
-                  return false;
-                } else if (cmp > 0) {
-                  break;
-                }
-                // equals continue!
-              }
-            }
-          }
-          var endPrimaryKey = request.end;
-          if (endPrimaryKey != null) {
-            for (var i = 0; i < endPrimaryKey.value.list.length; i++) {
-              var kv = endPrimaryKey.value.list[i];
-              var field = kv.name;
-              if (kv.value == TsValueInfinite.min) {
-                return false;
-              } else if (kv.value == TsValueInfinite.max) {
-                break;
-              } else {
-                var value = record[field] as Comparable;
-                var cmp = value.compareTo(valueToSembastValue(kv.value));
-                if (cmp > 0) {
-                  return false;
-                } else if (cmp < 0) {
-                  break;
-                }
-                // Last field make it strict
-                if (i == endPrimaryKey.value.list.length - 1) {
-                  return false;
-                }
-              }
-            }
-          }
-          return true;
-        }),
+        filter: _and(boundaryFilter, columnFilter),
         sortOrders:
             table.tableMeta.primaryKeys.map((e) => SortOrder(e.name)).toList(),
         limit: request.limit);

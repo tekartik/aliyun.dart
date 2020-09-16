@@ -66,6 +66,7 @@ Map<String, dynamic> tsUpdateAttributeParams(
 List<Map<String, dynamic>> tsUpdateAttributesParams(
         List<TsUpdateAttribute> attributes) =>
     attributes.map((e) => tsUpdateAttributeParams(e)).toList();
+
 List<dynamic> tsPrimaryKeyParams(TsPrimaryKey primaryKey) =>
     primaryKey.list.map(toPrimaryKeyValueParam).toList();
 
@@ -94,7 +95,8 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
       'inclusiveStartPrimaryKey': primaryKeyAsList(request.start.value),
     if (request.end != null)
       'exclusiveEndPrimaryKey': primaryKeyAsList(request.end.value),
-    'direction': request.direction ?? TsDirection.forward
+    'direction': request.direction ?? TsDirection.forward,
+    'columnFilter': request.columnCondition,
   });
   return map;
 }
@@ -130,7 +132,7 @@ int tsComparatorTypeToNative(TsComparatorType operatorType) {
       return tsNodeCommon.comparatorType.NOT_EQUAL;
     case TsComparatorType.greaterThan:
       return tsNodeCommon.comparatorType.GREATER_THAN;
-    case TsComparatorType.greatorThanOrEquals:
+    case TsComparatorType.greaterThanOrEquals:
       return tsNodeCommon.comparatorType.GREATER_EQUAL;
     case TsComparatorType.lessThan:
       return tsNodeCommon.comparatorType.LESS_THAN;
@@ -138,4 +140,16 @@ int tsComparatorTypeToNative(TsComparatorType operatorType) {
       return tsNodeCommon.comparatorType.LESS_EQUAL;
   }
   throw 'condition $operatorType not supported';
+}
+
+int tsLogicalOperatorTypeToNative(TsLogicalOperator operatorType) {
+  switch (operatorType) {
+    case TsLogicalOperator.and:
+      return tsNodeCommon.logicalOperator.AND;
+    case TsLogicalOperator.or:
+      return tsNodeCommon.logicalOperator.OR;
+    case TsLogicalOperator.not:
+      return tsNodeCommon.logicalOperator.NOT;
+  }
+  throw 'operator $operatorType not supported';
 }

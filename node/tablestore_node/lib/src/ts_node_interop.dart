@@ -73,7 +73,7 @@ abstract class TablestoreJs {
   external dynamic get SingleColumnCondition;
 
   /// Constructors
-  external dynamic get CompositeColumnCondition;
+  external dynamic get CompositeCondition;
 }
 
 /// Wrap a native error

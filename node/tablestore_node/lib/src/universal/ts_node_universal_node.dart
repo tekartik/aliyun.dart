@@ -1,4 +1,5 @@
 import 'package:collection/collection.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/interop/utils_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore.dart';
@@ -16,7 +17,7 @@ class TsArrayHack<T> {
   dynamic toJs(dynamic Function(dynamic) jsify) {
     var wrapper = JsArrayWrapper();
     for (var item in list) {
-      wrapper.add(jsify(item));
+      wrapper.add(tsJsify(item));
     }
     return wrapper.native;
   }
