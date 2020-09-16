@@ -47,7 +47,10 @@ export 'src/ts_row.dart'
         TsUpdateRowResponse,
         TsUpdateRowRequest,
         TsUpdateRowResponseExt,
-        TsWriteRowType;
+        TsWriteRowType,
+        TsStartLocalTransactionRequest,
+        TsStartLocalTransactionResponse,
+        TsStartLocalTransactionResponseExt;
 
 export 'src/ts_table.dart'
     show

@@ -69,7 +69,7 @@ class TsClientSembast implements TsClient {
           path = instanceName;
         }
         if (debugTs) {
-          print('[SBi] Openeing $path');
+          print('[SBi] Opening $path');
         }
         return tablestore.factory.openDatabase(path, version: 1,
             onVersionChanged: (db, oldVersion, newVersion) async {
@@ -308,7 +308,12 @@ class TsClientSembast implements TsClient {
       var table = await getTableContext(txn, request.tableName);
       var row = table.row(request.primaryKey);
       var record = row.record();
-      var key = await _checkPutDeleteCondition(record, request.condition);
+      var key = await _checkPutDeleteCondition(
+          record,
+          request.condition ??
+              TsCondition(
+                  rowExistenceExpectation:
+                      TsConditionRowExistenceExpectation.expectExist));
 
       var list = <TsAttribute>[];
       if (key != null) {
@@ -330,6 +335,13 @@ class TsClientSembast implements TsClient {
       await record.put();
       return TsUpdateRowResponseSembast(row);
     });
+  }
+
+  @override
+  Future<TsStartLocalTransactionResponse> startLocalTransaction(
+      TsStartLocalTransactionRequest request) {
+    // TODO: implement startLocalTransaction
+    throw UnimplementedError();
   }
 }
 
@@ -432,11 +444,26 @@ class TsTableContextSembast {
   List<String> get primaryKeyNames =>
       tableMeta.primaryKeys.map((e) => e.name).toList(growable: false);
 
+  void checkPrimaryKey(TsPrimaryKey primaryKey) {
+    // Check size
+    if (primaryKey.list.length != tableMeta.primaryKeys.length) {
+      throw TsExceptionSembast(
+          message: 'PK size fail', isPrimaryKeySizeError: true);
+    }
+  }
+
   TsRowContextSembast row(TsPrimaryKey primaryKey) {
+    checkPrimaryKey(primaryKey);
     return TsRowContextSembast(this, primaryKey);
   }
 
   TsRangeContextSembast range(TsGetRangeRequest request) {
+    if (request.start != null) {
+      checkPrimaryKey(request.start.value);
+    }
+    if (request.end != null) {
+      checkPrimaryKey(request.end.value);
+    }
     return TsRangeContextSembast(this, request);
   }
 }

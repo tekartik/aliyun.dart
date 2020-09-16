@@ -9,6 +9,9 @@ class TsExceptionSembast implements TsException {
   final bool isTableNotExistError;
 
   @override
+  final bool isPrimaryKeySizeError;
+
+  @override
   final String message;
 
   /// Default. to true
@@ -18,6 +21,7 @@ class TsExceptionSembast implements TsException {
   TsExceptionSembast(
       {this.isConditionFailedError = false,
       this.isTableNotExistError = false,
+      this.isPrimaryKeySizeError = false,
       @required this.message,
       this.retryable = false});
 

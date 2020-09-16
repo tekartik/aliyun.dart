@@ -345,4 +345,18 @@ class TsClientNode with TsClientMixin implements TsClient {
     });
     return updateRowResponseFromNative(nativeResponseJs);
   }
+
+  @override
+  Future<TsStartLocalTransactionResponse> startLocalTransaction(
+      TsStartLocalTransactionRequest request) async {
+    var params = toStartLocalTransactionParams(request);
+    var jsParams = tsJsify(params);
+
+    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+      native.startLocalTransaction(
+          _debugNativeRequestParams('startLocalTransaction', jsParams),
+          callback);
+    });
+    return startLocalTransactionRowResponseFromNative(nativeResponseJs);
+  }
 }

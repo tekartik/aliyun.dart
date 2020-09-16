@@ -4,6 +4,7 @@ import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_common_utils/env_utils.dart';
 import 'package:test/test.dart';
+import 'table_test.dart';
 
 void rowTest(TsClient client) {
   group('row', () {
@@ -92,6 +93,8 @@ void rowTest(TsClient client) {
         fail('should fail');
       } on TsException catch (e) {
         expect(e.isTableNotExistError, isTrue);
+        expect(e.isPrimaryKeySizeError, isFalse);
+        expect(e.isConditionFailedError, isFalse);
         expect(e.retryable, isFalse);
       }
     });
@@ -199,7 +202,7 @@ void rowTest(TsClient client) {
           TsDeleteRowRequest(tableName: keyStringTable, primaryKey: key));
 
       try {
-        // Default should faild (fail if not exists is the default
+        // Default should fail (fail if not exists is the default)
         await client.updateRow(TsUpdateRowRequest(
             tableName: keyStringTable,
             primaryKey: key,
@@ -208,6 +211,7 @@ void rowTest(TsClient client) {
                   [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')])),
               TsUpdateAttributeDelete(['col3', 'col4'])
             ])));
+        fail('should fail');
       } on TsException catch (e) {
         // {"message":"\n\u0015OTSConditionCheckFail\u0012\u0017Condition check failed.","code":403,"headers":{"date":"Wed, 09 Sep 2020 08:37:11 GMT","transfer-encoding":"chunked","connection":"keep-alive","authorization":"OTS LTAI4GCzUBNEhUsjDMwxrpHs:ezio+sryJpqj7sF4aadRZtfCGTI=","x-ots-contentmd5":"tb1xxFT1i9oAap/9e+zMLA==","x-ots-contenttype":"protocol buffer","x-ots-date":"2020-09-09T08:37:11.680616Z","x-ots-requestid":"0005aedd-5b9e-9b48-a5c1-720b12a7b4bb"},"time":{},"retryable":false}
         expect(e.isConditionFailedError, isTrue);
@@ -538,7 +542,7 @@ void rowTest(TsClient client) {
        */
     }, skip: true);
 
-    test('range', () async {
+    test('range_simple', () async {
       await createKeyStringTable();
       var key1 = TsPrimaryKey([TsKeyValue('key', 'range_1')]);
       var key2 = TsPrimaryKey([TsKeyValue('key', 'range_2')]);
@@ -601,5 +605,107 @@ void rowTest(TsClient client) {
         }
       ]);
     });
+
+    test('range_complex', () async {
+      await createWorkTable(client);
+      var col1 = 'range_complex';
+
+      var key1 = getWorkTableKey(col1, 1, 'path_1', 2);
+      var key2 = getWorkTableKey(col1, 2, 'path_2', 3);
+      var key3 = getWorkTableKey(col1, 3, 'path_1', 4);
+      var key4 = getWorkTableKey('${col1}_', 4, 'path_1', 4);
+
+      await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+        TsBatchWriteRowsRequestTable(tableName: workTable, rows: [
+          TsBatchWriteRowsRequestRow(
+              type: TsWriteRowType.put,
+              primaryKey: key1,
+              data: [TsAttribute.int('test', 1)]),
+          TsBatchWriteRowsRequestRow(
+              type: TsWriteRowType.put,
+              primaryKey: key2,
+              data: [TsAttribute.int('test', 2)]),
+          TsBatchWriteRowsRequestRow(
+              type: TsWriteRowType.put,
+              primaryKey: key3,
+              data: [TsAttribute.int('test', 3)]),
+          TsBatchWriteRowsRequestRow(
+              type: TsWriteRowType.put,
+              primaryKey: key4,
+              data: [TsAttribute.int('test', 4)]),
+        ])
+      ]));
+
+      try {
+        // TS!: errMap: {"message":"\n\fOTSInvalidPK\u0012)Validate PK size fail. Input: 1, Meta: 4.","code":400,"headers":{"date":"Wed, 16 Sep 2020 09:19:28 GMT","transfer-encoding":"chunked","connection":"keep-alive","authorization":"OTS LTAI4GCzUBNEhUsjDMwxrpHs:afS7DTs7cbaW5GB9Y0nc6O4Dz/g=","x-ots-contentmd5":"yt20bZ4gpFhPvN3pJ2XhVQ==","x-ots-contenttype":"protocol buffer","x-ots-date":"2020-09-16T09:19:28.148462Z","x-ots-requestid":"0005af6a-c3b1-a316-a5c1-720b0f1ffbdf"},"time":{},"retryable":false}
+        await client.getRange(TsGetRangeRequest(
+            tableName: workTable,
+            start: TsKeyStartBoundary(TsPrimaryKey([TsKeyValue('key', col1)])),
+            end: TsKeyEndBoundary(
+                TsPrimaryKey([TsKeyValue('col1', '${col1}_')]))));
+        fail('should fail');
+      } on TsException catch (e) {
+        expect(e.retryable, isFalse);
+        expect(e.isPrimaryKeySizeError, isTrue);
+        expect(e.isTableNotExistError, isFalse);
+        expect(e.isConditionFailedError, isFalse);
+      }
+      /*
+      expect(
+          response.rows
+              .where(
+                  (element) => element.primaryKey.list.first.value == 'range_1')
+              .map((e) => e.toDebugMap()),
+          [
+            {
+              'primaryKey': [
+                {'key': 'range_1'}
+              ],
+              'attributes': [
+                {'test': TsValueLong.fromNumber(1)}
+              ]
+            }
+          ]);
+
+      response = await client.getRange(TsGetRangeRequest(
+          tableName: keyStringTable,
+          start:
+              TsKeyStartBoundary(TsPrimaryKey([TsKeyValue('key', 'range_2')])),
+          end: TsKeyEndBoundary(TsPrimaryKey([TsKeyValue('key', 'range_3')]))));
+      expect(response.rows.map((e) => e.toDebugMap()), [
+        {
+          'primaryKey': [
+            {'key': 'range_2'}
+          ],
+          'attributes': [
+            {'test': TsValueLong.fromNumber(2)}
+          ]
+        }
+      ]);
+
+       */
+    });
+
+    test('transaction1', () async {
+      await createKeyStringTable();
+      var key = TsPrimaryKey([TsKeyValue('key', 'transaction')]);
+      await client.putRow(
+        TsPutRowRequest(
+            tableName: keyStringTable,
+            primaryKey: key,
+            data: TsAttributes([TsAttribute.int('test', 1)])),
+      );
+      await client.startLocalTransaction(TsStartLocalTransactionRequest(
+          tableName: keyStringTable, primaryKey: key));
+      // devPrint(jsonPretty(response.toDebugMap()));
+    }, skip: true);
+
+    test('transaction2', () async {
+      await createTable1(client);
+      var key = TsPrimaryKey([TsKeyValue('gid', TsValueLong.fromNumber(1))]);
+      await client.startLocalTransaction(TsStartLocalTransactionRequest(
+          tableName: table1Name, primaryKey: key));
+      // devPrint(jsonPretty(response.toDebugMap()));
+    }, skip: true);
   });
 }

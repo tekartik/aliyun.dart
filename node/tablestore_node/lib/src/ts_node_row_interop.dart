@@ -362,6 +362,15 @@ TsUpdateRowResponse updateRowResponseFromNative(dynamic nativeResponseJs) {
   return null;
 }
 
+TsStartLocalTransactionResponse startLocalTransactionRowResponseFromNative(
+    dynamic nativeResponseJs) {
+  if (nativeResponseJs != null) {
+    return TsStartLocalTransactionResponseNode(
+        nativeResponseJs as TsStartLocalTransactionResponseJs);
+  }
+  return null;
+}
+
 // Response to native
 TsDeleteRowResponse deleteRowResponseFromNative(dynamic nativeResponseJs) {
   if (nativeResponseJs != null) {
@@ -415,6 +424,12 @@ TsDeleteRowResponse deleteRowResponseFromNative(dynamic nativeResponseJs) {
 @anonymous
 class TsReadRowResponseJs {
   external TsReadRowJs get row;
+}
+
+@JS()
+@anonymous
+class TsStartLocalTransactionResponseJs {
+  external dynamic get transactionId;
 }
 
 @JS()
@@ -513,6 +528,18 @@ class TsUpdateRowResponseNode extends TsReadRowResponseNode
 
   @override
   String toString() => toDebugMap().toString();
+}
+
+class TsStartLocalTransactionResponseNode
+    implements TsStartLocalTransactionResponse {
+  final TsStartLocalTransactionResponseJs responseJs;
+  TsStartLocalTransactionResponseNode(this.responseJs);
+
+  @override
+  String toString() => toDebugMap().toString();
+
+  @override
+  dynamic get transactionId => responseJs.transactionId;
 }
 
 class TsDeleteRowResponseNode implements TsDeleteRowResponse {

@@ -103,6 +103,16 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
   return map;
 }
 
+Map<String, dynamic> toStartLocalTransactionParams(
+    TsStartLocalTransactionRequest request) {
+  var map = Model({
+    'tableName': request.tableName,
+    // Needed
+    'primaryKey': tsPrimaryKeyParams(request.primaryKey),
+  });
+  return map;
+}
+
 int tsConditionRowExistenceExpectationToNative(
     TsConditionRowExistenceExpectation rowExistenceExpecation) {
   switch (rowExistenceExpecation) {

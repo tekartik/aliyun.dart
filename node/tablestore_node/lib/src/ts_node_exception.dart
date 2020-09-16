@@ -42,4 +42,8 @@ class TsExceptionNode implements TsException {
   @override
   bool get isTableNotExistError =>
       isBadRequest400 && message.toLowerCase().contains('table not exist');
+
+  @override
+  bool get isPrimaryKeySizeError =>
+      isBadRequest400 && message.toLowerCase().contains('pk size fail');
 }

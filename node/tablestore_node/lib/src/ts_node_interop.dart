@@ -124,6 +124,8 @@ class TsClientJs {
   external void getRange(dynamic params, Function callback);
 
   external void createTable(dynamic params, Function callack);
+
+  external void startLocalTransaction(dynamic params, Function callback);
 }
 
 final tablestoreJs = require('tablestore') as TablestoreJs;

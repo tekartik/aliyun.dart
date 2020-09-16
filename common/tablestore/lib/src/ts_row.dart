@@ -312,6 +312,13 @@ extension TsUpdateRowResponseExt on TsUpdateRowResponse {
   }
 }
 
+extension TsStartLocalTransactionResponseExt
+    on TsStartLocalTransactionResponse {
+  Model toDebugMap() {
+    return Model({})..setValue('transactionId', transactionId);
+  }
+}
+
 extension TsGetRangeResponseExt on TsGetRangeResponse {
   Model toDebugMap() {
     return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
@@ -362,4 +369,17 @@ extension TsGetRowExt on TsGetRow {
       ..setValue('primaryKey', primaryKey?.toDebugList())
       ..setValue('attributes', attributes?.toDebugList());
   }
+}
+
+class TsStartLocalTransactionRequest {
+  final String tableName;
+  final TsPrimaryKey primaryKey;
+
+  // Primary key must contain only the partition key (i.e. single key value
+  TsStartLocalTransactionRequest(
+      {@required this.tableName, @required this.primaryKey});
+}
+
+abstract class TsStartLocalTransactionResponse {
+  dynamic get transactionId;
 }
