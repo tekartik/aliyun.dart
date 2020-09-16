@@ -234,9 +234,9 @@ class TsClientSembast implements TsClient {
       //var range = await getTableContext(client, tableName)
       var table = await getTableContext(txn, request.tableName);
       var range = table.range(request);
-      var rows = await range.get();
+      var result = await range.get();
 
-      return TsGetRangeResponseSembast(rows);
+      return TsGetRangeResponseSembast(result.rows, result.nextRow?.primaryKey);
     });
   }
 
@@ -349,7 +349,10 @@ class TsGetRangeResponseSembast implements TsGetRangeResponse {
   @override
   final List<TsGetRowSembast> rows;
 
-  TsGetRangeResponseSembast(this.rows);
+  TsGetRangeResponseSembast(this.rows, this.nextStartPrimaryKey);
+
+  @override
+  final TsPrimaryKey nextStartPrimaryKey;
 }
 
 class TsBatchGetRowsResponseSembast implements TsBatchGetRowsResponse {
@@ -485,11 +488,11 @@ class TsTableContextSembast {
   }
 
   TsRangeContextSembast range(TsGetRangeRequest request) {
-    if (request.start != null) {
-      checkPrimaryKey(request.start.value);
+    if (request.inclusiveStartPrimaryKey != null) {
+      checkPrimaryKey(request.inclusiveStartPrimaryKey);
     }
-    if (request.end != null) {
-      checkPrimaryKey(request.end.value);
+    if (request.exclusiveEndPrimaryKey != null) {
+      checkPrimaryKey(request.exclusiveEndPrimaryKey);
     }
     return TsRangeContextSembast(this, request);
   }
@@ -731,6 +734,13 @@ Filter tsConditionToSembastFilter(TsColumnCondition condition) {
   throw 'Unsupported condition $condition';
 }
 
+class TsGetRangeSembast {
+  final List<TsGetRowSembast> rows;
+  final TsGetRowSembast nextRow;
+
+  TsGetRangeSembast(this.rows, this.nextRow);
+}
+
 class TsRangeContextSembast {
   final TsTableContextSembast table;
   final TsGetRangeRequest request;
@@ -746,16 +756,16 @@ class TsRangeContextSembast {
     return Filter.and([filter1, filter2]);
   }
 
-  Future<List<TsGetRowSembast>> get() async {
+  Future<TsGetRangeSembast> get() async {
     Filter boundaryFilter;
     var columnFilter = tsConditionToSembastFilter(request.columnCondition);
-    var startPrimaryKey = request.start;
-    var endPrimaryKey = request.end;
+    var startPrimaryKey = request.inclusiveStartPrimaryKey;
+    var endPrimaryKey = request.exclusiveEndPrimaryKey;
 
     if (startPrimaryKey != null || endPrimaryKey != null) {
       boundaryFilter = Filter.custom((record) {
         if (startPrimaryKey != null) {
-          for (var kv in startPrimaryKey.value.list) {
+          for (var kv in startPrimaryKey.list) {
             var field = kv.name;
             if (kv.value == TsValueInfinite.min) {
               break;
@@ -775,8 +785,8 @@ class TsRangeContextSembast {
         }
 
         if (endPrimaryKey != null) {
-          for (var i = 0; i < endPrimaryKey.value.list.length; i++) {
-            var kv = endPrimaryKey.value.list[i];
+          for (var i = 0; i < endPrimaryKey.list.length; i++) {
+            var kv = endPrimaryKey.list[i];
             var field = kv.name;
             if (kv.value == TsValueInfinite.min) {
               return false;
@@ -791,7 +801,7 @@ class TsRangeContextSembast {
                 break;
               }
               // Last field make it strict
-              if (i == endPrimaryKey.value.list.length - 1) {
+              if (i == endPrimaryKey.list.length - 1) {
                 return false;
               }
             }
@@ -805,9 +815,12 @@ class TsRangeContextSembast {
         filter: _and(boundaryFilter, columnFilter),
         sortOrders:
             table.tableMeta.primaryKeys.map((e) => SortOrder(e.name)).toList(),
-        limit: request.limit);
+        // Add 1 for next
+        limit: request.limit != null ? request.limit + 1 : null);
 
     var records = await table.store.find(table.client, finder: finder);
+
+    TsGetRowSembast nextRow;
 
     var rows = records.map((snapshot) {
       var result = snapshot.value;
@@ -817,7 +830,15 @@ class TsRangeContextSembast {
           TsAttributes(readAttributesBut(result, table.primaryKeyNames));
 
       return TsGetRowSembast(true, primaryKey, attributes);
-    }).toList(growable: false);
-    return rows;
+    }).toList();
+
+    if (request.limit != null && rows.length > request.limit) {
+      // Pick last
+      nextRow = rows[request.limit];
+      // Remove last
+      rows = rows.sublist(0, request.limit);
+    }
+
+    return TsGetRangeSembast(rows, nextRow);
   }
 }

@@ -591,10 +591,10 @@ void rowTest(TsClient client) {
       // TSr: {"consumed":{"capacityUnit":{"read":1,"write":0}},"rows":[{"primaryKey":[{"name":"key","value":"binary"}],"attributes":[{"columnName":"test","columnValue":[1,2,3],"timestamp":{"buffer":[45,66,184,103,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"key1Js"}],"attributes":[{"columnName":"col1","columnValue":"表格存储","timestamp":{"buffer":[219,208,43,94,116,1,0,0],"offset":0}},{"columnName":"col2","columnValue":"2","timestamp":{"buffer":[28,208,43,94,116,1,0,0],"offset":0}},{"columnName":"col3","columnValue":3.1,"timestamp":{"buffer":[219,208,43,94,116,1,0,0],"offset":0}},{"columnName":"col4","columnValue":-0.32,"timestamp":{"buffer":[219,208,43,94,116,1,0,0],"offset":0}},{"columnName":"col5","columnValue":{"buffer":[21,205,91,7,0,0,0,0],"offset":0},"timestamp":{"buffer":[219,208,43,94,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"long"}],"attributes":[{"columnName":"test","columnValue":{"buffer":[246,255,255,255,255,255,63,1],"offset":0},"timestamp":{"buffer":[159,64,184,103,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"putRow"}],"attributes":[{"columnName":"test","columnValue":"text","timestamp":{"buffer":[188,58,184,103,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"put_row"}],"attributes":[{"columnName":"test","columnValue":"text","timestamp":{"buffer":[202,100,64,98,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"range"}],"attributes":[{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[23,255,189,103,116,1,0,0],"offset":0}}]},{"primaryKey":[{"name":"key","value":"range_1"}],"attributes":[{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[102,113,199,103,116,1,0,0],"offset":0}}]}],"nextStartPrimaryKey":null,"compressType":0,"dataBlockType":0,"nextToken":[],"RequestId":"0005aeb5-6315-e1be-a4c1-720b0bd8e513"}
       var response = await client.getRange(TsGetRangeRequest(
           tableName: keyStringTableName,
-          start: TsKeyStartBoundary(
-              TsPrimaryKey([TsKeyValue('key', TsValueInfinite.min)])),
-          end: TsKeyEndBoundary(
-              TsPrimaryKey([TsKeyValue('key', TsValueInfinite.max)]))));
+          inclusiveStartPrimaryKey:
+              TsPrimaryKey([TsKeyValue('key', TsValueInfinite.min)]),
+          exclusiveEndPrimaryKey:
+              TsPrimaryKey([TsKeyValue('key', TsValueInfinite.max)])));
       expect(
           response.rows
               .where(
@@ -613,9 +613,10 @@ void rowTest(TsClient client) {
 
       response = await client.getRange(TsGetRangeRequest(
           tableName: keyStringTableName,
-          start:
-              TsKeyStartBoundary(TsPrimaryKey([TsKeyValue('key', 'range_2')])),
-          end: TsKeyEndBoundary(TsPrimaryKey([TsKeyValue('key', 'range_3')]))));
+          inclusiveStartPrimaryKey:
+              TsPrimaryKey([TsKeyValue('key', 'range_2')]),
+          exclusiveEndPrimaryKey:
+              TsPrimaryKey([TsKeyValue('key', 'range_3')])));
       expect(response.rows.map((e) => e.toDebugMap()), [
         {
           'primaryKey': [
@@ -630,34 +631,38 @@ void rowTest(TsClient client) {
 
     group('getRangeComplex', () {
       var col1 = 'range_complex';
+      var _dataWritten = false;
       Future _writeComplexData() async {
-        await createWorkTable(client);
+        if (!_dataWritten) {
+          await createWorkTable(client);
 
-        var key1 = getWorkTableKey(col1, 1, 'col3_1', 2);
-        var key2 = getWorkTableKey(col1, 2, 'col3_2', 3);
-        var key3 = getWorkTableKey(col1, 3, 'col3_1', 4);
-        var key4 = getWorkTableKey('${col1}_', 4, 'col3_1', 4);
+          var key1 = getWorkTableKey(col1, 1, 'col3_1', 2);
+          var key2 = getWorkTableKey(col1, 2, 'col3_2', 3);
+          var key3 = getWorkTableKey(col1, 3, 'col3_1', 4);
+          var key4 = getWorkTableKey('${col1}_', 4, 'col3_1', 4);
 
-        await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
-          TsBatchWriteRowsRequestTable(tableName: workTableName, rows: [
-            TsBatchWriteRowsRequestRow(
-                type: TsWriteRowType.put,
-                primaryKey: key1,
-                data: [TsAttribute.int('test', 1)]),
-            TsBatchWriteRowsRequestRow(
-                type: TsWriteRowType.put,
-                primaryKey: key2,
-                data: [TsAttribute.int('test', 2)]),
-            TsBatchWriteRowsRequestRow(
-                type: TsWriteRowType.put,
-                primaryKey: key3,
-                data: [TsAttribute.int('test', 3)]),
-            TsBatchWriteRowsRequestRow(
-                type: TsWriteRowType.put,
-                primaryKey: key4,
-                data: [TsAttribute.int('test', 4)]),
-          ])
-        ]));
+          await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+            TsBatchWriteRowsRequestTable(tableName: workTableName, rows: [
+              TsBatchWriteRowsRequestRow(
+                  type: TsWriteRowType.put,
+                  primaryKey: key1,
+                  data: [TsAttribute.int('test', 1)]),
+              TsBatchWriteRowsRequestRow(
+                  type: TsWriteRowType.put,
+                  primaryKey: key2,
+                  data: [TsAttribute.int('test', 2)]),
+              TsBatchWriteRowsRequestRow(
+                  type: TsWriteRowType.put,
+                  primaryKey: key3,
+                  data: [TsAttribute.int('test', 3)]),
+              TsBatchWriteRowsRequestRow(
+                  type: TsWriteRowType.put,
+                  primaryKey: key4,
+                  data: [TsAttribute.int('test', 4)]),
+            ])
+          ]));
+          _dataWritten = true;
+        }
       }
 
       test('range_complex_single_condition', () async {
@@ -665,10 +670,10 @@ void rowTest(TsClient client) {
 
         var response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
-            start: TsKeyStartBoundary(getWorkTableKey(
-                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min)),
-            end: TsKeyEndBoundary(getWorkTableKey(
-                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max)),
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min),
+            exclusiveEndPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max),
             columnCondition: TsColumnCondition.equals('key3', 'col3_1')));
         expect(response.toDebugMap(), {
           'rows': [
@@ -699,10 +704,10 @@ void rowTest(TsClient client) {
 
         response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
-            start: TsKeyStartBoundary(getWorkTableKey(
-                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min)),
-            end: TsKeyEndBoundary(getWorkTableKey(
-                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max)),
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min),
+            exclusiveEndPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max),
             columnCondition: TsColumnCondition.greaterThanOrEquals(
                 'key4', TsValueLong.fromNumber(4))));
         expect(response.toDebugMap(), {
@@ -722,15 +727,15 @@ void rowTest(TsClient client) {
         });
       });
 
-      test('range_complex_composite_condition', () async {
+      test('range_complex_composite_condition_1', () async {
         await _writeComplexData();
 
         var response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
-            start: TsKeyStartBoundary(getWorkTableKey(
-                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min)),
-            end: TsKeyEndBoundary(getWorkTableKey(
-                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max)),
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min),
+            exclusiveEndPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max),
             columnCondition: TsColumnCondition.and([
               TsColumnCondition.equals('key3', 'col3_1'),
               TsColumnCondition.lessThan('key4', TsValueLong.fromNumber(4))
@@ -752,6 +757,39 @@ void rowTest(TsClient client) {
         });
       }, skip: true);
 
+      /*
+      test('range_complex_composite_condition_2', () async {
+        await _writeComplexData();
+
+        var response = await client.getRange(TsGetRangeRequest(
+            tableName: workTableName,
+            columns: ['test'],
+            start: TsKeyStartBoundary(getWorkTableKey(
+                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min)),
+            end: TsKeyEndBoundary(getWorkTableKey(
+                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max)),
+            columnCondition: TsColumnCondition.and([
+              TsColumnCondition.greaterThan('test', TsValueLong.fromNumber(1)),
+              TsColumnCondition.lessThan('test', TsValueLong.fromNumber(4))
+            ])));
+        expect(response.toDebugMap(), {
+          'rows': [
+            {
+              'primaryKey': [
+                {'key1': 'range_complex'},
+                {'key2': TsValueLong.fromNumber(1)},
+                {'key3': 'col3_1'},
+                {'key4': TsValueLong.fromNumber(2)}
+              ],
+              'attributes': [
+                {'test': TsValueLong.fromNumber(1)}
+              ]
+            }
+          ]
+        });
+      }, solo: true);
+      */
+
       test('range_complex_boundary', () async {
         await _writeComplexData();
 
@@ -759,10 +797,9 @@ void rowTest(TsClient client) {
           // TS!: errMap: {"message":"\n\fOTSInvalidPK\u0012)Validate PK size fail. Input: 1, Meta: 4.","code":400,"headers":{"date":"Wed, 16 Sep 2020 09:19:28 GMT","transfer-encoding":"chunked","connection":"keep-alive","authorization":"OTS LTAI4GCzUBNEhUsjDMwxrpHs:afS7DTs7cbaW5GB9Y0nc6O4Dz/g=","x-ots-contentmd5":"yt20bZ4gpFhPvN3pJ2XhVQ==","x-ots-contenttype":"protocol buffer","x-ots-date":"2020-09-16T09:19:28.148462Z","x-ots-requestid":"0005af6a-c3b1-a316-a5c1-720b0f1ffbdf"},"time":{},"retryable":false}
           await client.getRange(TsGetRangeRequest(
               tableName: workTableName,
-              start:
-                  TsKeyStartBoundary(TsPrimaryKey([TsKeyValue('key', col1)])),
-              end: TsKeyEndBoundary(
-                  TsPrimaryKey([TsKeyValue('col1', '${col1}_')]))));
+              inclusiveStartPrimaryKey: TsPrimaryKey([TsKeyValue('key', col1)]),
+              exclusiveEndPrimaryKey:
+                  TsPrimaryKey([TsKeyValue('col1', '${col1}_')])));
           fail('should fail');
         } on TsException catch (e) {
           expect(e.retryable, isFalse);
@@ -773,10 +810,10 @@ void rowTest(TsClient client) {
 
         var response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
-            start: TsKeyStartBoundary(getWorkTableKey(
-                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min)),
-            end: TsKeyEndBoundary(getWorkTableKey(
-                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max))));
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min),
+            exclusiveEndPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max)));
         expect(response.toDebugMap(), {
           'rows': [
             {
@@ -817,10 +854,10 @@ void rowTest(TsClient client) {
 
         response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
-            start: TsKeyStartBoundary(getWorkTableKey(col1,
-                TsValueLong.fromNumber(3), 'col3_1', TsValueInfinite.min)),
-            end: TsKeyEndBoundary(getWorkTableKey('${col1}_',
-                TsValueInfinite.min, 'col3_1', TsValueInfinite.max))));
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1, TsValueLong.fromNumber(3), 'col3_1', TsValueInfinite.min),
+            exclusiveEndPrimaryKey: getWorkTableKey('${col1}_',
+                TsValueInfinite.min, 'col3_1', TsValueInfinite.max)));
         expect(response.toDebugMap(), {
           'rows': [
             {
@@ -839,10 +876,10 @@ void rowTest(TsClient client) {
 
         response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
-            start: TsKeyStartBoundary(getWorkTableKey(col1,
-                TsValueLong.fromNumber(3), 'col3_1', TsValueInfinite.max)),
-            end: TsKeyEndBoundary(getWorkTableKey('${col1}_',
-                TsValueInfinite.max, 'col3_1', TsValueInfinite.max))));
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1, TsValueLong.fromNumber(3), 'col3_1', TsValueInfinite.max),
+            exclusiveEndPrimaryKey: getWorkTableKey('${col1}_',
+                TsValueInfinite.max, 'col3_1', TsValueInfinite.max)));
         expect(response.toDebugMap(), {
           'rows': [
             {
@@ -893,6 +930,64 @@ void rowTest(TsClient client) {
       ]);
 
        */
+      });
+
+      test('range_complex_limit', () async {
+        await _writeComplexData();
+
+        var request = TsGetRangeRequest(
+            tableName: workTableName,
+            limit: 1,
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min),
+            exclusiveEndPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max));
+        var response = await client.getRange(request);
+        expect(response.toDebugMap(), {
+          'rows': [
+            {
+              'primaryKey': [
+                {'key1': 'range_complex'},
+                {'key2': TsValueLong.fromNumber(1)},
+                {'key3': 'col3_1'},
+                {'key4': TsValueLong.fromNumber(2)}
+              ],
+              'attributes': [
+                {'test': TsValueLong.fromNumber(1)}
+              ]
+            }
+          ],
+          'nextStartPrimaryKey': [
+            {'key1': 'range_complex'},
+            {'key2': TsValueLong.fromNumber(2)},
+            {'key3': 'col3_2'},
+            {'key4': TsValueLong.fromNumber(3)}
+          ]
+        });
+
+        request.inclusiveStartPrimaryKey = response.nextStartPrimaryKey;
+        response = await client.getRange(request);
+        expect(response.toDebugMap(), {
+          'rows': [
+            {
+              'primaryKey': [
+                {'key1': 'range_complex'},
+                {'key2': TsValueLong.fromNumber(2)},
+                {'key3': 'col3_2'},
+                {'key4': TsValueLong.fromNumber(3)}
+              ],
+              'attributes': [
+                {'test': TsValueLong.fromNumber(2)}
+              ]
+            },
+          ],
+          'nextStartPrimaryKey': [
+            {'key1': 'range_complex'},
+            {'key2': TsValueLong.fromNumber(3)},
+            {'key3': 'col3_1'},
+            {'key4': TsValueLong.fromNumber(4)}
+          ]
+        });
       });
     });
 

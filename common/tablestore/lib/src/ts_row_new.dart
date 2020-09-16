@@ -1,4 +1,5 @@
 import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
+import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_common_utils/model/model.dart';
 
@@ -340,10 +341,13 @@ extension TsStartLocalTransactionResponseExt
 
 extension TsGetRangeResponseExt on TsGetRangeResponse {
   Model toDebugMap() {
+    /*
     return Model({})
       ..setValue('rows', rows?.map((row) => row.toDebugMap()))
-      ..setValue('nextStartPrimaryKey', nextStartPrimaryKey?.toDebugList());
-    //return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
+      ..setValue('nextStartPrimaryKey', nextStartPrimaryKey.toDebugList());
+
+     */
+    return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
   }
 }
 

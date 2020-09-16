@@ -91,12 +91,17 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
     'limit': request.limit,
     if (request.tableName != null) 'tableName': request.tableName,
     if (request.columns != null) 'columnsToGet': request.columns,
-    if (request.start != null)
-      'inclusiveStartPrimaryKey': primaryKeyAsList(request.start.value),
-    if (request.end != null)
-      'exclusiveEndPrimaryKey': primaryKeyAsList(request.end.value),
+    if (request.inclusiveStartPrimaryKey != null)
+      'inclusiveStartPrimaryKey':
+          primaryKeyAsList(request.inclusiveStartPrimaryKey),
+    if (request.exclusiveEndPrimaryKey != null)
+      'exclusiveEndPrimaryKey':
+          primaryKeyAsList(request.exclusiveEndPrimaryKey),
     'direction': request.direction ?? TsDirection.forward,
-    'columnFilter': request.columnCondition,
+    if (request.columnCondition is TsColumnSingleCondition)
+      'columnFilter': request.columnCondition,
+    if (request.columnCondition is TsColumnCompositeCondition)
+      'filter': request.columnCondition,
   });
   return map;
 }
