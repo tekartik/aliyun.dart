@@ -46,4 +46,9 @@ class TsExceptionNode implements TsException {
   @override
   bool get isPrimaryKeySizeError =>
       isBadRequest400 && message.toLowerCase().contains('pk size fail');
+
+  // Validate PK type fail
+  @override
+  bool get isPrimaryKeyTypeError =>
+      isBadRequest400 && message.toLowerCase().contains('pk type fail');
 }

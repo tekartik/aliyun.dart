@@ -4,5 +4,6 @@ abstract class TsException implements Exception {
   bool get isConditionFailedError;
   bool get isTableNotExistError;
   bool get isPrimaryKeySizeError;
+  bool get isPrimaryKeyTypeError;
   bool get retryable;
 }

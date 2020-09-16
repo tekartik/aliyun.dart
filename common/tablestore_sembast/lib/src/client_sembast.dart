@@ -450,6 +450,33 @@ class TsTableContextSembast {
       throw TsExceptionSembast(
           message: 'PK size fail', isPrimaryKeySizeError: true);
     }
+    for (var i = 0; i < primaryKey.list.length; i++) {
+      var def = tableMeta.primaryKeys[i];
+      var key = primaryKey.list[i];
+      switch (def.type) {
+        case TsColumnType.integer:
+          if (!(key.value is TsValueLong || key.value is TsValueInfinite)) {
+            throw TsExceptionSembast(
+                message: 'PK type fail, expecting int for $key',
+                isPrimaryKeyTypeError: true);
+          }
+          break;
+        case TsColumnType.string:
+          if (!(key.value is String || key.value is TsValueInfinite)) {
+            throw TsExceptionSembast(
+                message: 'PK type fail, expecting String for $key',
+                isPrimaryKeyTypeError: true);
+          }
+          break;
+        case TsColumnType.binary:
+          if (!(key.value is Uint8List || key.value is TsValueInfinite)) {
+            throw TsExceptionSembast(
+                message: 'PK type fail, expecting Uint8List for $key',
+                isPrimaryKeyTypeError: true);
+          }
+          break;
+      }
+    }
   }
 
   TsRowContextSembast row(TsPrimaryKey primaryKey) {
@@ -607,8 +634,21 @@ class TsRowContextSembast {
   String get tableName => table.tableName;
 
   /// Null record for get
-  TsRowRecordContextSembast record([List<TsAttribute> attributes]) =>
-      TsRowRecordContextSembast(this, attributes);
+  TsRowRecordContextSembast record([List<TsAttribute> attributes]) {
+    if (attributes != null) {
+      for (var attribute in attributes) {
+        if (!(attribute.value is String ||
+            attribute.value is TsValueLong ||
+            attribute.value is Uint8List)) {
+          throw TsExceptionSembast(
+              message:
+                  'Invalid value type for $attribute ${attribute.value?.runtimeType}',
+              retryable: false);
+        }
+      }
+    }
+    return TsRowRecordContextSembast(this, attributes);
+  }
 }
 
 class TsGetRowResponseSembast extends TsReadRowResponseSembast

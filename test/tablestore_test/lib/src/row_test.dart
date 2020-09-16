@@ -141,7 +141,7 @@ void rowTest(TsClient client) {
 
       TsPutRowResponse response;
       try {
-        response = await client.putRow(TsPutRowRequest(
+        await client.putRow(TsPutRowRequest(
             tableName: keyStringTable,
             condition: TsCondition.expectExist,
             primaryKey: key,
@@ -149,6 +149,43 @@ void rowTest(TsClient client) {
         fail('should fail');
       } on TsException catch (e) {
         expect(e.isConditionFailedError, isTrue);
+        expect(e.retryable, isFalse);
+      }
+
+      var badKey = TsPrimaryKey([TsKeyValue('key', TsValueLong.fromNumber(1))]);
+      try {
+        // TS!: errMap: {"message":"\n\fOTSInvalidPK\u0012:Validate PK type fail. Input: VT_INTEGER, Meta: VT_STRING.","code":400,"headers":{"date":"Wed, 16 Sep 2020 10:02:55 GMT","transfer-encoding":"chunked","connection":"keep-alive","authorization":"OTS LTAI4GCzUBNEhUsjDMwxrpHs:/3c02Jlku+fxqx506jh+WEP2paY=","x-ots-contentmd5":"F1dJ+CMsGH4Nc1DUKSWHQA==","x-ots-contenttype":"protocol buffer","x-ots-date":"2020-09-16T10:02:55.384181Z","x-ots-requestid":"0005af6b-5f18-e605-2bc1-720b17615fbe"},"time":{},"retryable":false}
+        await client.putRow(TsPutRowRequest(
+            tableName: keyStringTable,
+            primaryKey: badKey,
+            data: TsAttributes([TsAttribute('test', 'text')])));
+        fail('should fail');
+      } on TsException catch (e) {
+        expect(e.isPrimaryKeyTypeError, isTrue);
+        expect(e.retryable, isFalse);
+      }
+
+      var nullKey = TsPrimaryKey([TsKeyValue('key', null)]);
+      try {
+        await client.putRow(TsPutRowRequest(
+            tableName: keyStringTable,
+            primaryKey: nullKey,
+            data: TsAttributes([TsAttribute('test', 'test')])));
+        fail('should fail');
+      } on TsException catch (e) {
+        // expect(e.isPrimaryKeyTypeError, isTrue);
+        expect(e.retryable, isFalse);
+      }
+
+      // Null value
+      try {
+        await client.putRow(TsPutRowRequest(
+            tableName: keyStringTable,
+            primaryKey: key,
+            data: TsAttributes([TsAttribute('test', null)])));
+        fail('should fail');
+      } on TsException catch (e) {
+        // expect(e.isPrimaryKeyTypeError, isTrue);
         expect(e.retryable, isFalse);
       }
 
