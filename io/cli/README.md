@@ -4,10 +4,10 @@
 
 ```yaml
 dependencies:
-  tekartik_aliyun_tablestore:
+  tekartik_aliyun_cli:
     git:
       url: git://github.com/tekartik/aliyun.dart
-      path: common/tablestore
+      path: io/cli
       ref: dart2
     version: '>=0.1.0'
 ```

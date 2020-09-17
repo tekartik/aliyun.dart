@@ -2,6 +2,7 @@ import 'package:dev_test/package.dart';
 
 Future main() async {
   for (var dir in [
+    'io/cli',
     'common/fc',
     //'common/fc_universal',
     'common/tablestore',
