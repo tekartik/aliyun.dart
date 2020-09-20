@@ -7,7 +7,8 @@ import 'package:tekartik_common_utils/model/model.dart';
 Model blobToDebugValue(Uint8List bytes) =>
     Model({'@blob': base64Encode(bytes)});
 
-dynamic valueToDebugValue(dynamic value) {
+// Can be of any type TsValue, double, String but not int!
+dynamic tsValueToDebugValue(dynamic value) {
   assert(
       (value == null ||
           value is TsValue ||

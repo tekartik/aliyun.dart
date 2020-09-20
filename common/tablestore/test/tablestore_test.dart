@@ -3,6 +3,16 @@ import 'package:test/test.dart';
 
 void main() {
   group('tablestore', () {
+    test('public', () {
+      // ignore: unnecessary_statements
+      tsValueToDebugValue;
+      // ignore: unnecessary_statements
+      TsValueLong;
+      // ignore: unnecessary_statements
+      TsValue;
+      // ignore: unnecessary_statements
+      TsValueInfinite;
+    });
     test('key', () {
       var key = TsPrimaryKeyDef();
       expect(key.toMap(), {});

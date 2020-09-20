@@ -31,7 +31,7 @@ class TsKeyValue {
   TsKeyValue.binary(String name, Uint8List value) : this(name, value);
 
   // Json
-  Model toDebugMap() => Model({name: valueToDebugValue(value)});
+  Model toDebugMap() => Model({name: tsValueToDebugValue(value)});
 
   @override
   String toString() => toDebugMap().toString();
