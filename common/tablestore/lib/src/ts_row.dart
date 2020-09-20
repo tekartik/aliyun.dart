@@ -169,6 +169,11 @@ class TsPrimaryKey {
 
   ModelList toDebugList() =>
       ModelList(list.map((e) => e?.toDebugMap())?.toList(growable: false));
+
+  Map<String, TsKeyValue> toMap() =>
+      list.fold(<String, TsKeyValue>{}, (map, kv) {
+        return map..[kv.name] = kv;
+      });
 }
 
 class TsPutRowRequest {

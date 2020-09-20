@@ -52,5 +52,26 @@ void main() {
         'tableOptions': {'timeToLive': -1, 'maxVersions': 1}
       });
     });
+    test('TsPrimaryKey', () {
+      var kv = TsKeyValue.string('test', 'text');
+      var pk = TsPrimaryKey([kv]);
+      expect(pk.toMap(), {'test': kv});
+
+      var kv1 = TsKeyValue.string('test1', 'text');
+      var kv2 = TsKeyValue.int('test2', 1);
+      pk = TsPrimaryKey([kv1, kv2]);
+      expect(pk.toMap(), {'test1': kv1, 'test2': kv2});
+    });
+
+    test('TsAttribute', () {
+      var attr = TsAttribute.string('test', 'text');
+      var attrs = TsAttributes([attr]);
+      expect(attrs.toMap(), {'test': attr});
+
+      var attr1 = TsAttribute.string('test1', 'text');
+      var attr2 = TsAttribute.int('test2', 1);
+      attrs = TsAttributes([attr1, attr2]);
+      expect(attrs.toMap(), {'test1': attr1, 'test2': attr2});
+    });
   });
 }

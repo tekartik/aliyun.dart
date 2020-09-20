@@ -35,6 +35,13 @@ class TsKeyValue {
 
   @override
   String toString() => toDebugMap().toString();
+
+  @override
+  int get hashCode => name.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is TsKeyValue && (other.name == name) && (other.value == value);
 }
 
 class TsAttributes with ListMixin<TsAttribute> {
@@ -60,7 +67,7 @@ class TsAttributes with ListMixin<TsAttribute> {
 
   Map<String, TsAttribute> toMap() =>
       list.fold(<String, TsAttribute>{}, (map, attr) {
-        return map;
+        return map..[attr.name] = attr;
       });
 }
 

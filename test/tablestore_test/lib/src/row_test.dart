@@ -292,6 +292,25 @@ void rowTest(TsClient client) {
         expect(e.retryable, isFalse);
       }
 
+      // Null data
+      response = await client.putRow(TsPutRowRequest(
+          tableName: keyStringTableName, primaryKey: key, data: null));
+      expect(response.toDebugMap(), {
+        'row': {
+          'primaryKey': [
+            {'key': 'putRow'}
+          ],
+          'attributes': []
+        }
+      });
+      expect(
+          (await client.getRow(TsGetRowRequest(
+                  tableName: keyStringTableName, primaryKey: key)))
+              .row
+              .attributes
+              .toDebugList(),
+          []);
+
       response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTableName,
           condition: TsCondition.ignore,
@@ -305,6 +324,22 @@ void rowTest(TsClient client) {
           'attributes': []
         }
       });
+      expect(
+          (await client.getRow(TsGetRowRequest(
+                  tableName: keyStringTableName, primaryKey: key)))
+              .row
+              .attributes
+              .toDebugList(),
+          [
+            {'test': 'text'}
+          ]);
+      expect(
+          (await client.getRow(TsGetRowRequest(
+                  tableName: keyStringTableName, primaryKey: key)))
+              .row
+              .attributes
+              .toMap(),
+          {'test': TsAttribute('test', 'text')});
 
       await _createKeyStringTable();
       response = await client.putRow(TsPutRowRequest(
