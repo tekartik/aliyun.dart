@@ -1,6 +1,6 @@
 name: tekartik_aliyun_tablestore_node
 description: Aliyun tablestore node access
-version: 0.1.0
+version: 0.2.0
 # homepage: https://www.example.com
 
 environment:
