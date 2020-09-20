@@ -70,4 +70,4 @@ export 'src/ts_table.dart'
 /// More dartdocs go here.
 
 export 'src/ts_tablestore.dart' show Tablestore;
-export 'src/ts_value_type.dart' show TsValueLong, TsValueInfinite;
+export 'src/ts_value.dart' show TsValueLong, TsValueInfinite, TsValue;

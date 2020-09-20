@@ -66,6 +66,126 @@ void rowTest(TsClient client) {
       });
     });
 
+    test('put/getRowColumns', () async {
+      var key = TsPrimaryKey([TsKeyValue('key', 'get_row_columns')]);
+      await _createKeyStringTable();
+      var response = await client.putRow(TsPutRowRequest(
+          tableName: keyStringTableName,
+          primaryKey: key,
+          data: TsAttributes([
+            TsAttribute('test1', 'text1'),
+            TsAttribute('test2', TsValueLong.fromNumber(1)),
+            TsAttribute('test3', Uint8List.fromList([2]))
+          ])));
+      expect(response.toDebugMap(), {
+        'row': {'primaryKey': key.toDebugList(), 'attributes': []}
+      });
+
+      // TSs: getRow {"tableName":"test_key_string","primaryKey":[{"key":"get_row_columns"}]}
+      // TSr: {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":
+      // {"primaryKey":[{"name":"key","value":"get_row_columns"}],
+      // "attributes":[
+      //    {"columnName":"test1","columnValue":"text1","timestamp":{"buffer":[179,37,123,170,116,1,0,0],"offset":0}},
+      //    {"columnName":"test2","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[179,37,123,170,116,1,0,0],"offset":0}},
+      //    {"columnName":"test3","columnValue":[2],"timestamp":{"buffer":[179,37,123,170,116,1,0,0],"offset":0}}]},"RequestId":"0005afb9-f10e-60b2-a5c1-720b1bf9dfb2"}
+      /*00:06 +1 ~1: test/tablestore_universal_test.dart: tablestore universal tablestore row put/getRowColumns
+      TSs: getRow {"tableName":"test_key_string","primaryKey":[{"key":"get_row_columns"}],"columnsToGet":["missing","test1"]}
+      00:06 +1 ~1: compiling test/tablestore_universal_test.dart
+      TSr: {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":{"primaryKey":[{"name":"key","value":"get_row_columns"}],"attributes":[{"columnName":"test1","columnValue":"text1","timestamp":{"buffer":[179,37,123,170,116,1,0,0],"offset":0}}]},"RequestId":"0005afb9-f111-90bb-2bc1-720b16336918"}
+      00:06 +1 ~1: test/tablestore_universal_test.dart: tablestore universal tablestore row put/getRowColumns
+      TSs: getRow {"tableName":"test_key_string","primaryKey":[{"key":"get_row_columns"}],"columnsToGet":["test2","test1"]}
+      00:06 +1 ~1: compiling test/tablestore_universal_test.dart
+      TSr: {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":{"primaryKey":[{"name":"key","value":"get_row_columns"}],"attributes":[{"columnName":"test1","columnValue":"text1","timestamp":{"buffer":[179,37,123,170,116,1,0,0],"offset":0}},{"columnName":"test2","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[179,37,123,170,116,1,0,0],"offset":0}}]},"RequestId":"0005afb9-f114-7a78-a4c1-720b1a61284e"}
+  */
+      var getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key));
+      expect(
+          getResponse.row.attributes.map((attr) => attr.name).toList()..sort(),
+          ['test1', 'test2', 'test3']);
+      // With column
+      getResponse = await client.getRow(TsGetRowRequest(
+          tableName: keyStringTableName,
+          primaryKey: key,
+          columns: ['missing', 'test1']));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKey': key.toDebugList(),
+          'attributes': [
+            {'test1': 'text1'}
+          ]
+        }
+      });
+      // Order might not be respected!
+      getResponse = await client.getRow(TsGetRowRequest(
+          tableName: keyStringTableName,
+          primaryKey: key,
+          columns: ['test2', 'test1']));
+      try {
+        expect(getResponse.toDebugMap(), {
+          'row': {
+            'primaryKey': key.toDebugList(),
+            'attributes': [
+              {
+                'test2': {'@long': '1'}
+              },
+              {'test1': 'text1'}
+            ]
+          }
+        });
+      } on TestFailure catch (_) {
+        expect(getResponse.toDebugMap(), {
+          'row': {
+            'primaryKey': key.toDebugList(),
+            'attributes': [
+              {'test1': 'text1'},
+              {
+                'test2': {'@long': '1'}
+              },
+            ]
+          }
+        });
+      }
+      getResponse = await client.getRow(TsGetRowRequest(
+          tableName: keyStringTableName,
+          primaryKey: key,
+          columns: ['test1', 'test3']));
+      try {
+        expect(getResponse.toDebugMap(), {
+          'row': {
+            'primaryKey': key.toDebugList(),
+            'attributes': [
+              {'test1': 'text1'},
+              {
+                'test3': {'@blob': 'Ag=='}
+              }
+            ]
+          }
+        });
+      } on TestFailure catch (_) {
+        expect(getResponse.toDebugMap(), {
+          'row': {
+            'primaryKey': key.toDebugList(),
+            'attributes': [
+              {
+                'test3': {'@blob': 'Ag=='}
+              },
+              {'test1': 'text1'},
+            ]
+          }
+        });
+      }
+      // With no columns
+      getResponse = await client.getRow(TsGetRowRequest(
+          tableName: keyStringTableName, primaryKey: key, columns: []));
+      // Implementation reads all attributes
+      expect(getResponse.row.attributes.length, 3);
+
+      // With key columns
+      getResponse = await client.getRow(TsGetRowRequest(
+          tableName: keyStringTableName, primaryKey: key, columns: ['key']));
+      expect(getResponse.row.attributes.length, 0);
+    });
+
     test('getRow missing table', () async {
       var key = TsPrimaryKey([TsKeyValue('key', 'value')]);
 
@@ -268,7 +388,9 @@ void rowTest(TsClient client) {
             {'key': 'updateRow'}
           ],
           'attributes': [
-            {'col1': TsValueLong.fromNumber(1)},
+            {
+              'col1': {'@long': '1'}
+            },
             {'col2': 'value'},
           ]
         }
@@ -278,7 +400,7 @@ void rowTest(TsClient client) {
           primaryKey: key,
           data: TsUpdateAttributes([
             TsUpdateAttributePut(TsAttributes(
-                [TsAttribute.int('col1', 2), TsAttribute.int('col4', 2)])),
+                [TsAttribute.int('col1', 2), TsAttribute.int('col4', 4)])),
             TsUpdateAttributeDelete(['col2', 'col3'])
           ])));
       expect(response.toDebugMap(), {
@@ -298,8 +420,12 @@ void rowTest(TsClient client) {
             {'key': 'updateRow'}
           ],
           'attributes': [
-            {'col1': TsValueLong.fromNumber(2)},
-            {'col4': TsValueLong.fromNumber(2)},
+            {
+              'col1': {'@long': '2'}
+            },
+            {
+              'col4': {'@long': '4'}
+            },
           ]
         }
       });
@@ -368,7 +494,9 @@ void rowTest(TsClient client) {
             {'key': 'long'}
           ],
           'attributes': [
-            {'test': TsValueLong.fromNumber(1)}
+            {
+              'test': {'@long': '1'}
+            }
           ]
         }
       });
@@ -391,12 +519,17 @@ void rowTest(TsClient client) {
             {'key': 'long'}
           ],
           'attributes': [
-            {'test': TsValueLong.fromString('90071992547409910')}
+            {
+              'test': {'@long': '90071992547409910'}
+            }
           ]
         }
       });
-      var long = getResponse.toDebugMap()['row']['attributes'][0]['test']
-          as TsValueLong;
+      expect(getResponse.toDebugMap()['row']['attributes'][0]['test'],
+          {'@long': '90071992547409910'});
+
+      expect(getResponse.row.attributes.first.name, 'test');
+      var long = getResponse.row.attributes.first.value as TsValueLong;
       if (isRunningAsJavascript) {
         expect(TsValueLong.fromNumber(long.toNumber()).toString(),
             isNot('90071992547409910'));
@@ -425,13 +558,16 @@ void rowTest(TsClient client) {
           ],
           'attributes': [
             {
-              'test': [1, 2, 3]
+              'test': {'@blob': 'AQID'}
             }
           ]
         }
       });
-      var binary = getResponse.toDebugMap()['row']['attributes'][0]['test'];
+      expect(getResponse.toDebugMap()['row']['attributes'][0]['test'],
+          {'@blob': 'AQID'});
+      var binary = getResponse.row.attributes.first.value;
       expect(binary, const TypeMatcher<Uint8List>());
+      expect(binary, buffer);
     });
 
     test('batch_read', () async {
@@ -466,7 +602,9 @@ void rowTest(TsClient client) {
                 {'key': 'batch_1'}
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(1)}
+                {
+                  'test': {'@long': '1'}
+                }
               ]
             },
           ]
@@ -606,7 +744,9 @@ void rowTest(TsClient client) {
                 {'key': 'range_1'}
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(1)}
+                {
+                  'test': {'@long': '1'}
+                }
               ]
             }
           ]);
@@ -623,7 +763,9 @@ void rowTest(TsClient client) {
             {'key': 'range_2'}
           ],
           'attributes': [
-            {'test': TsValueLong.fromNumber(2)}
+            {
+              'test': {'@long': '2'}
+            }
           ]
         }
       ]);
@@ -680,23 +822,35 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(1)},
+                {
+                  'key2': {'@long': '1'}
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(2)}
+                {
+                  'key4': {'@long': '2'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(1)}
+                {
+                  'test': {'@long': '1'}
+                }
               ]
             },
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(3)},
+                {
+                  'key2': {'@long': '3'}
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(4)}
+                {
+                  'key4': {'@long': '4'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(3)}
+                {
+                  'test': {'@long': '3'}
+                }
               ]
             }
           ]
@@ -715,12 +869,18 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(3)},
+                {
+                  'key2': {'@long': '3'}
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(4)}
+                {
+                  'key4': {'@long': '4'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(3)}
+                {
+                  'test': {'@long': '3'}
+                }
               ]
             }
           ]
@@ -739,6 +899,37 @@ void rowTest(TsClient client) {
             columnCondition: TsColumnCondition.and([
               TsColumnCondition.equals('key3', 'col3_1'),
               TsColumnCondition.lessThan('key4', TsValueLong.fromNumber(4))
+            ])));
+        expect(response.toDebugMap(), {
+          'rows': [
+            {
+              'primaryKey': [
+                {'key1': 'range_complex'},
+                {'key2': TsValueLong.fromNumber(1)},
+                {'key3': 'col3_1'},
+                {'key4': TsValueLong.fromNumber(2)}
+              ],
+              'attributes': [
+                {'test': TsValueLong.fromNumber(1)}
+              ]
+            }
+          ]
+        });
+      }, skip: true);
+
+      test('range_complex_composite_condition_2', () async {
+        await _writeComplexData();
+
+        var response = await client.getRange(TsGetRangeRequest(
+            tableName: workTableName,
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.min, 'col3_1', TsValueInfinite.min),
+            exclusiveEndPrimaryKey: getWorkTableKey(
+                col1, TsValueInfinite.max, 'col3_1', TsValueInfinite.max),
+            columnCondition: TsColumnCondition.or([
+              TsColumnCondition.equals('key3', 'col3_1'),
+              TsColumnCondition.equals('key3', 'col3_2')
+              // TsColumnCondition.lessThan('key4', TsValueLong.fromNumber(4))
             ])));
         expect(response.toDebugMap(), {
           'rows': [
@@ -819,34 +1010,52 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(1)},
+                {
+                  'key2': {'@long': '1'}
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(2)}
+                {
+                  'key4': {'@long': '2'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(1)}
+                {
+                  'test': {'@long': '1'}
+                }
               ]
             },
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(2)},
+                {
+                  'key2': {'@long': '2'}
+                },
                 {'key3': 'col3_2'},
-                {'key4': TsValueLong.fromNumber(3)}
+                {
+                  'key4': {'@long': '3'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(2)}
+                {
+                  'test': {'@long': '2'}
+                }
               ]
             },
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(3)},
+                {
+                  'key2': {'@long': '3'}
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(4)}
+                {
+                  'key4': {'@long': '4'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(3)}
+                {
+                  'test': {'@long': '3'}
+                }
               ]
             }
           ]
@@ -863,12 +1072,18 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(3)},
+                {
+                  'key2': {'@long': '3'}
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(4)}
+                {
+                  'key4': {'@long': '4'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(3)}
+                {
+                  'test': {'@long': '3'}
+                }
               ]
             }
           ]
@@ -885,12 +1100,18 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex_'},
-                {'key2': TsValueLong.fromNumber(4)},
+                {
+                  'key2': {'@long': '4'}
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(4)}
+                {
+                  'key4': {'@long': '4'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(4)}
+                {
+                  'test': {'@long': '4'}
+                }
               ]
             }
           ]
@@ -948,20 +1169,30 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(1)},
+                {
+                  'key2': {'@long': '1'}
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(2)}
+                {
+                  'key4': {'@long': '2'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(1)}
+                {
+                  'test': {'@long': '1'}
+                }
               ]
             }
           ],
           'nextStartPrimaryKey': [
             {'key1': 'range_complex'},
-            {'key2': TsValueLong.fromNumber(2)},
+            {
+              'key2': {'@long': '2'}
+            },
             {'key3': 'col3_2'},
-            {'key4': TsValueLong.fromNumber(3)}
+            {
+              'key4': {'@long': '3'}
+            }
           ]
         });
 
@@ -972,20 +1203,30 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(2)},
+                {
+                  'key2': {'@long': '2'}
+                },
                 {'key3': 'col3_2'},
-                {'key4': TsValueLong.fromNumber(3)}
+                {
+                  'key4': {'@long': '3'}
+                }
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(2)}
+                {
+                  'test': {'@long': '2'}
+                }
               ]
             },
           ],
           'nextStartPrimaryKey': [
             {'key1': 'range_complex'},
-            {'key2': TsValueLong.fromNumber(3)},
+            {
+              'key2': {'@long': '3'}
+            },
             {'key3': 'col3_1'},
-            {'key4': TsValueLong.fromNumber(4)}
+            {
+              'key4': {'@long': '4'}
+            }
           ]
         });
       });

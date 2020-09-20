@@ -6,6 +6,11 @@ import 'package:tekartik_common_utils/model/model.dart';
 Map<String, dynamic> toPrimaryKeyValueParam(TsKeyValue keyValue) =>
     <String, dynamic>{keyValue.name: keyValue.value};
 
+/// Weird list handling workaround
+/* List | TsArrayHack */ dynamic toListParam(List list) {
+  return TsArrayHack(list);
+}
+
 Map<String, dynamic> toGetRowParams(TsGetRowRequest request) {
   var map = Model({
     if (request.tableName != null) 'tableName': request.tableName,
@@ -101,7 +106,7 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
     if (request.columnCondition is TsColumnSingleCondition)
       'columnFilter': request.columnCondition,
     if (request.columnCondition is TsColumnCompositeCondition)
-      'filter': request.columnCondition,
+      'columnFilter': request.columnCondition,
   });
   return map;
 }

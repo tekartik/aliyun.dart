@@ -1,3 +1,4 @@
+import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
 
 // ignore_for_file: non_constant_identifier_names
@@ -35,7 +36,7 @@ class TsConstantReturnTypeShim implements TsConstantReturnType {
   int get AfterModify => 2;
 }
 
-class TsNodeLongShim implements TsNodeLong {
+class TsNodeLongShim extends TsValueBase implements TsNodeLong {
   final int value;
 
   TsNodeLongShim(this.value);

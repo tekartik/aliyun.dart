@@ -1,5 +1,37 @@
+import 'dart:typed_data';
+
+import 'package:meta/meta.dart';
+import 'package:tekartik_common_utils/common_utils_import.dart';
+import 'package:tekartik_common_utils/model/model.dart';
+
+Model blobToDebugValue(Uint8List bytes) =>
+    Model({'@blob': base64Encode(bytes)});
+
+dynamic valueToDebugValue(dynamic value) {
+  assert(
+      (value == null ||
+          value is TsValue ||
+          value is String ||
+          value is Uint8List ||
+          value is double),
+      'value $value (type ${value?.runtimeType} not supported');
+  if (value is TsValueBase) {
+    return value.toDebugMap();
+  } else if (value is Uint8List) {
+    return blobToDebugValue(value);
+  }
+  return value;
+}
+
+abstract class TsValue {}
+
+abstract class TsValueBase implements TsValue {
+  @mustCallSuper
+  Model toDebugMap() => Model();
+}
+
 // Can be implemented too
-abstract class TsValueLong {
+abstract class TsValueLong extends TsValueBase {
   // From caller only
   factory TsValueLong.fromNumber(int value) => _TsValueLongNumber(value);
   // From caller only
@@ -10,13 +42,22 @@ abstract class TsValueLong {
   String toString();
 }
 
-class TsValueInfinite {
+class TsValueInfinite implements TsValueBase {
   final String _label;
   const TsValueInfinite._(this._label);
   static const min = TsValueInfinite._('INF_MIN');
   static const max = TsValueInfinite._('INF_MAX');
   @override
   String toString() => _label;
+
+  @override
+  Model toDebugMap() => Model({
+        '@infinite': this == min
+            ? 'min'
+            : (this == max)
+                ? 'max'
+                : throw UnsupportedError('TsValueInfinite($_label)')
+      });
 }
 
 mixin _TsValueLongMixin implements TsValueLong {
@@ -30,6 +71,9 @@ mixin _TsValueLongMixin implements TsValueLong {
     }
     return false;
   }
+
+  @override
+  Model toDebugMap() => Model({'@long': toString()});
 }
 
 // Only for valid js int(s)

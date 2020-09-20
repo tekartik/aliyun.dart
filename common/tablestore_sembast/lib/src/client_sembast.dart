@@ -170,7 +170,7 @@ class TsClientSembast implements TsClient {
       var table = await getTableContext(txn, request.tableName);
       var row = table.row(request.primaryKey);
       var record = row.record();
-      var result = await record.get();
+      var result = await record.get(request.columns);
       var exists = result != null;
       return TsGetRowResponseSembast(
           row, exists, result?.primaryKey, result?.attributes);
@@ -252,7 +252,7 @@ class TsClientSembast implements TsClient {
           var row = table.row(primaryKey);
 
           var record = row.record();
-          var result = await record.get();
+          var result = await record.get(requestTable.columns);
           // return TsGetRowResponseSembast(row, result.primaryKey, result.attributes);
           var isOk = true;
 
@@ -317,7 +317,7 @@ class TsClientSembast implements TsClient {
 
       var list = <TsAttribute>[];
       if (key != null) {
-        list.addAll((await record.get())?.attributes);
+        list.addAll((await record.get(null))?.attributes);
       }
       // Merge!
       for (var update in request.data) {
@@ -520,12 +520,32 @@ List<TsKeyValue> readKeyValues(Map map, List<String> names) {
   return list;
 }
 
-List<TsAttribute> readAttributesBut(Map map, List<String> names) {
+/// Read all columns
+List<TsAttribute> readAttributesBut(Map map, List<String> but) {
   var list = <TsAttribute>[];
   map.forEach((key, value) {
-    if (!names.contains(key)) {
+    if (!but.contains(key)) {
       var value = sembastValueToValue(map[key]);
       list.add(TsAttribute(key as String, value));
+    }
+  });
+  return list;
+}
+
+/// Read all columns if columns is null or empty (!), none if empty, exclude [but]
+List<TsAttribute> readAttributesColumnsBut(
+    Map map, List<String> columns, List<String> but) {
+  if (columns == null || columns.isEmpty) {
+    return readAttributesBut(map, but);
+  }
+  var list = <TsAttribute>[];
+
+  columns.forEach((key) {
+    if (!but.contains(key)) {
+      if (map.containsKey(key)) {
+        var value = sembastValueToValue(map[key]);
+        list.add(TsAttribute(key, value));
+      }
     }
   });
   return list;
@@ -613,16 +633,20 @@ class TsRowRecordContextSembast {
 
   TsRowRecordContextSembast(this.row, [this.attributes]);
 
-  Future<TsGetRowSembast> get() async {
+  TsGetRowSembast recordValueToGetRowSembast(Map map, List<String> columns) {
+    var primaryKey = TsPrimaryKey(readKeyValues(map, table.primaryKeyNames));
+    var attributes =
+        sembastRecordValueToAttributes(map, columns, table.primaryKeyNames);
+    var exists = map != null;
+    return TsGetRowSembast(exists, primaryKey, attributes);
+  }
+
+  /// Filter columns, all if null
+  Future<TsGetRowSembast> get(List<String> /*?*/ columns) async {
     var id = await findKey();
     if (id != null) {
       var result = await table.store.record(id).get(table.client);
-      var primaryKey =
-          TsPrimaryKey(readKeyValues(result, table.primaryKeyNames));
-      var attributes =
-          TsAttributes(readAttributesBut(result, table.primaryKeyNames));
-      var exists = result != null;
-      return TsGetRowSembast(exists, primaryKey, attributes);
+      return recordValueToGetRowSembast(result, columns);
     }
     return null;
   }
@@ -824,10 +848,12 @@ class TsRangeContextSembast {
 
     var rows = records.map((snapshot) {
       var result = snapshot.value;
+
       var primaryKey =
           TsPrimaryKey(readKeyValues(result, table.primaryKeyNames));
-      var attributes =
-          TsAttributes(readAttributesBut(result, table.primaryKeyNames));
+
+      var attributes = sembastRecordValueToAttributes(
+          result, request.columns, table.primaryKeyNames);
 
       return TsGetRowSembast(true, primaryKey, attributes);
     }).toList();
@@ -841,4 +867,10 @@ class TsRangeContextSembast {
 
     return TsGetRangeSembast(rows, nextRow);
   }
+}
+
+TsAttributes sembastRecordValueToAttributes(
+    Map map, List<String> columns, List<String> but) {
+  var attributes = TsAttributes(readAttributesColumnsBut(map, columns, but));
+  return attributes;
 }
