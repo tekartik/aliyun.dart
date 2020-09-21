@@ -15,7 +15,7 @@ dev_dependencies:
       url: git://github.com/tekartik/build_utils.dart
       ref: dart2
     version: '>=0.5.8'
-  process_run: '>=0.10.2'
+  process_run: '>=0.11.0+1'
 
 dependency_overrides:
   dev_test:

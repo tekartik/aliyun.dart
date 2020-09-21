@@ -1,11 +1,13 @@
 import 'package:tekartik_aliyun_fc_node/fc_node.dart';
 import 'package:tekartik_aliyun_fc_universal/fc_universal.dart';
-import 'package:tekartik_aliyun_fc_universal/src/fc_universal/fc_common.dart';
 import 'package:tekartik_aliyun_fc_node/src/aliyun_function_compute_node.dart'; // ignore: implementation_imports
 
 class FcServerNode implements FcServer {
   @override
   Future<void> close() async {}
+
+  @override
+  Uri get uri => null;
 }
 
 /// Can be called only once
@@ -20,5 +22,5 @@ class AliyunFunctionComputeNodeUniversal extends AliyunFunctionComputeNode
   Future<FcServer> serve({int port}) async => FcServerNode();
 }
 
-AliyunFunctionComputeUniversal aliyunFunctionCompute =
+AliyunFunctionComputeUniversal aliyunFunctionComputeUniversal =
     AliyunFunctionComputeNodeUniversal();

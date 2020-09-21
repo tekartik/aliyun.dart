@@ -1,5 +1,5 @@
 import 'package:tekartik_aliyun_fc_universal/fc_universal.dart';
-import 'package:tekartik_aliyun_fc_universal/src/fc_universal/fc_common.dart';
+import 'package:tekartik_aliyun_fc_universal/src/fc_universal_common.dart';
 import 'package:tekartik_http_io/http_server_io.dart';
 
 @deprecated
@@ -11,5 +11,5 @@ class AliyunFunctionComputeHttpUniversalIo
   AliyunFunctionComputeHttpUniversalIo() : super(httpServerFactoryIo);
 }
 
-final AliyunFunctionComputeUniversal aliyunFunctionCompute =
+final AliyunFunctionComputeUniversal aliyunFunctionComputeUniversal =
     AliyunFunctionComputeHttpUniversalIo();

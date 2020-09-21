@@ -16,6 +16,9 @@ class FcServerHttp implements FcServer {
   Future<void> close() async {
     await httpServer.close(force: true);
   }
+
+  @override
+  Uri get uri => httpServerGetDefaultUri(httpServer);
 }
 
 class AliyunFunctionComputeHttpUniversal extends AliyunFunctionComputeHttp
@@ -33,5 +36,5 @@ class AliyunFunctionComputeHttpUniversal extends AliyunFunctionComputeHttp
   }
 }
 
-final AliyunFunctionComputeUniversal aliyunFunctionComputeMemory =
+final AliyunFunctionComputeUniversal aliyunFunctionComputeUniversalMemory =
     AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);

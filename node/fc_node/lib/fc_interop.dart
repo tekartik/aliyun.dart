@@ -18,8 +18,6 @@ class HttpResponseJs {
 @anonymous
 class HttpReqJs {
   external String get url;
-
-  external Map<String, dynamic> get queries;
 }
 
 @JS()
@@ -97,10 +95,14 @@ class FcHttpRequestNode implements FcHttpRequest {
   @override
   Map<String, String> get headers {
     var headers = <String, String>{};
-    var map = getProperty(req, 'headers') as Map;
-    map.forEach((key, value) {
-      headers[key?.toString()] = value?.toString();
-    });
+
+    // Need to loop through the keys
+    var nativeHeaders = getProperty(req, 'headers');
+    var keys = jsObjectKeys(nativeHeaders);
+    for (var key in keys) {
+      headers[key] = getProperty(nativeHeaders, key);
+    }
+
     return headers;
   }
 

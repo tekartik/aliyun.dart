@@ -10,7 +10,7 @@ void main() {
   group('tablestore_universal', () {
     test('options', () {
       print('options: $options');
-      print('accessKeyId: ${options.accessKeyId}');
+      print('accessKeyId: ${options?.accessKeyId}');
     });
   });
 }
