@@ -10,13 +10,13 @@ import 'package:tekartik_js_utils/js_utils.dart';
 
 @JS()
 @anonymous
-class _HttpResponseJs {
+class HttpResponseJs {
   external void send(String body);
 }
 
 @JS()
 @anonymous
-class _HttpReqJs {
+class HttpReqJs {
   external String get url;
 
   external Map<String, dynamic> get queries;
@@ -24,7 +24,7 @@ class _HttpReqJs {
 
 @JS()
 @anonymous
-class _HttpContextJs {
+class HttpContextJs {
   external Map<String, dynamic> get credentials;
 }
 
@@ -42,10 +42,10 @@ getRawBody(request, function(err, data){
  */
 
 // ["requestId","credentials","function","service","region","accountId","logger","retryCount"]
-class FcHttpContextJs implements FcHttpContext {
-  final _HttpContextJs native;
+class FcHttpContextNode implements FcHttpContext {
+  final HttpContextJs native;
 
-  FcHttpContextJs(this.native);
+  FcHttpContextNode(this.native);
 
   Map<String, dynamic> get credentials => jsObjectAsMap(native.credentials);
 
@@ -59,11 +59,11 @@ class FcHttpContextJs implements FcHttpContext {
 }
 
 // ["_events","_eventsCount","_maxListeners","method","clientIP","url","path","queries","headers","getHeader"
-class FcHttpRequestJs implements FcHttpRequest {
-  final _HttpReqJs req;
+class FcHttpRequestNode implements FcHttpRequest {
+  final HttpReqJs req;
   Future _rawBody;
 
-  FcHttpRequestJs(this.req);
+  FcHttpRequestNode(this.req);
 
   Future getRawBody() {
     return _rawBody ??= promiseToFuture(_getRawBodyFn(req));
@@ -94,7 +94,15 @@ class FcHttpRequestJs implements FcHttpRequest {
   @override
   String get method => getProperty(req, 'method');
 
-  dynamic get headers => getProperty(req, 'headers');
+  @override
+  Map<String, String> get headers {
+    var headers = <String, String>{};
+    var map = getProperty(req, 'headers') as Map;
+    map.forEach((key, value) {
+      headers[key?.toString()] = value?.toString();
+    });
+    return headers;
+  }
 
   @override
   String toString() {
@@ -109,24 +117,26 @@ class FcHttpRequestJs implements FcHttpRequest {
   }
 }
 
-class FcHttpResponseJs implements FcHttpResponse {
-  final _HttpResponseJs impl;
+class FcHttpResponseNode implements FcHttpResponse {
+  final HttpResponseJs impl;
 
-  FcHttpResponseJs(this.impl);
+  FcHttpResponseNode(this.impl);
 
   @override
-  void sendString(String text) {
+  Future sendString(String text) async {
     // var sendResponse =
     // callMethod(impl, 'send', [text]);
     impl.send(text);
   }
 
+  @override
   void setStatusCode(int statusCode) {
     // to call first
     // var sendResponse =
     callMethod(impl, 'setStatusCode', [statusCode]);
   }
 
+  @override
   void setHeader(String key, String value) {
     // to call first
     // var sendResponse =

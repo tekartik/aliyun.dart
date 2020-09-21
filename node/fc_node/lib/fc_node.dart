@@ -1,8 +1,6 @@
 /// Support for doing something awesome.
 ///
 /// More dartdocs go here.
-library fc_node;
+library tekartik_aliyun_fc_node;
 
-export 'src/fc_node_base.dart';
-
-// TODO: Export any libraries intended for clients of this package.
+export 'src/aliyun_function_compute_node.dart' show aliyunFunctionComputeNode;

@@ -30,5 +30,7 @@ dependency_overrides:
     path: ../../../common/fc_universal
   tekartik_aliyun_fc_node:
     path: ../../../node/fc_node
+  tekartik_aliyun_fc_http:
+    path: ../../../common/fc_http
   tekartik_aliyun_fc:
     path: ../../../common/fc
