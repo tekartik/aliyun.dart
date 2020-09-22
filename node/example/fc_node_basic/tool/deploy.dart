@@ -1,6 +1,7 @@
 import 'package:http/http.dart';
 import 'package:process_run/shell_run.dart';
 import 'package:process_run/utils/process_result_extension.dart';
+import 'package:path/path.dart';
 
 Future<void> main() async {
   await deploy();
@@ -21,6 +22,14 @@ Future<void> deploy() async {
   if (foundUrl != null) {
     print('url: $foundUrl');
     var response = await get(foundUrl, headers: {'x-in': 'in-value'});
+    print('status code: ${response.statusCode}');
+    print('headers: ${response.headers}');
+    print(response.body);
+
+    var asyncUrl = url.join(foundUrl, 'async');
+    print('url: $asyncUrl');
+    response =
+        await get(url.join(asyncUrl, 'async'), headers: {'x-in': 'in-value'});
     print('status code: ${response.statusCode}');
     print('headers: ${response.headers}');
     print(response.body);

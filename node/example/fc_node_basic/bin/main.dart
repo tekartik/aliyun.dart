@@ -11,21 +11,32 @@ import 'package:tekartik_http/http.dart';
 Future<void> main() async {
   aliyunFunctionComputeUniversal.exportHttpHandler((FcHttpRequest request,
       FcHttpResponse response, FcHttpContext httpContext) async {
-    response.setStatusCode(201);
-    response.setHeader(httpHeaderContentType, httpContentTypeJson);
-    response.setHeader('x-test', 'x-value');
-    var body = await request.getBodyString();
-    var map = {
-      'version': 3,
-      'tag': 'v1',
-      'method': request.method,
-      'body': body,
-      'path': request.path,
-      'url': request.url,
-      'headers': request.headers,
-      'env': platform.environment,
-    };
-    await response.sendString(jsonPretty(map));
+    var command = request.path.split('/').last;
+
+    Future sendResponse() async {
+      response.setStatusCode(201);
+      response.setHeader(httpHeaderContentType, httpContentTypeJson);
+      response.setHeader('x-test', 'x-value');
+      var body = await request.getBodyString();
+      var map = {
+        'version': 3,
+        'tag': 'v1',
+        'method': request.method,
+        'body': body,
+        'path': request.path,
+        'url': request.url,
+        'headers': request.headers,
+        'env': platform.environment,
+      };
+      await response.sendString(jsonPretty(map));
+    }
+
+    if (command == 'async') {
+      await Future.delayed(Duration(milliseconds: 1));
+      await sendResponse();
+    } else {
+      return sendResponse();
+    }
   });
   await aliyunFunctionComputeUniversal.serve(port: 4998);
 }

@@ -29,7 +29,7 @@ typedef FcHttpHandler = dynamic Function(
 
 /// Abstract factory
 abstract class AliyunFunctionCompute {
-  /// Can be calledly once
+  /// Can be called only once
   void exportHttpHandler(FcHttpHandler handler, {String name = 'handler'});
 }
 
