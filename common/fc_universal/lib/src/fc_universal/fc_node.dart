@@ -1,6 +1,5 @@
-import 'package:tekartik_aliyun_fc_node/fc_node.dart';
-import 'package:tekartik_aliyun_fc_universal/fc_universal.dart';
 import 'package:tekartik_aliyun_fc_node/src/aliyun_function_compute_node.dart'; // ignore: implementation_imports
+import 'package:tekartik_aliyun_fc_universal/fc_universal.dart';
 
 class FcServerNode implements FcServer {
   @override
@@ -10,11 +9,7 @@ class FcServerNode implements FcServer {
   Uri get uri => null;
 }
 
-/// Can be called only once
-@deprecated
-void exportHttpHandler(FcHttpHandler handler, {String name = 'handler'}) =>
-    aliyunFunctionComputeNode.exportHttpHandler(handler, name: name);
-
+/// Node implementation
 class AliyunFunctionComputeNodeUniversal extends AliyunFunctionComputeNode
     implements AliyunFunctionComputeUniversal {
   /// Dummy implementation on node

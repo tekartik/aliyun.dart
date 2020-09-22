@@ -8,6 +8,8 @@ void main() {
     // ignore: unnecessary_statements
     AliyunFunctionComputeUniversal;
     // ignore: unnecessary_statements
+    AliyunFunctionComputeHttpUniversal;
+    // ignore: unnecessary_statements
     FcServer;
   });
 }

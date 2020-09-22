@@ -2,9 +2,11 @@ import 'package:tekartik_aliyun_fc/fc_api.dart';
 
 export 'package:tekartik_aliyun_fc/fc_api.dart';
 export 'package:tekartik_aliyun_fc_universal/src/fc_universal_common.dart'
-    show aliyunFunctionComputeUniversalMemory;
+    show
+        aliyunFunctionComputeUniversalMemory,
+        AliyunFunctionComputeHttpUniversal;
 
-export 'src/fc_universal/fc.dart';
+export 'src/fc_universal/fc.dart' show aliyunFunctionComputeUniversal;
 
 abstract class FcServer {
   Uri get uri;
