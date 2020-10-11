@@ -1,6 +1,7 @@
 # Files and directories created by pub
 .dart_tool/
 .packages
+/pubspec.lock
 
 # Conventional directory for build outputs
 build/
@@ -12,6 +13,8 @@ doc/api/
 .idea/
 *.iml
 .vscode/
-/deploy/index.js
-/deploy/.fun/
-/pubspec.lock
+
+# Excluded
+deploy/index.js
+deploy/.fun/
+

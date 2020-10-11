@@ -27,6 +27,7 @@ class TsExceptionNode implements TsException {
 
   bool get isNotFound => code == httpStatusCodeNotFound;
   bool get isForbidden403 => code == httpStatusCodeForbidden;
+  bool get isBadRequest400 => code == httpStatusCodeBadRequest;
 
   @override
   String toString() => 'TableStoreNodeException($message, $map)';
@@ -36,5 +37,18 @@ class TsExceptionNode implements TsException {
   @override
   bool get isConditionFailedError =>
       isForbidden403 ??
-      message.toLowerCase().contains('Condition check failed');
+      message.toLowerCase().contains('condition check failed');
+
+  @override
+  bool get isTableNotExistError =>
+      isBadRequest400 && message.toLowerCase().contains('table not exist');
+
+  @override
+  bool get isPrimaryKeySizeError =>
+      isBadRequest400 && message.toLowerCase().contains('pk size fail');
+
+  // Validate PK type fail
+  @override
+  bool get isPrimaryKeyTypeError =>
+      isBadRequest400 && message.toLowerCase().contains('pk type fail');
 }

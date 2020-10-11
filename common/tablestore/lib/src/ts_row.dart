@@ -15,7 +15,15 @@ class TsGetRowRequest {
       this.columns});
 }
 
-class TsKeyBoundary {
+class TsKeyStartBoundary extends TsKeyBoundary {
+  TsKeyStartBoundary(TsPrimaryKey value) : super(value, true);
+}
+
+class TsKeyEndBoundary extends TsKeyBoundary {
+  TsKeyEndBoundary(TsPrimaryKey value) : super(value, false);
+}
+
+abstract class TsKeyBoundary {
   final TsPrimaryKey value;
   final bool inclusive;
 
@@ -24,21 +32,23 @@ class TsKeyBoundary {
 
 class TsGetRangeRequest {
   final String tableName;
-  TsKeyBoundary start;
-  TsKeyBoundary end;
+  TsPrimaryKey inclusiveStartPrimaryKey;
+  TsPrimaryKey exclusiveEndPrimaryKey;
   final List<String> columns;
-  final direction;
+  final TsDirection direction;
   final int limit;
+  final TsColumnCondition columnCondition;
 
   TsGetRangeRequest(
       {@required this.tableName,
-      this.start,
-      this.end,
-      this.direction,
-      this.limit,
 
       /// Optional
-      this.columns});
+      this.inclusiveStartPrimaryKey,
+      this.exclusiveEndPrimaryKey,
+      this.direction,
+      this.limit,
+      this.columns,
+      this.columnCondition});
 }
 
 // Condition for put and delete
@@ -71,6 +81,22 @@ abstract class TsColumnCondition {
   factory TsColumnCondition.equals(String name, dynamic value) =>
       TsColumnSingleCondition(TsComparatorType.equals, name, value);
 
+  factory TsColumnCondition.notEquals(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.notEquals, name, value);
+
+  factory TsColumnCondition.lessThan(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.lessThan, name, value);
+
+  factory TsColumnCondition.lessThanOrEquals(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.lessThanOrEquals, name, value);
+
+  factory TsColumnCondition.greaterThan(String name, dynamic value) =>
+      TsColumnSingleCondition(TsComparatorType.greaterThan, name, value);
+
+  factory TsColumnCondition.greaterThanOrEquals(String name, dynamic value) =>
+      TsColumnSingleCondition(
+          TsComparatorType.greaterThanOrEquals, name, value);
+
   factory TsColumnCondition.or(List<TsColumnCondition> conditions) =>
       TsColumnCompositeCondition(TsLogicalOperator.or, conditions);
 
@@ -84,7 +110,7 @@ enum TsComparatorType {
   equals,
   notEquals,
   greaterThan,
-  greatorThanOrEquals,
+  greaterThanOrEquals,
   lessThan,
   lessThanOrEquals,
 }
@@ -143,6 +169,11 @@ class TsPrimaryKey {
 
   ModelList toDebugList() =>
       ModelList(list.map((e) => e?.toDebugMap())?.toList(growable: false));
+
+  Map<String, TsKeyValue> toMap() =>
+      list.fold(<String, TsKeyValue>{}, (map, kv) {
+        return map..[kv.name] = kv;
+      });
 }
 
 class TsPutRowRequest {
@@ -240,6 +271,9 @@ class TsDeleteRowRequest {
 }
 
 abstract class TsGetRow {
+  bool get exists;
+
+  /// Null if the record was not found
   TsPrimaryKey get primaryKey;
 
   TsAttributes get attributes;
@@ -261,6 +295,7 @@ abstract class TsDeleteRowResponse {}
 
 abstract class TsGetRangeResponse {
   List<TsGetRow> get rows;
+  TsPrimaryKey get nextStartPrimaryKey;
 }
 
 // {isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string,
@@ -301,9 +336,19 @@ extension TsUpdateRowResponseExt on TsUpdateRowResponse {
   }
 }
 
+extension TsStartLocalTransactionResponseExt
+    on TsStartLocalTransactionResponse {
+  Model toDebugMap() {
+    return Model({})..setValue('transactionId', transactionId);
+  }
+}
+
 extension TsGetRangeResponseExt on TsGetRangeResponse {
   Model toDebugMap() {
-    return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
+    return Model({})
+      ..setValue('rows', rows?.map((row) => row.toDebugMap()))
+      ..setValue('nextStartPrimaryKey', nextStartPrimaryKey?.toDebugList());
+    //return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
   }
 }
 
@@ -351,4 +396,17 @@ extension TsGetRowExt on TsGetRow {
       ..setValue('primaryKey', primaryKey?.toDebugList())
       ..setValue('attributes', attributes?.toDebugList());
   }
+}
+
+class TsStartLocalTransactionRequest {
+  final String tableName;
+  final TsPrimaryKey primaryKey;
+
+  // Primary key must contain only the partition key (i.e. single key value
+  TsStartLocalTransactionRequest(
+      {@required this.tableName, @required this.primaryKey});
+}
+
+abstract class TsStartLocalTransactionResponse {
+  dynamic get transactionId;
 }

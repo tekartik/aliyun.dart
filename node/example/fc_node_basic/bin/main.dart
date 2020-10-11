@@ -2,76 +2,43 @@
   print('Hello');
 }
 */
-import 'dart:convert';
-
 import 'package:tekartik_aliyun_fc/fc.dart';
 import 'package:tekartik_aliyun_fc_universal/fc_universal.dart';
+import 'package:tekartik_app_node_utils/node_utils.dart';
+import 'package:tekartik_common_utils/json_utils.dart';
+import 'package:tekartik_http/http.dart';
 
-// var getRawBody = require('raw-body');
-/*
-exports.hello = (event, context, callback) => {
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({ message: 'Hello!' }),
-  };
+Future<void> main() async {
+  aliyunFunctionComputeUniversal.exportHttpHandler((FcHttpRequest request,
+      FcHttpResponse response, FcHttpContext httpContext) async {
+    var command = request.path.split('/').last;
 
-  callback(null, response);
-};
- */
-
-//jsCon
-void main() {
-  print('Print from dartjs');
-  exportHttpHandler((FcHttpRequest httpRequest, FcHttpResponse httpResp,
-      FcHttpContext httpContext) async {
-    /*
-    httpResp.setStatusCode(200);
-    // First
-    httpResp.setContentTypeJson();
-    httpResp.setHeader('x-test', 'x-value');
-
-     */
-
-    // Handle recursive objects
-    /*
-    var reqMap = <String, dynamic>{};
-    for (var key in jsObjectKeys(req)) {
-      /*
-      try {
-        var value = getProperty(req, key);
-        reqMap[key] = value;
-      } catch (e) {
-        reqMap[key] = 'Error: $e';
-      }*/
-      /*
-      if (jsIsCollection(value)) {
-        // recursive
-        value = jsObjectToCollection(value,
-            depth: depth == null ? null : depth - 1);
-      }
-      map[key] = value;
-
-       */
+    Future sendResponse() async {
+      response.setStatusCode(201);
+      response.setHeader(httpHeaderContentType, httpContentTypeJson);
+      response.setHeader('x-test', 'x-value');
+      var body = await request.getBodyString();
+      var map = {
+        'version': 3,
+        'tag': 'v1',
+        'method': request.method,
+        'body': body,
+        'path': request.path,
+        'url': request.url,
+        'headers': request.headers,
+        'env': platform.environment,
+      };
+      await response.sendString(jsonPretty(map));
     }
 
-     */
-    var map = {
-      'version': 1,
-      'tag': 'v1',
-      //'body': 'body'
-      //'body': await httpReq.getBodyString(),
-      //'rawBodyType': (await httpReq.getRawBody())?.runtimeType?.toString(),
-      //'req': jsObjectKeys(req),
-      //'httpReq': httpReq.toString(),
-      //'resp': jsObjectAsMap(resp),
-      //'contextKeys': jsObjectKeys(context),
-      //'context': httpContext.toString(),
-    };
-    httpResp.sendString(jsonEncode(map));
-    //resp.send('Hello from dartjs');
+    if (command == 'async') {
+      await Future.delayed(Duration(milliseconds: 1));
+      await sendResponse();
+    } else {
+      return sendResponse();
+    }
   });
-  /*
-  module.exports['handler'] = (req, resp, callback) {
-    
-  }*/
+  await aliyunFunctionComputeUniversal.serve(port: 4998);
 }
+
+// curl -i -H "x-value-in: my value in" -d 'my_body' http://localhost:4998/handler?test=1

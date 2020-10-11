@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:tekartik_aliyun_tablestore/src/ts_value_type.dart';
+import 'package:tekartik_aliyun_tablestore/src/ts_value.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_common_utils/model/model.dart';
 
@@ -16,7 +16,7 @@ class TsKeyValue {
             value is String ||
             value is Uint8List ||
             value is double),
-        'value $value (type ${value.runtimeType} not supported');
+        'TsKeyValue: value \'$name\': $value (type ${value?.runtimeType} not supported');
   }
 
   TsKeyValue.string(String name, String value) : this(name, value);
@@ -30,10 +30,18 @@ class TsKeyValue {
 
   TsKeyValue.binary(String name, Uint8List value) : this(name, value);
 
-  Map<String, dynamic> toDebugMap() => <String, dynamic>{name: value};
+  // Json
+  Model toDebugMap() => Model({name: tsValueToDebugValue(value)});
 
   @override
   String toString() => toDebugMap().toString();
+
+  @override
+  int get hashCode => name.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      other is TsKeyValue && (other.name == name) && (other.value == value);
 }
 
 class TsAttributes with ListMixin<TsAttribute> {
@@ -56,6 +64,11 @@ class TsAttributes with ListMixin<TsAttribute> {
 
   ModelList toDebugList() =>
       ModelList(list.map((e) => e.toDebugMap()).toList(growable: false));
+
+  Map<String, TsAttribute> toMap() =>
+      list.fold(<String, TsAttribute>{}, (map, attr) {
+        return map..[attr.name] = attr;
+      });
 }
 
 // Read only

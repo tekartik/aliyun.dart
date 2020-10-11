@@ -216,7 +216,7 @@ class TsKeyValueJs {
 
 TsKeyValueJs tsKeyValueToNative(TsKeyValue keyValue) {
   var kvJs = TsKeyValueJs();
-  util.setProperty(kvJs, keyValue.name, tsJsify(keyValue.value));
+  util.setProperty(kvJs, keyValue.name, tsValueToNative(keyValue.value));
   return kvJs;
 }
 
@@ -362,6 +362,15 @@ TsUpdateRowResponse updateRowResponseFromNative(dynamic nativeResponseJs) {
   return null;
 }
 
+TsStartLocalTransactionResponse startLocalTransactionRowResponseFromNative(
+    dynamic nativeResponseJs) {
+  if (nativeResponseJs != null) {
+    return TsStartLocalTransactionResponseNode(
+        nativeResponseJs as TsStartLocalTransactionResponseJs);
+  }
+  return null;
+}
+
 // Response to native
 TsDeleteRowResponse deleteRowResponseFromNative(dynamic nativeResponseJs) {
   if (nativeResponseJs != null) {
@@ -419,9 +428,20 @@ class TsReadRowResponseJs {
 
 @JS()
 @anonymous
+class TsStartLocalTransactionResponseJs {
+  external dynamic get transactionId;
+}
+
+@JS()
+@anonymous
 class TsGetRangeResponseJs {
   external List get rows;
+  external List get nextStartPrimaryKey;
 }
+
+Iterable<TsRowPrimaryKeyValueJs> getRangeResponseNextStartPrimaryKeyValuesJs(
+        TsGetRangeResponseJs js) =>
+    js.nextStartPrimaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
 @JS()
 @anonymous
@@ -432,10 +452,10 @@ class TsReadRowJs {
 }
 
 Iterable<TsRowPrimaryKeyValueJs> rowPrimaryKeyValuesJs(TsReadRowJs js) =>
-    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
 Iterable<TsRowAttributeKeyValueJs> rowAttributeKeyValuesJs(TsReadRowJs js) =>
-    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
+    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
 
 // Response to native
 TsGetRowResponse getRowResponseFromNative(dynamic nativeResponseJs) {
@@ -460,6 +480,9 @@ class TsGetRowNode implements TsGetRow {
 
   @override
   String toString() => toDebugMap().toString();
+
+  @override
+  bool get exists => primaryKey != null;
 }
 
 TsAttributes fromNativeAttributes(Iterable<TsRowAttributeKeyValueJs> native) {
@@ -510,6 +533,18 @@ class TsUpdateRowResponseNode extends TsReadRowResponseNode
 
   @override
   String toString() => toDebugMap().toString();
+}
+
+class TsStartLocalTransactionResponseNode
+    implements TsStartLocalTransactionResponse {
+  final TsStartLocalTransactionResponseJs responseJs;
+  TsStartLocalTransactionResponseNode(this.responseJs);
+
+  @override
+  String toString() => toDebugMap().toString();
+
+  @override
+  dynamic get transactionId => responseJs.transactionId;
 }
 
 class TsDeleteRowResponseNode implements TsDeleteRowResponse {
@@ -629,6 +664,10 @@ class TsGetRangeResponseNode implements TsGetRangeResponse {
   List<TsGetRow> get rows => responseJs.rows
       ?.map((e) => TsGetRowNode(e as TsReadRowJs))
       ?.toList(growable: false);
+
+  @override
+  TsPrimaryKey get nextStartPrimaryKey => fromNativePrimaryKey(
+      getRangeResponseNextStartPrimaryKeyValuesJs(responseJs));
 }
 
 // Response to native
@@ -641,10 +680,10 @@ TsGetRangeResponse getRangeResponseFromNative(
 }
 
 dynamic tsSingleConditionToNative(TsColumnSingleCondition condition) {
-  var columnConditionJs = util.callConstructor(
-      tablestoreJs.SingleColumnCondition, [
+  var columnConditionJs =
+      util.callConstructor(tablestoreJs.SingleColumnCondition, [
     condition.name,
-    condition.value,
+    tsValueToNative(condition.value),
     tsComparatorTypeToNative(condition.operator)
   ]);
 
@@ -658,10 +697,13 @@ abstract class CompositeConditionJs {
 }
 
 dynamic tsCompositeConditionToNative(TsColumnCompositeCondition condition) {
-  var columnConditionJs =
-      util.callConstructor(tablestoreJs.CompositeColumnCondition, [
-    // tsComparatorTypeToNative(condition.)];
-  ]);
+  var columnConditionJs = util.callConstructor(tablestoreJs.CompositeCondition,
+          [tsLogicalOperatorTypeToNative(condition.operator)])
+      as CompositeConditionJs;
+  for (var sub in condition.list) {
+    columnConditionJs.addSubCondition(tsColumnConditionToNative(sub));
+  }
+
   return columnConditionJs;
 }
 

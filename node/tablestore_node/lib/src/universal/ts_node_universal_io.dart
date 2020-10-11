@@ -17,11 +17,12 @@ class TsArrayHack<T> {
   @override
   bool operator ==(Object other) {
     if (other is TsArrayHack) {
-      return const ListEquality().equals(list.toList(), other.list.toList());
+      return const DeepCollectionEquality()
+          .equals(list.toList(), other.list.toList());
     }
     return false;
   }
 
   @override
-  int get hashCode => const ListEquality().hash(list.toList());
+  int get hashCode => const DeepCollectionEquality().hash(list.toList());
 }

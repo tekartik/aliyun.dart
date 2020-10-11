@@ -51,6 +51,9 @@ abstract class TsClient {
   Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request);
 
   Future<TsGetRangeResponse> getRange(TsGetRangeRequest request);
+
+  Future<TsStartLocalTransactionResponse> startLocalTransaction(
+      TsStartLocalTransactionRequest request);
 }
 
 mixin TsClientMixin implements TsClient {

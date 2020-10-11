@@ -73,7 +73,7 @@ abstract class TablestoreJs {
   external dynamic get SingleColumnCondition;
 
   /// Constructors
-  external dynamic get CompositeColumnCondition;
+  external dynamic get CompositeCondition;
 }
 
 /// Wrap a native error
@@ -124,6 +124,8 @@ class TsClientJs {
   external void getRange(dynamic params, Function callback);
 
   external void createTable(dynamic params, Function callack);
+
+  external void startLocalTransaction(dynamic params, Function callback);
 }
 
 final tablestoreJs = require('tablestore') as TablestoreJs;

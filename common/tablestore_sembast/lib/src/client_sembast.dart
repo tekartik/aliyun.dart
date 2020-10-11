@@ -42,7 +42,9 @@ Future<TsTableContextSembast> getTableContext(
   var tableMetaRecord = getTableMetaRecord(tableName);
   var tableMetaRaw = await tableMetaRecord.get(client);
   if (tableMetaRaw == null) {
-    throw TsExceptionSembast(message: 'table $tableName does not exists');
+    throw TsExceptionSembast(
+        message: 'table $tableName does not exists',
+        isTableNotExistError: true);
   }
   return TsTableContextSembast(
       client, TsTableDescriptionTableMeta.fromMap(tableMetaRaw));
@@ -67,7 +69,7 @@ class TsClientSembast implements TsClient {
           path = instanceName;
         }
         if (debugTs) {
-          print('[SBi] Openeing $path');
+          print('[SBi] Opening $path');
         }
         return tablestore.factory.openDatabase(path, version: 1,
             onVersionChanged: (db, oldVersion, newVersion) async {
@@ -168,21 +170,10 @@ class TsClientSembast implements TsClient {
       var table = await getTableContext(txn, request.tableName);
       var row = table.row(request.primaryKey);
       var record = row.record();
-      var result = await record.get();
+      var result = await record.get(request.columns);
+      var exists = result != null;
       return TsGetRowResponseSembast(
-          row, result.primaryKey, result?.attributes);
-      /*
-      var tableExtraRaw = await tableExtraRecord.get(txn);
-      if (tableExtraRaw != null) {
-        // Everything but tableMeta
-        extra = TsTableDescription.fromMap(tableExtraRaw);
-      }
-
-      return TsTableDescription(
-          tableMeta: TsTableDescriptionTableMeta.fromMap(tableMetaRaw),
-          reservedThroughput: extra.reservedThroughput,
-          tableOptions: extra.tableOptions);
-          */
+          row, exists, result?.primaryKey, result?.attributes);
     });
   }
 
@@ -240,18 +231,12 @@ class TsClientSembast implements TsClient {
   @override
   Future<TsGetRangeResponse> getRange(TsGetRangeRequest request) async {
     return await (await _db).transaction((txn) async {
-      //var table = await getTableContext(txn, request.tableName);
-      /*
-      var row = table.row(request.primaryKey);
-      var record = row.record();
-      var key = await _checkPutDeleteCondition(record, request.condition);
-      if (key != null) {
-        await record.deleteByKey(key);
-      }
+      //var range = await getTableContext(client, tableName)
+      var table = await getTableContext(txn, request.tableName);
+      var range = table.range(request);
+      var result = await range.get();
 
-       */
-      // return TsDeleteRowResponseSembast();
-      return null;
+      return TsGetRangeResponseSembast(result.rows, result.nextRow?.primaryKey);
     });
   }
 
@@ -267,7 +252,7 @@ class TsClientSembast implements TsClient {
           var row = table.row(primaryKey);
 
           var record = row.record();
-          var result = await record.get();
+          var result = await record.get(requestTable.columns);
           // return TsGetRowResponseSembast(row, result.primaryKey, result.attributes);
           var isOk = true;
 
@@ -323,11 +308,16 @@ class TsClientSembast implements TsClient {
       var table = await getTableContext(txn, request.tableName);
       var row = table.row(request.primaryKey);
       var record = row.record();
-      var key = await _checkPutDeleteCondition(record, request.condition);
+      var key = await _checkPutDeleteCondition(
+          record,
+          request.condition ??
+              TsCondition(
+                  rowExistenceExpectation:
+                      TsConditionRowExistenceExpectation.expectExist));
 
       var list = <TsAttribute>[];
       if (key != null) {
-        list.addAll((await record.get())?.attributes);
+        list.addAll((await record.get(null))?.attributes);
       }
       // Merge!
       for (var update in request.data) {
@@ -346,6 +336,23 @@ class TsClientSembast implements TsClient {
       return TsUpdateRowResponseSembast(row);
     });
   }
+
+  @override
+  Future<TsStartLocalTransactionResponse> startLocalTransaction(
+      TsStartLocalTransactionRequest request) {
+    // TODO: implement startLocalTransaction
+    throw UnimplementedError();
+  }
+}
+
+class TsGetRangeResponseSembast implements TsGetRangeResponse {
+  @override
+  final List<TsGetRowSembast> rows;
+
+  TsGetRangeResponseSembast(this.rows, this.nextStartPrimaryKey);
+
+  @override
+  final TsPrimaryKey nextStartPrimaryKey;
 }
 
 class TsBatchGetRowsResponseSembast implements TsBatchGetRowsResponse {
@@ -392,7 +399,10 @@ class TsBatchGetRowResponseRowSembast implements TsBatchGetRowsResponseRow {
 }
 
 class TsGetRowSembast implements TsGetRow {
-  TsGetRowSembast(this.primaryKey, this.attributes);
+  @override
+  final bool exists;
+
+  TsGetRowSembast(this.exists, this.primaryKey, this.attributes);
 
   @override
   final TsPrimaryKey primaryKey;
@@ -437,12 +447,54 @@ class TsTableContextSembast {
   List<String> get primaryKeyNames =>
       tableMeta.primaryKeys.map((e) => e.name).toList(growable: false);
 
+  void checkPrimaryKey(TsPrimaryKey primaryKey) {
+    // Check size
+    if (primaryKey.list.length != tableMeta.primaryKeys.length) {
+      throw TsExceptionSembast(
+          message: 'PK size fail', isPrimaryKeySizeError: true);
+    }
+    for (var i = 0; i < primaryKey.list.length; i++) {
+      var def = tableMeta.primaryKeys[i];
+      var key = primaryKey.list[i];
+      switch (def.type) {
+        case TsColumnType.integer:
+          if (!(key.value is TsValueLong || key.value is TsValueInfinite)) {
+            throw TsExceptionSembast(
+                message: 'PK type fail, expecting int for $key',
+                isPrimaryKeyTypeError: true);
+          }
+          break;
+        case TsColumnType.string:
+          if (!(key.value is String || key.value is TsValueInfinite)) {
+            throw TsExceptionSembast(
+                message: 'PK type fail, expecting String for $key',
+                isPrimaryKeyTypeError: true);
+          }
+          break;
+        case TsColumnType.binary:
+          if (!(key.value is Uint8List || key.value is TsValueInfinite)) {
+            throw TsExceptionSembast(
+                message: 'PK type fail, expecting Uint8List for $key',
+                isPrimaryKeyTypeError: true);
+          }
+          break;
+      }
+    }
+  }
+
   TsRowContextSembast row(TsPrimaryKey primaryKey) {
+    checkPrimaryKey(primaryKey);
     return TsRowContextSembast(this, primaryKey);
   }
 
   TsRangeContextSembast range(TsGetRangeRequest request) {
-    return null; // TODO
+    if (request.inclusiveStartPrimaryKey != null) {
+      checkPrimaryKey(request.inclusiveStartPrimaryKey);
+    }
+    if (request.exclusiveEndPrimaryKey != null) {
+      checkPrimaryKey(request.exclusiveEndPrimaryKey);
+    }
+    return TsRangeContextSembast(this, request);
   }
 }
 
@@ -458,6 +510,46 @@ class KeyValueSembast {
 
 List<KeyValueSembast> toSembastKeyValues(List<TsKeyValue> tsKeyValues) =>
     tsKeyValues.map((e) => KeyValueSembast.from(e)).toList(growable: false);
+
+List<TsKeyValue> readKeyValues(Map map, List<String> names) {
+  var list = <TsKeyValue>[];
+  for (var name in names) {
+    var value = sembastValueToValue(map[name]);
+    list.add(TsKeyValue(name, value));
+  }
+  return list;
+}
+
+/// Read all columns
+List<TsAttribute> readAttributesBut(Map map, List<String> but) {
+  var list = <TsAttribute>[];
+  map.forEach((key, value) {
+    if (!but.contains(key)) {
+      var value = sembastValueToValue(map[key]);
+      list.add(TsAttribute(key as String, value));
+    }
+  });
+  return list;
+}
+
+/// Read all columns if columns is null or empty (!), none if empty, exclude [but]
+List<TsAttribute> readAttributesColumnsBut(
+    Map map, List<String> columns, List<String> but) {
+  if (columns == null || columns.isEmpty) {
+    return readAttributesBut(map, but);
+  }
+  var list = <TsAttribute>[];
+
+  columns.forEach((key) {
+    if (!but.contains(key)) {
+      if (map.containsKey(key)) {
+        var value = sembastValueToValue(map[key]);
+        list.add(TsAttribute(key, value));
+      }
+    }
+  });
+  return list;
+}
 
 class TsRowRecordContextSembast {
   final TsRowContextSembast row;
@@ -541,34 +633,20 @@ class TsRowRecordContextSembast {
 
   TsRowRecordContextSembast(this.row, [this.attributes]);
 
-  List<TsKeyValue> read(Map map, List<String> names) {
-    var list = <TsKeyValue>[];
-    for (var name in names) {
-      var value = sembastValueToValue(map[name]);
-      list.add(TsKeyValue(name, value));
-    }
-    return list;
+  TsGetRowSembast recordValueToGetRowSembast(Map map, List<String> columns) {
+    var primaryKey = TsPrimaryKey(readKeyValues(map, table.primaryKeyNames));
+    var attributes =
+        sembastRecordValueToAttributes(map, columns, table.primaryKeyNames);
+    var exists = map != null;
+    return TsGetRowSembast(exists, primaryKey, attributes);
   }
 
-  List<TsAttribute> readAttributesBut(Map map, List<String> names) {
-    var list = <TsAttribute>[];
-    map.forEach((key, value) {
-      if (!names.contains(key)) {
-        var value = sembastValueToValue(map[key]);
-        list.add(TsAttribute(key as String, value));
-      }
-    });
-    return list;
-  }
-
-  Future<TsGetRowSembast> get() async {
+  /// Filter columns, all if null
+  Future<TsGetRowSembast> get(List<String> /*?*/ columns) async {
     var id = await findKey();
     if (id != null) {
       var result = await table.store.record(id).get(table.client);
-      var primaryKey = TsPrimaryKey(read(result, table.primaryKeyNames));
-      var attributes =
-          TsAttributes(readAttributesBut(result, table.primaryKeyNames));
-      return TsGetRowSembast(primaryKey, attributes);
+      return recordValueToGetRowSembast(result, columns);
     }
     return null;
   }
@@ -583,8 +661,21 @@ class TsRowContextSembast {
   String get tableName => table.tableName;
 
   /// Null record for get
-  TsRowRecordContextSembast record([List<TsAttribute> attributes]) =>
-      TsRowRecordContextSembast(this, attributes);
+  TsRowRecordContextSembast record([List<TsAttribute> attributes]) {
+    if (attributes != null) {
+      for (var attribute in attributes) {
+        if (!(attribute.value is String ||
+            attribute.value is TsValueLong ||
+            attribute.value is Uint8List)) {
+          throw TsExceptionSembast(
+              message:
+                  'Invalid value type for $attribute ${attribute.value?.runtimeType}',
+              retryable: false);
+        }
+      }
+    }
+    return TsRowRecordContextSembast(this, attributes);
+  }
 }
 
 class TsGetRowResponseSembast extends TsReadRowResponseSembast
@@ -592,25 +683,28 @@ class TsGetRowResponseSembast extends TsReadRowResponseSembast
   final TsAttributes attributes;
   final TsPrimaryKey primaryKey;
 
-  TsGetRowResponseSembast(
-      TsRowContextSembast rowContext, this.primaryKey, this.attributes)
-      : super(rowContext);
+  TsGetRowResponseSembast(TsRowContextSembast rowContext, bool exists,
+      this.primaryKey, this.attributes)
+      : super(rowContext, exists);
 
   @override
-  TsGetRow get row => TsGetRowSembast(primaryKey, attributes);
+  TsGetRow get row => TsGetRowSembast(exists, primaryKey, attributes);
 }
 
 class TsReadRowResponseSembast {
+  final bool exists;
   final TsRowContextSembast rowContext;
 
-  TsReadRowResponseSembast(this.rowContext);
+  TsReadRowResponseSembast(this.rowContext, this.exists);
 
-  TsGetRow get row => TsGetRowSembast(rowContext.primaryKey, TsAttributes([]));
+  TsGetRow get row =>
+      TsGetRowSembast(exists, rowContext.primaryKey, TsAttributes([]));
 }
 
 class TsPutRowResponseSembast extends TsReadRowResponseSembast
     implements TsPutRowResponse {
-  TsPutRowResponseSembast(TsRowContextSembast rowContext) : super(rowContext);
+  TsPutRowResponseSembast(TsRowContextSembast rowContext)
+      : super(rowContext, true);
 }
 
 class TsDeleteRowResponseSembast implements TsDeleteRowResponse {}
@@ -618,7 +712,57 @@ class TsDeleteRowResponseSembast implements TsDeleteRowResponse {}
 class TsUpdateRowResponseSembast extends TsReadRowResponseSembast
     implements TsUpdateRowResponse {
   TsUpdateRowResponseSembast(TsRowContextSembast rowContext)
-      : super(rowContext);
+      : super(rowContext, true);
+}
+
+Filter tsConditionToSembastFilter(TsColumnCondition condition) {
+  if (condition == null) {
+    return null;
+  }
+  if (condition is TsColumnCompositeCondition) {
+    switch (condition.operator) {
+      case TsLogicalOperator.and:
+        assert(condition.list.length > 1);
+        return Filter.and(
+            condition.list.map(tsConditionToSembastFilter).toList());
+      case TsLogicalOperator.or:
+        assert(condition.list.length > 1);
+        return Filter.or(
+            condition.list.map(tsConditionToSembastFilter).toList());
+      case TsLogicalOperator.not:
+        assert(condition.list.length == 1);
+        throw UnsupportedError('\'not\' not supported yet');
+    }
+  } else if (condition is TsColumnSingleCondition) {
+    switch (condition.operator) {
+      case TsComparatorType.equals:
+        return Filter.equals(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.notEquals:
+        return Filter.notEquals(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.greaterThan:
+        return Filter.greaterThan(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.greaterThanOrEquals:
+        return Filter.greaterThanOrEquals(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.lessThan:
+        return Filter.lessThan(
+            condition.name, valueToSembastValue(condition.value));
+      case TsComparatorType.lessThanOrEquals:
+        return Filter.lessThanOrEquals(
+            condition.name, valueToSembastValue(condition.value));
+    }
+  }
+  throw 'Unsupported condition $condition';
+}
+
+class TsGetRangeSembast {
+  final List<TsGetRowSembast> rows;
+  final TsGetRowSembast nextRow;
+
+  TsGetRangeSembast(this.rows, this.nextRow);
 }
 
 class TsRangeContextSembast {
@@ -626,4 +770,107 @@ class TsRangeContextSembast {
   final TsGetRangeRequest request;
 
   TsRangeContextSembast(this.table, this.request);
+
+  Filter _and(Filter filter1, Filter filter2) {
+    if (filter1 == null) {
+      return filter2;
+    } else if (filter2 == null) {
+      return filter1;
+    }
+    return Filter.and([filter1, filter2]);
+  }
+
+  Future<TsGetRangeSembast> get() async {
+    Filter boundaryFilter;
+    var columnFilter = tsConditionToSembastFilter(request.columnCondition);
+    var startPrimaryKey = request.inclusiveStartPrimaryKey;
+    var endPrimaryKey = request.exclusiveEndPrimaryKey;
+
+    if (startPrimaryKey != null || endPrimaryKey != null) {
+      boundaryFilter = Filter.custom((record) {
+        if (startPrimaryKey != null) {
+          for (var kv in startPrimaryKey.list) {
+            var field = kv.name;
+            if (kv.value == TsValueInfinite.min) {
+              break;
+            } else if (kv.value == TsValueInfinite.max) {
+              return false;
+            } else {
+              var value = record[field] as Comparable;
+              var cmp = value.compareTo(valueToSembastValue(kv.value));
+              if (cmp < 0) {
+                return false;
+              } else if (cmp > 0) {
+                break;
+              }
+              // equals continue!
+            }
+          }
+        }
+
+        if (endPrimaryKey != null) {
+          for (var i = 0; i < endPrimaryKey.list.length; i++) {
+            var kv = endPrimaryKey.list[i];
+            var field = kv.name;
+            if (kv.value == TsValueInfinite.min) {
+              return false;
+            } else if (kv.value == TsValueInfinite.max) {
+              break;
+            } else {
+              var value = record[field] as Comparable;
+              var cmp = value.compareTo(valueToSembastValue(kv.value));
+              if (cmp > 0) {
+                return false;
+              } else if (cmp < 0) {
+                break;
+              }
+              // Last field make it strict
+              if (i == endPrimaryKey.list.length - 1) {
+                return false;
+              }
+            }
+          }
+        }
+        // Condition
+        return true;
+      });
+    }
+    var finder = Finder(
+        filter: _and(boundaryFilter, columnFilter),
+        sortOrders:
+            table.tableMeta.primaryKeys.map((e) => SortOrder(e.name)).toList(),
+        // Add 1 for next
+        limit: request.limit != null ? request.limit + 1 : null);
+
+    var records = await table.store.find(table.client, finder: finder);
+
+    TsGetRowSembast nextRow;
+
+    var rows = records.map((snapshot) {
+      var result = snapshot.value;
+
+      var primaryKey =
+          TsPrimaryKey(readKeyValues(result, table.primaryKeyNames));
+
+      var attributes = sembastRecordValueToAttributes(
+          result, request.columns, table.primaryKeyNames);
+
+      return TsGetRowSembast(true, primaryKey, attributes);
+    }).toList();
+
+    if (request.limit != null && rows.length > request.limit) {
+      // Pick last
+      nextRow = rows[request.limit];
+      // Remove last
+      rows = rows.sublist(0, request.limit);
+    }
+
+    return TsGetRangeSembast(rows, nextRow);
+  }
+}
+
+TsAttributes sembastRecordValueToAttributes(
+    Map map, List<String> columns, List<String> but) {
+  var attributes = TsAttributes(readAttributesColumnsBut(map, columns, but));
+  return attributes;
 }

@@ -84,6 +84,21 @@ dynamic jsifyList(Iterable list) {
   return js.toJSArray(list.map(tsJsify).toList());
 }
 
+dynamic tsValueToNative(dynamic value) {
+  // Test before list
+  if (value is Uint8List) {
+    // devPrint('blob $dartObject');
+    return node.Buffer.from(value);
+  }
+  if (value is TsValueLong) {
+    return tsValueLongToNative(value);
+  }
+  if (value is String) {
+    return value;
+  }
+  throw 'Unsupported value $value (${value.runtimeType})';
+}
+
 /// Returns the JS implementation from Dart Object.
 dynamic tsJsify(Object dartObject) {
   if (_isBasicType(dartObject)) {
@@ -134,6 +149,10 @@ dynamic tsJsify(Object dartObject) {
   if (dartObject is TsArrayHack) {
     // devPrint('converting $dartObject');
     return dartObject.toJs(tsJsify);
+  }
+
+  if (dartObject is TsColumnCondition) {
+    return tsColumnConditionToNative(dartObject);
   }
 
   print('Could not convert type ${dartObject?.runtimeType}, value $dartObject');

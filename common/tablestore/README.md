@@ -1,22 +1,13 @@
-A library for Dart developers.
+# Setup
 
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
+`pubspec.yaml`:
 
-## Usage
-
-A simple usage example:
-
-```dart
-import 'package:tablestore/tablestore.dart';
-
-main() {
-  var awesome = new Awesome();
-}
+```yaml
+dependencies:
+  tekartik_aliyun_tablestore:
+    git:
+      url: git://github.com/tekartik/aliyun.dart
+      path: common/tablestore
+      ref: dart2
+    version: '>=0.1.0'
 ```
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: http://example.com/issues/replaceme

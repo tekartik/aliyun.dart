@@ -109,10 +109,11 @@ class TsClientNode with TsClientMixin implements TsClient {
   @override
   Future createTable(String name, TsTableDescription description) async {
     var params = toCreateTableParams(description);
+    var jsParams = tsJsify(params);
     var nativeResponse = await _nativeOperationWithCallback((callback) {
       // ignore: unused_local_variable
       native.createTable(
-          _debugNativeRequestParams('createTable', jsify(params)), callback);
+          _debugNativeRequestParams('createTable', jsParams), callback);
     });
     print(jsObjectToDebugString(nativeResponse));
     return null;
@@ -344,5 +345,19 @@ class TsClientNode with TsClientMixin implements TsClient {
           _debugNativeRequestParams('updateRow', jsParams), callback);
     });
     return updateRowResponseFromNative(nativeResponseJs);
+  }
+
+  @override
+  Future<TsStartLocalTransactionResponse> startLocalTransaction(
+      TsStartLocalTransactionRequest request) async {
+    var params = toStartLocalTransactionParams(request);
+    var jsParams = tsJsify(params);
+
+    var nativeResponseJs = await _nativeOperationWithCallback((callback) {
+      native.startLocalTransaction(
+          _debugNativeRequestParams('startLocalTransaction', jsParams),
+          callback);
+    });
+    return startLocalTransactionRowResponseFromNative(nativeResponseJs);
   }
 }

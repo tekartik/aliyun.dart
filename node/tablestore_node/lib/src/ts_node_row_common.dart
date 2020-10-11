@@ -6,6 +6,11 @@ import 'package:tekartik_common_utils/model/model.dart';
 Map<String, dynamic> toPrimaryKeyValueParam(TsKeyValue keyValue) =>
     <String, dynamic>{keyValue.name: keyValue.value};
 
+/// Weird list handling workaround
+/* List | TsArrayHack */ dynamic toListParam(List list) {
+  return TsArrayHack(list);
+}
+
 Map<String, dynamic> toGetRowParams(TsGetRowRequest request) {
   var map = Model({
     if (request.tableName != null) 'tableName': request.tableName,
@@ -66,6 +71,7 @@ Map<String, dynamic> tsUpdateAttributeParams(
 List<Map<String, dynamic>> tsUpdateAttributesParams(
         List<TsUpdateAttribute> attributes) =>
     attributes.map((e) => tsUpdateAttributeParams(e)).toList();
+
 List<dynamic> tsPrimaryKeyParams(TsPrimaryKey primaryKey) =>
     primaryKey.list.map(toPrimaryKeyValueParam).toList();
 
@@ -90,15 +96,27 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
     'limit': request.limit,
     if (request.tableName != null) 'tableName': request.tableName,
     if (request.columns != null) 'columnsToGet': request.columns,
-    if (request.start?.inclusive ?? false)
-      'inclusiveStartPrimaryKey': primaryKeyAsList(request.start.value)
-    else if (request.start?.inclusive == false)
-      'exclusiveStartPrimaryKey': primaryKeyAsList(request.start.value),
-    if (request.end?.inclusive ?? false)
-      'inclusiveEndPrimaryKey': primaryKeyAsList(request.end.value)
-    else if (request.end?.inclusive == false)
-      'exclusiveEndPrimaryKey': primaryKeyAsList(request.end.value),
-    'direction': request.direction ?? TsDirection.forward
+    if (request.inclusiveStartPrimaryKey != null)
+      'inclusiveStartPrimaryKey':
+          primaryKeyAsList(request.inclusiveStartPrimaryKey),
+    if (request.exclusiveEndPrimaryKey != null)
+      'exclusiveEndPrimaryKey':
+          primaryKeyAsList(request.exclusiveEndPrimaryKey),
+    'direction': request.direction ?? TsDirection.forward,
+    if (request.columnCondition is TsColumnSingleCondition)
+      'columnFilter': request.columnCondition,
+    if (request.columnCondition is TsColumnCompositeCondition)
+      'columnFilter': request.columnCondition,
+  });
+  return map;
+}
+
+Map<String, dynamic> toStartLocalTransactionParams(
+    TsStartLocalTransactionRequest request) {
+  var map = Model({
+    'tableName': request.tableName,
+    // Needed
+    'primaryKey': tsPrimaryKeyParams(request.primaryKey),
   });
   return map;
 }
@@ -124,7 +142,7 @@ int tsComparatorTypeToNative(TsComparatorType operatorType) {
       return tsNodeCommon.comparatorType.NOT_EQUAL;
     case TsComparatorType.greaterThan:
       return tsNodeCommon.comparatorType.GREATER_THAN;
-    case TsComparatorType.greatorThanOrEquals:
+    case TsComparatorType.greaterThanOrEquals:
       return tsNodeCommon.comparatorType.GREATER_EQUAL;
     case TsComparatorType.lessThan:
       return tsNodeCommon.comparatorType.LESS_THAN;
@@ -132,4 +150,16 @@ int tsComparatorTypeToNative(TsComparatorType operatorType) {
       return tsNodeCommon.comparatorType.LESS_EQUAL;
   }
   throw 'condition $operatorType not supported';
+}
+
+int tsLogicalOperatorTypeToNative(TsLogicalOperator operatorType) {
+  switch (operatorType) {
+    case TsLogicalOperator.and:
+      return tsNodeCommon.logicalOperator.AND;
+    case TsLogicalOperator.or:
+      return tsNodeCommon.logicalOperator.OR;
+    case TsLogicalOperator.not:
+      return tsNodeCommon.logicalOperator.NOT;
+  }
+  throw 'operator $operatorType not supported';
 }

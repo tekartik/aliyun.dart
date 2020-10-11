@@ -28,6 +28,8 @@ export 'src/ts_row.dart'
         TsCondition,
         TsColumnCondition,
         TsKeyBoundary,
+        TsKeyStartBoundary,
+        TsKeyEndBoundary,
         TsDirection,
         TsGetRowExt,
         TsConditionRowExistenceExpectation,
@@ -45,7 +47,10 @@ export 'src/ts_row.dart'
         TsUpdateRowResponse,
         TsUpdateRowRequest,
         TsUpdateRowResponseExt,
-        TsWriteRowType;
+        TsWriteRowType,
+        TsStartLocalTransactionRequest,
+        TsStartLocalTransactionResponse,
+        TsStartLocalTransactionResponseExt;
 
 export 'src/ts_table.dart'
     show
@@ -65,4 +70,5 @@ export 'src/ts_table.dart'
 /// More dartdocs go here.
 
 export 'src/ts_tablestore.dart' show Tablestore;
-export 'src/ts_value_type.dart' show TsValueLong, TsValueInfinite;
+export 'src/ts_value.dart'
+    show TsValueLong, TsValueInfinite, TsValue, tsValueToDebugValue;

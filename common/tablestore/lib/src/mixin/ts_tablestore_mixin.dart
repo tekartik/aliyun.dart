@@ -8,3 +8,4 @@ export 'package:tekartik_aliyun_tablestore/src/ts_row.dart'
         TsComparatorType,
         TsLogicalOperator,
         TsColumnSingleCondition;
+export 'package:tekartik_aliyun_tablestore/src/ts_value.dart' show TsValueBase;

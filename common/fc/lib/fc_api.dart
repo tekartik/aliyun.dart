@@ -1,4 +1,10 @@
-class FcHttpRequest {}
+abstract class FcHttpRequest {
+  String get path;
+  String get url;
+  String get method;
+  Map<String, String> get headers;
+  Future<String> getBodyString();
+}
 
 typedef FcRequestHandler = void Function(FcHttpRequest request);
 
@@ -11,7 +17,20 @@ abstract class FcHttp {
 abstract class FcHttpContext {}
 
 abstract class FcHttpResponse {
-  void sendString(String body);
+  Future sendString(String body);
+
+  void setHeader(String name, String value);
+
+  void setStatusCode(int statusCode);
+}
+
+typedef FcHttpHandler = dynamic Function(
+    FcHttpRequest request, FcHttpResponse response, FcHttpContext context);
+
+/// Abstract factory
+abstract class AliyunFunctionCompute {
+  /// Can be called only once
+  void exportHttpHandler(FcHttpHandler handler, {String name = 'handler'});
 }
 
 // HTTP trigger interface format

@@ -1,22 +1,19 @@
-A library for Dart developers.
+Table universal import.
 
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
+## Setup
 
-## Usage
+# Setup
 
-A simple usage example:
+- Follow the [node app setup](https://github.com/tekartik/app_node_utils.dart/tree/master/app_build) instructions
 
-```dart
-import 'package:fc/fc.dart';
+- Add the follwing dependency:
 
-main() {
-  var awesome = new Awesome();
-}
-```
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: http://example.com/issues/replaceme
+  ```yaml
+  dependencies:
+    tekartik_aliyun_fc_universal:
+      git:
+        url: git://github.com/tekartik/aliyun.dart
+        path: common/fc_universal
+        ref: dart2
+      version: '>=0.1.0'
+  ```

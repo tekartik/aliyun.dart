@@ -1,5 +1,5 @@
-import 'package:tekartik_aliyun_fc_universal/src/fc_universal/fc_common.dart';
+import 'package:tekartik_aliyun_fc_universal/fc_universal.dart';
 
-/// Can be called only once
-void exportHttpHandler(FcHttpHandler handler, {String name = 'handler'}) =>
-    throw UnsupportedError('exportHttpHandler');
+/// The main universal function compute definition
+AliyunFunctionComputeUniversal get aliyunFunctionComputeUniversal =>
+    throw UnsupportedError('aliyunFunctionComputeUniversal');
