@@ -28,6 +28,11 @@ class HttpContextJs {
   external Map<String, dynamic> get credentials;
 }
 
+@JS('Buffer')
+class Buffer {
+  external static Buffer from(Uint8List bytes);
+}
+
 typedef _GetBodyFn = dynamic Function(dynamic req, [dynamic option]);
 
 /// https://www.npmjs.com/package/raw-body
@@ -161,7 +166,7 @@ class FcHttpResponseNode implements FcHttpResponse {
 
   @override
   Future<void> sendBytes(Uint8List bytes) async {
-    impl.send(bytes);
+    impl.send(Buffer.from(bytes));
   }
 //response.setStatusCode(200);
 //response.setHeader('content-type', 'application/json');
