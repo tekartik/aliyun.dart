@@ -47,3 +47,6 @@ class AliyunFunctionComputeHttpUniversal extends AliyunFunctionComputeHttp
 
 final AliyunFunctionComputeUniversal aliyunFunctionComputeUniversalMemory =
     AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);
+
+AliyunFunctionComputeUniversal newAliyunFunctionComputeUniversalMemory() =>
+    AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);
