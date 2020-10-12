@@ -4,4 +4,7 @@
 library tekartik_aliyun_tablestore_sembast;
 
 export 'src/tablestore_sembast.dart'
-    show getTablestoreSembast, tablestoreSembastMemory;
+    show
+        getTablestoreSembast,
+        tablestoreSembastMemory,
+        newTablestoreSembastMemory;

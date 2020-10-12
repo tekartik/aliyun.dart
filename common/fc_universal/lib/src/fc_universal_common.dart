@@ -1,11 +1,20 @@
 import 'package:tekartik_aliyun_fc_http/fc_http.dart';
 import 'package:tekartik_aliyun_fc_universal/fc_universal.dart';
 import 'package:tekartik_http/http_memory.dart';
-import 'package:tekartik_http/http_server.dart' hide httpServerFactoryMemory;
-import 'package:tekartik_http/src/http_server.dart'; // ignore: implementation_imports
+import 'package:tekartik_http/http_server.dart';
 
 export 'package:tekartik_aliyun_fc/fc_api.dart';
 export 'package:tekartik_aliyun_fc_http/src/function_compute_http.dart';
+
+abstract class FcServer {
+  Uri get uri;
+  Future<void> close();
+}
+
+abstract class AliyunFunctionComputeUniversal extends AliyunFunctionCompute {
+  /// No effect on node
+  Future<FcServer> serve({int port});
+}
 
 class FcServerHttp implements FcServer {
   final HttpServer httpServer;
@@ -18,7 +27,7 @@ class FcServerHttp implements FcServer {
   }
 
   @override
-  Uri get uri => httpServerGetDefaultUri(httpServer);
+  Uri get uri => httpServerGetUri(httpServer);
 }
 
 class AliyunFunctionComputeHttpUniversal extends AliyunFunctionComputeHttp
