@@ -1,9 +1,12 @@
+import 'dart:typed_data';
+
 abstract class FcHttpRequest {
   String get path;
   String get url;
   String get method;
   Map<String, String> get headers;
   Future<String> getBodyString();
+  Future<Uint8List> getBodyBytes();
 }
 
 typedef FcRequestHandler = void Function(FcHttpRequest request);
@@ -16,8 +19,13 @@ abstract class FcHttp {
 
 abstract class FcHttpContext {}
 
+/// Function compute response.
 abstract class FcHttpResponse {
-  Future sendString(String body);
+  /// Send a string
+  Future<void> sendString(String text);
+
+  /// Send a byte buffer
+  Future<void> sendBytes(Uint8List bytes);
 
   void setHeader(String name, String value);
 

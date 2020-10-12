@@ -48,4 +48,9 @@ class FcHttpRequestHttp implements FcHttpRequest {
     });
     return headers;
   }
+
+  @override
+  Future<Uint8List> getBodyBytes() {
+    return _readBody();
+  }
 }

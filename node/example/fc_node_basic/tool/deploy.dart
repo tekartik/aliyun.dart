@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:http/http.dart';
 import 'package:process_run/shell_run.dart';
 import 'package:process_run/utils/process_result_extension.dart';
@@ -28,11 +30,27 @@ Future<void> deploy() async {
 
     var asyncUrl = url.join(foundUrl, 'async');
     print('url: $asyncUrl');
-    response =
-        await get(url.join(asyncUrl, 'async'), headers: {'x-in': 'in-value'});
+    response = await get(asyncUrl, headers: {'x-in': 'in-value'});
     print('status code: ${response.statusCode}');
     print('headers: ${response.headers}');
     print(response.body);
+
+    var bodyStringUrl = url.join(foundUrl, 'bodyString');
+    print('url: $bodyStringUrl');
+    response = await post(bodyStringUrl, body: 'some text');
+    print('status code: ${response.statusCode}');
+    print('headers: ${response.headers}');
+    print(response.body);
+
+    var bodyBytesUrl = url.join(foundUrl, 'bodyBytes');
+    print('url: $bodyBytesUrl');
+    response = await post(bodyBytesUrl, body: Uint8List.fromList([1, 2, 3]));
+    print('status code: ${response.statusCode}');
+    print('headers: ${response.headers}');
+    print(response.bodyBytes);
+    // status code: 200
+    // headers: {content-disposition: attachment, date: Mon, 12 Oct 2020 13:12:33 GMT, x-fc-invocation-duration: 45, x-fc-invocation-service-version: LATEST, content-length: 3, x-fc-request-id: ea2e4004-83f9-4723-b9d8-6cbc05fbf7e3, access-control-expose-headers: Date,x-fc-request-id,x-fc-error-type,x-fc-code-checksum,x-fc-invocation-duration,x-fc-max-memory-usage,x-fc-log-result,x-fc-invocation-code-version, x-fc-code-checksum: 2321752769879710394, x-fc-max-memory-usage: 17.23, content-type: application/octet-stream}
+    // [1, 2, 3]
   }
 }
 

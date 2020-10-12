@@ -2,16 +2,18 @@
 library tekartik_aliyun_fc_node.fc_interop;
 
 import 'dart:js_util';
+import 'dart:typed_data';
 
 import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
 import 'package:tekartik_aliyun_fc/fc_api.dart';
 import 'package:tekartik_js_utils/js_utils.dart';
+import 'package:tekartik_common_utils/common_utils_import.dart';
 
 @JS()
 @anonymous
 class HttpResponseJs {
-  external void send(String body);
+  external void send(dynamic /*String|Uint8List*/ body);
 }
 
 @JS()
@@ -28,6 +30,7 @@ class HttpContextJs {
 
 typedef _GetBodyFn = dynamic Function(dynamic req, [dynamic option]);
 
+/// https://www.npmjs.com/package/raw-body
 _GetBodyFn _getRawBodyFn = require('raw-body');
 
 /*
@@ -77,6 +80,13 @@ class FcHttpRequestNode implements FcHttpRequest {
     var buff = await _getRawBody(encoding: true);
     // print('rawbody ${buff.runtimeType}');
     return buff.toString();
+  }
+
+  @override
+  Future<Uint8List> getBodyBytes() async {
+    var buff = await _getRawBody();
+    // devPrint('rawbody ${buff.runtimeType}');
+    return buff as Uint8List;
   }
 
   Map<String, dynamic> get queries {
@@ -147,6 +157,11 @@ class FcHttpResponseNode implements FcHttpResponse {
 
   void setContentTypeJson() {
     setHeader('Content-Type', 'application/json');
+  }
+
+  @override
+  Future<void> sendBytes(Uint8List bytes) async {
+    impl.send(bytes);
   }
 //response.setStatusCode(200);
 //response.setHeader('content-type', 'application/json');

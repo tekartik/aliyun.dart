@@ -34,6 +34,14 @@ Future<void> main() async {
     if (command == 'async') {
       await Future.delayed(Duration(milliseconds: 1));
       await sendResponse();
+    } else if (command == 'bodyBytes') {
+      response.setStatusCode(200);
+      var body = await request.getBodyBytes();
+      await response.sendBytes(body);
+    } else if (command == 'bodyString') {
+      response.setStatusCode(200);
+      var body = await request.getBodyString();
+      await response.sendString(body);
     } else {
       return sendResponse();
     }
