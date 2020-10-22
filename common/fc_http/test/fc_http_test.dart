@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:tekartik_aliyun_fc_http/src/function_compute_http.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
@@ -40,6 +41,19 @@ void main() {
       expect(map['body'], 'body_data');
       expect(map['path'], '/handler');
       expect(map['url'], endsWith('/handler?t=1'));
+      await server.close(force: true);
+      client.close();
+    });
+
+    test('binary', () async {
+      functionCompute.exportHttpHandler((request, response, context) async {
+        await response.sendBytes(Uint8List.fromList(utf8.encode('test')));
+      });
+      var server = await functionCompute.serveHttp(port: 0);
+      var url = 'http://localhost:${server.port}';
+      var client = httpClientFactoryMemory.newClient();
+      var result = await httpClientRead(client, httpMethodGet, '$url/handler');
+      expect(result, 'test');
       await server.close(force: true);
       client.close();
     });
