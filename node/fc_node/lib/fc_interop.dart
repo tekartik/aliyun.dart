@@ -116,7 +116,7 @@ class FcHttpRequestNode implements FcHttpRequest {
         var nativeHeaders = getProperty(req, 'headers');
         var keys = jsObjectKeys(nativeHeaders);
         for (var key in keys) {
-          headers[key.toLowerCase()] = getProperty(nativeHeaders, key);
+          lowerCaseHaders[key.toLowerCase()] = getProperty(nativeHeaders, key);
         }
         return FcHttpRequestHeaders(lowerCaseHaders);
       }();
