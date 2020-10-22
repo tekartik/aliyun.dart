@@ -1,8 +1,38 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_aliyun_fc/fc_api.dart';
 import 'package:tekartik_http/http.dart' as impl;
+
+class FcHttpRequestHeaders with MapMixin<String, String> {
+  final Map<String, String> lowerCaseHeaders;
+
+  FcHttpRequestHeaders(this.lowerCaseHeaders);
+
+  @override
+  String operator [](Object key) {
+    return lowerCaseHeaders[key?.toString()?.toLowerCase()];
+  }
+
+  @override
+  void operator []=(String key, String value) {
+    throw StateError('read-only');
+  }
+
+  @override
+  void clear() {
+    throw StateError('read-only');
+  }
+
+  @override
+  Iterable<String> get keys => lowerCaseHeaders.keys;
+
+  @override
+  String remove(Object key) {
+    throw StateError('read-only');
+  }
+}
 
 class FcHttpRequestHttp implements FcHttpRequest {
   final impl.HttpRequest requestImpl;
@@ -40,14 +70,15 @@ class FcHttpRequestHttp implements FcHttpRequest {
   @override
   String get url => requestImpl.uri.toString();
 
+  FcHttpRequestHeaders _headers;
   @override
-  Map<String, String> get headers {
-    var headers = <String, String>{};
-    requestImpl.headers.forEach((name, values) {
-      headers[name] = values.join(',');
-    });
-    return headers;
-  }
+  Map<String, String> get headers => _headers ??= () {
+        var lowerCaseHaders = <String, String>{};
+        requestImpl.headers.forEach((name, values) {
+          lowerCaseHaders[name.toLowerCase()] = values.join(',');
+        });
+        return FcHttpRequestHeaders(lowerCaseHaders);
+      }();
 
   @override
   Future<Uint8List> getBodyBytes() {
