@@ -9,6 +9,7 @@ import 'package:node_interop/node_interop.dart';
 import 'package:tekartik_aliyun_fc/fc_api.dart';
 import 'package:tekartik_js_utils/js_utils.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
+import 'package:tekartik_aliyun_fc/src/mixin/fc_http_request_headers.dart'; // ignore: implementation_imports
 
 @JS()
 @anonymous
@@ -107,19 +108,18 @@ class FcHttpRequestNode implements FcHttpRequest {
   @override
   String get method => getProperty(req, 'method');
 
+  FcHttpRequestHeaders _headers;
   @override
-  Map<String, String> get headers {
-    var headers = <String, String>{};
-
-    // Need to loop through the keys
-    var nativeHeaders = getProperty(req, 'headers');
-    var keys = jsObjectKeys(nativeHeaders);
-    for (var key in keys) {
-      headers[key] = getProperty(nativeHeaders, key);
-    }
-
-    return headers;
-  }
+  Map<String, String> get headers => _headers ??= () {
+        var lowerCaseHaders = <String, String>{};
+        // Need to loop through the keys
+        var nativeHeaders = getProperty(req, 'headers');
+        var keys = jsObjectKeys(nativeHeaders);
+        for (var key in keys) {
+          headers[key.toLowerCase()] = getProperty(nativeHeaders, key);
+        }
+        return FcHttpRequestHeaders(lowerCaseHaders);
+      }();
 
   @override
   String toString() {
