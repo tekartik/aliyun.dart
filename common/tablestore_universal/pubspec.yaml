@@ -1,6 +1,7 @@
 name: tekartik_aliyun_tablestore_universal
 description: Tablestore
 version: 0.2.0
+publish_to: none
 
 environment:
   sdk: '>=2.8.1 <3.0.0'

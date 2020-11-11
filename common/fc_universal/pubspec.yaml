@@ -1,6 +1,7 @@
 name: tekartik_aliyun_fc_universal
 description: Abstract Function Compute binding
 version: 0.1.3
+publish_to: none
 # homepage: https://www.example.com
 
 environment:
