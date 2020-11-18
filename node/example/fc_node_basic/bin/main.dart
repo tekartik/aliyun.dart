@@ -13,6 +13,11 @@ Future<void> main() async {
       FcHttpResponse response, FcHttpContext httpContext) async {
     var command = request.path.split('/').last;
 
+    // Testing logs if attached
+    print('print command: $command');
+    console.out.writeln('out command: $command');
+    console.err.writeln('err command: $command');
+
     Future sendResponse() async {
       response.setStatusCode(201);
       response.setHeader(httpHeaderContentType, httpContentTypeJson);

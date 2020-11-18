@@ -1,0 +1,36 @@
+name: tekartik_aliyun_oss_node
+description: Aliyun oss node access
+version: 0.2.0
+publish_to: none
+# homepage: https://www.example.com
+
+environment:
+  sdk: '>=2.8.1 <3.0.0'
+
+dependencies:
+  path: ^1.7.0
+  tekartik_aliyun_oss:
+    git:
+      url: git://github.com/tekartik/aliyun.dart
+      path: common/oss
+      ref: dart2
+    version: '>=0.2.0'
+  collection:
+
+dev_dependencies:
+  dev_test: '>=0.13.3-dev.1'
+  pedantic: ^1.9.0
+  test: ^1.14.4
+  # Node needed dev dependencies
+  tekartik_app_node_build:
+    git:
+      url: git://github.com/tekartik/app_node_utils.dart
+      path: app_build
+      ref: dart2
+    version: '>=0.1.0'
+  build_node_compilers:
+  build_runner:
+
+dependency_overrides:
+  tekartik_aliyun_oss:
+    path: ../../common/oss

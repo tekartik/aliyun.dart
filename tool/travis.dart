@@ -3,6 +3,7 @@ import 'package:dev_test/package.dart';
 Future main() async {
   for (var dir in [
     'common/fc',
+    'common/oss',
     'common/fc_http',
     'common/fc_universal',
     'io/cli',
@@ -13,6 +14,7 @@ Future main() async {
     'test/tablestore_universal_test',
     'node/fc_node',
     'node/tablestore_node',
+    'node/oss_node',
   ]) {
     print('package: $dir');
     await ioPackageRunCi(dir);

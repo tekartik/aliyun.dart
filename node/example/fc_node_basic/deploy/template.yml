@@ -11,7 +11,7 @@ Resources:
         Handler: index.handler
         Runtime: nodejs12
         CodeUri: './'
-        Timeout: 3
+        Timeout: 10
       Events:
         httpTrigger:
           Type: HTTP

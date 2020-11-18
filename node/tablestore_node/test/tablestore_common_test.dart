@@ -1,5 +1,5 @@
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
-import 'package:tekartik_aliyun_tablestore_node/src/ts_node_exception.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_exception_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore_common.dart';

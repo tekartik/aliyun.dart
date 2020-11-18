@@ -5,7 +5,7 @@ import 'package:tekartik_aliyun_tablestore/src/ts_row.dart'; // ignore: implemen
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
-import 'package:tekartik_aliyun_tablestore_node/src/ts_node_exception.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_exception_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_common.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
@@ -245,6 +245,7 @@ class TsClientNode with TsClientMixin implements TsClient {
 
   // experimental way (keep it false...)
   final useJs = false;
+
   /*
   {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":{"primaryKey":[{"name":"key","value":"value"}],"attributes":[{"columnName":"test","columnValue":"text","timestamp":{"buffer":[30,20,154,94,116,1,0,0],"offset":0}}]},"RequestId":"0005ae91-ac09-e850-e5c1-720b08a5216a"}
    */

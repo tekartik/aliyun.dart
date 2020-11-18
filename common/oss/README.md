@@ -1,12 +1,13 @@
-## Setup
+# Setup
 
 `pubspec.yaml`:
+
 ```yaml
-dependencies
-  tekartik_aliyun_fc:
+dependencies:
+  tekartik_aliyun_oss:
     git:
       url: git://github.com/tekartik/aliyun.dart
-      path: common/fc
+      path: common/oss
       ref: dart2
-    version: '>=0.1.1'
+    version: '>=0.1.0'
 ```
