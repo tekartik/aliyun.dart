@@ -1,7 +1,7 @@
 import 'package:tekartik_app_node_utils/node_utils.dart';
 import 'package:tekartik_common_utils/env_utils.dart';
 
-import 'oss_service.dart';
+import 'oss_node.dart';
 
 var _env = platform.environment;
 OssClientOptions _tsClientOptionsFromEnv;

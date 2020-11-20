@@ -1,14 +1,14 @@
 import 'dart:js';
 import 'dart:js_util';
 
-import 'package:tekartik_aliyun_oss_node/oss_service.dart';
+import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 import 'package:tekartik_aliyun_oss_node/src/oss_interop.dart';
 
 import 'import.dart';
 import 'oss_bucket_node.dart';
 import 'oss_common_node.dart';
 
-final ossServiceNode = OssServiceNode();
+OssService ossServiceNode = OssServiceNode();
 
 class OssServiceNode with OssServiceMixin implements OssServiceNodeCommon {
   @override

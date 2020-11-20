@@ -5,7 +5,7 @@ import 'dart:js_util';
 
 import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
-import 'package:tekartik_aliyun_oss_node/oss_service.dart';
+import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 
 import 'import.dart';
 

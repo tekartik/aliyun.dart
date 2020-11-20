@@ -1,4 +1,4 @@
-import 'package:tekartik_aliyun_oss_node/oss_service.dart';
+import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 
 import 'import.dart';
 
