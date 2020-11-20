@@ -1,3 +1,4 @@
+export 'package:tekartik_aliyun_oss/oss.dart';
 export 'package:tekartik_aliyun_oss_fs/oss_fs.dart'
     show ossServiceFsMemory, newOssServiceFsMemory, debugAliyunOss;
 export 'package:tekartik_aliyun_oss_fs/oss_fs_io.dart' show ossServiceFsIo;

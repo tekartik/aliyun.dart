@@ -1,16 +1,27 @@
 import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 import 'package:tekartik_aliyun_oss_node/src/oss_interop.dart';
 
-class OssBucketNode implements OssBucket {
+class OssBucketNode with OssBucketMixin implements OssBucket {
   @override
   String name;
 
   @override
   String toString() => 'bucket $name';
+
+  @override
+  String location;
 }
 
 OssBucket wrapNativeBucket(OssClientListBucketJs nativeBucket) {
-  return OssBucketNode()..name = nativeBucket.name;
+  return OssBucketNode()
+    ..name = nativeBucket.name
+    ..location = nativeBucket.region;
+}
+
+OssBucket wrapNativeBucketInfo(OssClientBucketInfoJs bucketInfoJs) {
+  return OssBucketNode()
+    ..name = bucketInfoJs.Name
+    ..location = bucketInfoJs.Location;
 }
 
 List<OssBucket> wrapNativeBuckets(List list) =>

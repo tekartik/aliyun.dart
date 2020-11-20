@@ -8,5 +8,8 @@ class OssExceptionFs implements OssException {
   @override
   final bool retryable;
 
-  OssExceptionFs({this.retryable = false});
+  OssExceptionFs({this.retryable = false, this.isNotFound = false});
+
+  @override
+  final bool isNotFound;
 }

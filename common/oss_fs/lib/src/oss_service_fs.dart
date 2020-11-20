@@ -2,6 +2,8 @@ import 'package:fs_shim/fs_memory.dart';
 
 import 'import.dart';
 
+bool debugAliyunOssFs = false; //devWarning(true);
+
 class OssServiceFs with OssServiceMixin {
   final FileSystem fs;
 

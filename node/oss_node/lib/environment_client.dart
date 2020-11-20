@@ -1,12 +1,11 @@
 import 'package:tekartik_app_node_utils/node_utils.dart';
-import 'package:tekartik_common_utils/env_utils.dart';
 
 import 'oss_node.dart';
 
 var _env = platform.environment;
 OssClientOptions _tsClientOptionsFromEnv;
 
-OssClientOptions getOssClientOptionsFromEnv(Map<String, String> env) {
+OssClientOptions getOssNodeClientOptionsFromEnv(Map<String, String> env) {
   var endpoint = env['endpoint'];
   var accessKeyId = env['accessKeyId'];
   var accessKeySecret = env['accessKeySecret'];
@@ -29,12 +28,5 @@ OssClientOptions getOssClientOptionsFromEnv(Map<String, String> env) {
   );
 }
 
-OssClientOptions get ossClientOptionsFromEnv => _tsClientOptionsFromEnv ??= () {
-      if (isRunningAsJavascript) {
-        return getOssClientOptionsFromEnv(_env);
-      } else {
-        // io sim
-        return OssClientOptions(
-            endpoint: 'local', accessKeyId: null, accessKeySecret: null);
-      }
-    }();
+OssClientOptions get ossNodeClientOptionsFromEnv =>
+    _tsClientOptionsFromEnv ??= getOssNodeClientOptionsFromEnv(_env);

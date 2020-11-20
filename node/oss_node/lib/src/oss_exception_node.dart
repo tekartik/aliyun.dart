@@ -21,4 +21,9 @@ class OssExceptionNode implements OssException {
 
   @override
   bool get retryable => parseBool(_errMapValue('retryable')) ?? true;
+
+  @override
+  bool get isNotFound => _isNotFound ?? false;
+
+  bool _isNotFound;
 }
