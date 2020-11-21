@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 import 'package:tekartik_aliyun_oss_universal/oss_universal.dart';
 import 'package:tekartik_aliyun_oss_universal/src/import.dart';
@@ -9,22 +11,27 @@ var _env = platform.environment;
 
 void main() {
   var bucketName = _env['ossTestBucketName'];
-  assert(bucketName != null,
-      'ossTestBucketName not defined as an environment variable');
+  if (bucketName == null) {
+    stderr.writeln('ossTestBucketName not defined as an environment variable');
+  }
 
   // ignore: deprecated_member_use
   debugAliyunOss = true;
   var client = ossClientTest; // ignore: unused_local_variable
 
+  var _getOrCreatedDone = false;
   Future<OssBucket> getOrCreateBucket() async {
-    try {
-      var bucket = await client.getBucket(bucketName);
-      return bucket;
-    } catch (e) {
-      if (isLocalTest) {
-        return await client.putBucket(bucketName);
+    if (!_getOrCreatedDone) {
+      try {
+        var bucket = await client.getBucket(bucketName);
+        _getOrCreatedDone = true;
+        return bucket;
+      } catch (e) {
+        if (isLocalTest) {
+          return await client.putBucket(bucketName);
+        }
+        rethrow;
       }
-      rethrow;
     }
   }
 
@@ -53,17 +60,19 @@ void main() {
       }
     });
 
-    test('put/get/delete as String', () async {
-      var bucket = await getOrCreateBucket();
-      var path = 'test/file.txt';
-      var content = 'Hello OSS';
-      await client.putAsString(bucket.name, path, content);
-      expect(await client.getAsString(bucket.name, path), content);
-      await client.delete(bucket.name, path);
+    group('in bucket', () {
+      test('put/get/delete as String', () async {
+        var bucket = await getOrCreateBucket();
+        var path = 'test/file.txt';
+        var content = 'Hello OSS';
+        await client.putAsString(bucket.name, path, content);
+        expect(await client.getAsString(bucket.name, path), content);
+        await client.delete(bucket.name, path);
 
-      await client.delete(bucket.name, path);
+        await client.delete(bucket.name, path);
 
-      expect(await client.getAsString(bucket.name, path), isNull);
-    });
+        expect(await client.getAsString(bucket.name, path), isNull);
+      });
+    }, skip: bucketName == null);
   }, skip: client == null);
 }

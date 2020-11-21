@@ -11,6 +11,9 @@ void main() {
   }
 
   void _expectIo([Object e]) {
+    if (e != null) {
+      expect(e, isNot(const TypeMatcher<TestFailure>()));
+    }
     expect(isRunningAsJavascript, isFalse);
   }
 
