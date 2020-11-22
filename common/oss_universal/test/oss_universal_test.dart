@@ -19,13 +19,11 @@ void main() {
   debugAliyunOss = true;
   var client = ossClientTest; // ignore: unused_local_variable
 
-  var _getOrCreatedDone = false;
+  OssBucket _getOrCreatedBucket;
   Future<OssBucket> getOrCreateBucket() async {
-    if (!_getOrCreatedDone) {
+    if (_getOrCreatedBucket != null) {
       try {
-        var bucket = await client.getBucket(bucketName);
-        _getOrCreatedDone = true;
-        return bucket;
+        _getOrCreatedBucket = await client.getBucket(bucketName);
       } catch (e) {
         if (isLocalTest) {
           return await client.putBucket(bucketName);
@@ -33,6 +31,7 @@ void main() {
         rethrow;
       }
     }
+    return _getOrCreatedBucket;
   }
 
   test('client', () {
