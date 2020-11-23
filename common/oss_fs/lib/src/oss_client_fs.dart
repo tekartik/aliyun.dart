@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:path/path.dart' as p;
 import 'package:tekartik_aliyun_oss_fs/oss_fs.dart';
+import 'package:tekartik_aliyun_oss_fs/src/oss_file_fs.dart';
 
 import 'import.dart';
 import 'oss_service_fs.dart';
@@ -24,7 +26,7 @@ class OssClientFs with OssClientMixin {
   /// Use the endpoint as the location
   String get location => options.endpoint;
 
-  String fixPath(String path) =>
+  String fixFsPath(String path) =>
       fs.path.normalize(rootPath == null ? path : fs.path.join(rootPath, path));
 
   OssClientFs(
@@ -32,7 +34,7 @@ class OssClientFs with OssClientMixin {
       : service = service,
         options = options;
 
-  Directory get root => fs.directory(fixPath('.'));
+  Directory get root => fs.directory(fixFsPath('.'));
 
   @override
   Future<List<OssBucket>> listBuckets() async {
@@ -47,7 +49,7 @@ class OssClientFs with OssClientMixin {
     return list;
   }
 
-  String getFsBucketPath(String name) => fixPath(name);
+  String getFsBucketPath(String name) => fixFsPath(name);
 
   void info(String message) {
     print('/oss_fs $message');
@@ -79,7 +81,7 @@ class OssClientFs with OssClientMixin {
   }
 
   String getFsFilePath(String bucketName, String path) =>
-      fixPath(fs.path.join(bucketName, path));
+      fixFsPath(path == null ? bucketName : fs.path.join(bucketName, path));
 
   @override
   Future<void> putAsBytes(
@@ -119,6 +121,69 @@ class OssClientFs with OssClientMixin {
       return null;
     }
   }
+
+  @override
+  Future<OssListFilesResponse> list(String bucketName,
+      [OssListFilesOptions options]) async {
+    var fs = await fsReady;
+    var bucketPath = getFsBucketPath(bucketName);
+    var parentPath = getFsFilePath(bucketName, options?.prefix);
+    var files = await fs.directory(parentPath).list(recursive: true).toList();
+    var paths = <String>[];
+    for (var file in files) {
+      if (await fs.isFile(file.path)) {
+        paths.add(file.path);
+      }
+    }
+    paths.sort();
+
+    String _toOssPath(String path) =>
+        p.url.normalize(fs.path.relative(path, from: bucketPath));
+
+    // marker?
+    // TODO too slow for now
+    if (options?.marker != null) {
+      int startIndex;
+      for (var i = 0; i < paths.length; i++) {
+        if (options.marker.compareTo(_toOssPath(paths[i])) <= 0) {
+          startIndex = i;
+        }
+      }
+      if (startIndex != null) {
+        paths = paths.sublist(startIndex);
+      }
+    }
+
+    // limit?
+    var maxResults = options?.maxResults ?? 1000;
+    var isTruncated = false;
+    String nextMarker;
+    if (paths.length > maxResults) {
+      // set next marker
+      isTruncated = true;
+      nextMarker = _toOssPath(paths[maxResults]);
+
+      paths = paths.sublist(0, maxResults);
+    }
+
+    // Convert
+    var ossFiles = <OssFile>[];
+    for (var path in paths) {
+      var stat = await fs.file(path).stat();
+
+      var name = _toOssPath(path);
+      var size = stat.size;
+      var dateModified = stat.modified;
+      ossFiles
+          .add(OssFileFs(name: name, size: size, lastModified: dateModified));
+    }
+
+    return OssListFilesResponseFs(
+        isTruncated: isTruncated, nextMarker: nextMarker, files: ossFiles);
+  }
+
+  @override
+  String toString() => 'OssClientFs(${rootPath ?? ''})';
 }
 
 // Allow setting a root path

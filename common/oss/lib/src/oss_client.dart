@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:meta/meta.dart';
 import 'package:tekartik_aliyun_oss/oss.dart';
+import 'package:tekartik_aliyun_oss/src/oss_bucket.dart';
 
 String obfuscate(String text) {
   if (text == null) {
@@ -69,12 +70,23 @@ abstract class OssClient {
   ///
   /// ignore if not found
   Future<void> delete(String bucketName, String path);
+
+  /// List all object in a bucket
+  Future<OssListFilesResponse> list(String bucketName,
+      [OssListFilesOptions options]);
 }
 
 mixin OssClientMixin implements OssClient {
   @override
   Future<List<OssBucket>> listBuckets() =>
-      throw UnsupportedError('listBuckets');
+      throw UnimplementedError('listBuckets');
+
+  @override
+  Future<OssListFilesResponse> list(String bucketName,
+      [OssListFilesOptions options]) {
+    throw UnimplementedError(
+        'list($bucketName${options != null ? ', $options' : ''})');
+  }
 
   @override
   Future<OssBucket> getBucket(String name) {

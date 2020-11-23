@@ -21,7 +21,7 @@ void main() {
 
   OssBucket _getOrCreatedBucket;
   Future<OssBucket> getOrCreateBucket() async {
-    if (_getOrCreatedBucket != null) {
+    if (_getOrCreatedBucket == null) {
       try {
         _getOrCreatedBucket = await client.getBucket(bucketName);
       } catch (e) {
@@ -71,6 +71,36 @@ void main() {
         await client.delete(bucket.name, path);
 
         expect(await client.getAsString(bucket.name, path), isNull);
+      });
+      test('list files', () async {
+        var bucket = await getOrCreateBucket();
+        var content = 'Hello OSS';
+        await client.putAsString(
+            bucket.name, 'test/list_files/no/file0.txt', content);
+        await client.putAsString(
+            bucket.name, 'test/list_files/yes/file1.txt', content);
+        await client.putAsString(
+            bucket.name, 'test/list_files/yes/sub/file2.txt', content);
+        await client.putAsString(bucket.name,
+            'test/list_files/yes/other_sub/sub/file3.txt', content);
+
+        var names = <String>[];
+        var options =
+            OssListFilesOptions(prefix: 'test/list_files/yes/', maxResults: 2);
+        var response = await client.list(bucketName, options);
+        names.addAll(response.files.map((e) => e.name));
+        expect(response.isTruncated, isTrue);
+        expect(response.files, hasLength(2));
+        while (response.isTruncated) {
+          options.marker = response.nextMarker;
+          response = await client.list(bucketName, options);
+          names.addAll(response.files.map((e) => e.name));
+        }
+        expect(names, contains('test/list_files/yes/file1.txt'));
+
+        expect(names, contains('test/list_files/yes/sub/file2.txt'));
+        expect(names, contains('test/list_files/yes/other_sub/sub/file3.txt'));
+        expect(names, isNot(contains('test/list_files/no/file0.txt')));
       });
     }, skip: bucketName == null);
   }, skip: client == null);

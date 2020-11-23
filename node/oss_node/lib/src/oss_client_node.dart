@@ -4,15 +4,16 @@ import 'dart:typed_data';
 
 import 'package:node_interop/node_interop.dart' as node;
 import 'package:tekartik_aliyun_oss_node/oss_node.dart';
+import 'package:tekartik_aliyun_oss_node/src/oss_file_node.dart';
 import 'package:tekartik_aliyun_oss_node/src/oss_interop.dart';
 
 import 'import.dart';
 import 'oss_bucket_node.dart';
 
 class OssClientNode with OssClientMixin implements OssClient {
-  final OssClientJs native;
+  final OssClientJs nativeInstance;
 
-  OssClientNode(this.native);
+  OssClientNode(this.nativeInstance);
 
   void _handleError(Completer completer, dynamic err) {
     if (!completer.isCompleted) {
@@ -137,7 +138,7 @@ class OssClientNode with OssClientMixin implements OssClient {
   Future<List<OssBucket>> listBuckets() async {
     var nativeResponse =
         await _nativeOperation<OssClientListBucketsResponseJs>(() async {
-      var result = await promiseToFuture(native.listBuckets(
+      var result = await promiseToFuture(nativeInstance.listBuckets(
         _debugNativeRequestParams(
             'listBuckets', OssClientListBucketsParamsJs()),
       )) as OssClientListBucketsResponseJs;
@@ -163,7 +164,7 @@ class OssClientNode with OssClientMixin implements OssClient {
     if (debugAliyunOss) {
       log('useBucket($name)');
     }
-    native.useBucket(name);
+    nativeInstance.useBucket(name);
   }
 
   void log(dynamic message) {
@@ -189,7 +190,8 @@ class OssClientNode with OssClientMixin implements OssClient {
     var nativeResponse =
         await _nativeOperation<OssClientGetBucketInfoResponseJs>(() async {
       var result = await promiseToFuture(
-        native.getBucketInfo(_debugNativeRequestParams('getBucketinfo', name)),
+        nativeInstance
+            .getBucketInfo(_debugNativeRequestParams('getBucketinfo', name)),
       ) as OssClientGetBucketInfoResponseJs;
       return result;
     });
@@ -206,7 +208,7 @@ class OssClientNode with OssClientMixin implements OssClient {
         if (debugAliyunOss) {
           log('<send>: put($bucketName, $path, ${bytes.length} bytes buffer');
         }
-        var result = await promiseToFuture(native.put(path, buffer))
+        var result = await promiseToFuture(nativeInstance.put(path, buffer))
             as OssClientPutResponseJs;
         if (debugAliyunOss) {
           log('<resp>: ${nativeDataToDebugString(result)}');
@@ -228,8 +230,8 @@ class OssClientNode with OssClientMixin implements OssClient {
           log('<send>: get($bucketName, $path)');
         }
         try {
-          var result =
-              await promiseToFuture(native.get(path)) as OssClientGetResponseJs;
+          var result = await promiseToFuture(nativeInstance.get(path))
+              as OssClientGetResponseJs;
           if (debugAliyunOss) {
             log('<resp>: ${nativeDataToDebugString(result)}');
           }
@@ -260,13 +262,39 @@ class OssClientNode with OssClientMixin implements OssClient {
         if (debugAliyunOss) {
           log('<send>: delete($bucketName, $path)');
         }
-        var result = await promiseToFuture(native.delete(path))
+        var result = await promiseToFuture(nativeInstance.delete(path))
             as OssClientDeleteResponseJs;
         if (debugAliyunOss) {
           log('<resp>: ${nativeDataToDebugString(result)}');
         }
         return result;
       });
+    });
+  }
+
+  @override
+  Future<OssListFilesResponse> list(String bucketName,
+      [OssListFilesOptions options]) async {
+    return inBucket<OssListFilesResponseNode>(bucketName, () async {
+      var nativeResponse =
+          await _nativeOperation<OssClientListFilesResponseJs>(() async {
+        var params = unwrapListFilesOptions(options);
+        var result = await ossClientJsListFiles(
+            nativeInstance, _debugNativeRequestParams('list', params));
+        if (debugAliyunOss) {
+          log('<resp>: ${nativeDataToDebugString(result)}');
+        }
+        /*
+      try {
+        devPrint(nativeDataToDebugString(result));
+      } catch (e) {
+        devPrint(e);
+      }*/
+        return result;
+      });
+
+      // Need to wrap result first
+      return OssListFilesResponseNode(nativeResponse);
     });
   }
 }
