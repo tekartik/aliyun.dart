@@ -128,7 +128,13 @@ class OssClientFs with OssClientMixin {
     var fs = await fsReady;
     var bucketPath = getFsBucketPath(bucketName);
     var parentPath = getFsFilePath(bucketName, options?.prefix);
-    var files = await fs.directory(parentPath).list(recursive: true).toList();
+    List<FileSystemEntity> files;
+    try {
+      files = await fs.directory(parentPath).list(recursive: true).toList();
+    } on FileSystemException catch (_) {
+      // Not found?
+      files = <FileSystemEntity>[];
+    }
     var paths = <String>[];
     for (var file in files) {
       if (await fs.isFile(file.path)) {

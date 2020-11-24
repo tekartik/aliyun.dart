@@ -102,6 +102,14 @@ void main() {
         expect(names, contains('test/list_files/yes/other_sub/sub/file3.txt'));
         expect(names, isNot(contains('test/list_files/no/file0.txt')));
       });
+
+      test('list dummy', () async {
+        await getOrCreateBucket();
+        var options = OssListFilesOptions(
+            prefix: 'test/dummy_that_should_not_exists', maxResults: 2);
+        var response = await client.list(bucketName, options);
+        expect(response.files, isEmpty);
+      });
     }, skip: bucketName == null);
   }, skip: client == null);
 }
