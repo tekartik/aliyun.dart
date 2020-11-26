@@ -71,7 +71,7 @@ Future createWorkTable(TsClient client) async {
 }
 
 TsPrimaryKey getWorkTableKey(
-    String col1, dynamic col2, String col3, dynamic col4) {
+    String col1, dynamic col2, dynamic col3, dynamic col4) {
   return TsPrimaryKey([
     TsKeyValue('key1', col1),
     TsKeyValue('key2', col2 is int ? TsValueLong.fromNumber(col2) : col2),

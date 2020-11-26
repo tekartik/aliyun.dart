@@ -1,6 +1,7 @@
 name: tekartik_aliyun_cli
 description: Aliyun command-line utilities (oss).
 version: 0.1.0
+publish_to: none
 
 environment:
   sdk: '>=2.8.1 <3.0.0'

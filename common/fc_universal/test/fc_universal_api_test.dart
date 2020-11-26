@@ -6,6 +6,8 @@ void main() {
     // ignore: unnecessary_statements
     aliyunFunctionComputeUniversalMemory;
     // ignore: unnecessary_statements
+    newAliyunFunctionComputeUniversalMemory;
+    // ignore: unnecessary_statements
     AliyunFunctionComputeUniversal;
     // ignore: unnecessary_statements
     AliyunFunctionComputeHttpUniversal;

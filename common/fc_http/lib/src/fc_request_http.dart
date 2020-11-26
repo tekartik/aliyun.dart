@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_aliyun_fc/fc_api.dart';
+import 'package:tekartik_aliyun_fc/src/mixin/fc_http_request_headers.dart'; // ignore: implementation_imports
 import 'package:tekartik_http/http.dart' as impl;
 
 class FcHttpRequestHttp implements FcHttpRequest {
@@ -9,6 +11,7 @@ class FcHttpRequestHttp implements FcHttpRequest {
   Uint8List _body;
 
   final _bodyLock = Lock();
+
   Future<Uint8List> _readBody() async {
     if (_body != null) {
       return _body;
@@ -40,12 +43,19 @@ class FcHttpRequestHttp implements FcHttpRequest {
   @override
   String get url => requestImpl.uri.toString();
 
+  FcHttpRequestHeaders _headers;
+
   @override
-  Map<String, String> get headers {
-    var headers = <String, String>{};
-    requestImpl.headers.forEach((name, values) {
-      headers[name] = values.join(',');
-    });
-    return headers;
+  Map<String, String> get headers => _headers ??= () {
+        var lowerCaseHaders = <String, String>{};
+        requestImpl.headers.forEach((name, values) {
+          lowerCaseHaders[name.toLowerCase()] = values.join(',');
+        });
+        return FcHttpRequestHeaders(lowerCaseHaders);
+      }();
+
+  @override
+  Future<Uint8List> getBodyBytes() {
+    return _readBody();
   }
 }

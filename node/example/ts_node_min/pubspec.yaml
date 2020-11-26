@@ -1,5 +1,6 @@
 name: tekartik_aliyun_ts_node_min_example
 description: A sample command-line application.
+publish_to: none
 # version: 1.0.0
 # homepage: https://www.example.com
 

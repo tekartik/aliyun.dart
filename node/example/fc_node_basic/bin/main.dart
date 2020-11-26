@@ -13,6 +13,11 @@ Future<void> main() async {
       FcHttpResponse response, FcHttpContext httpContext) async {
     var command = request.path.split('/').last;
 
+    // Testing logs if attached
+    print('print command: $command');
+    console.out.writeln('out command: $command');
+    console.err.writeln('err command: $command');
+
     Future sendResponse() async {
       response.setStatusCode(201);
       response.setHeader(httpHeaderContentType, httpContentTypeJson);
@@ -34,6 +39,14 @@ Future<void> main() async {
     if (command == 'async') {
       await Future.delayed(Duration(milliseconds: 1));
       await sendResponse();
+    } else if (command == 'bodyBytes') {
+      response.setStatusCode(200);
+      var body = await request.getBodyBytes();
+      await response.sendBytes(body);
+    } else if (command == 'bodyString') {
+      response.setStatusCode(200);
+      var body = await request.getBodyString();
+      await response.sendString(body);
     } else {
       return sendResponse();
     }

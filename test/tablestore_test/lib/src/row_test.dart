@@ -1152,6 +1152,40 @@ void rowTest(TsClient client) {
           ]
         });
 
+        response = await client.getRange(TsGetRangeRequest(
+            tableName: workTableName,
+            inclusiveStartPrimaryKey: getWorkTableKey(
+                col1,
+                TsValueLong.fromNumber(3),
+                TsValueInfinite.min,
+                TsValueInfinite.min),
+            exclusiveEndPrimaryKey: getWorkTableKey(
+                col1,
+                TsValueLong.fromNumber(3),
+                TsValueInfinite.max,
+                TsValueInfinite.max)));
+        expect(response.toDebugMap(), {
+          'rows': [
+            {
+              'primaryKey': [
+                {'key1': 'range_complex'},
+                {
+                  'key2': {'@long': '3'}
+                },
+                {'key3': 'col3_1'},
+                {
+                  'key4': {'@long': '4'}
+                }
+              ],
+              'attributes': [
+                {
+                  'test': {'@long': '3'}
+                }
+              ]
+            }
+          ]
+        });
+
         /*
       expect(
           response.rows

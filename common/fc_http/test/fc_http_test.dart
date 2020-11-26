@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:tekartik_aliyun_fc_http/src/function_compute_http.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
@@ -18,6 +19,8 @@ void main() {
       functionCompute.exportHttpHandler((request, response, context) async {
         var body = await request.getBodyString();
         response.setHeader('content-type', 'application/json');
+        expect(request.headers['Upper'], 'Value');
+        expect(request.headers['upper'], 'Value');
         await response.sendString(jsonEncode({
           'method': request.method,
           'body': body,
@@ -31,13 +34,26 @@ void main() {
       var client = httpClientFactoryMemory.newClient();
       var result = await httpClientRead(
           client, httpMethodGet, '$url/handler?t=1',
-          headers: {'hk': 'hv'}, body: 'body_data');
+          headers: {'hk': 'hv', 'Upper': 'Value'}, body: 'body_data');
       var map = jsonDecode(result) as Map;
 
       expect(map['method'], 'GET');
       expect(map['body'], 'body_data');
       expect(map['path'], '/handler');
       expect(map['url'], endsWith('/handler?t=1'));
+      await server.close(force: true);
+      client.close();
+    });
+
+    test('binary', () async {
+      functionCompute.exportHttpHandler((request, response, context) async {
+        await response.sendBytes(Uint8List.fromList(utf8.encode('test')));
+      });
+      var server = await functionCompute.serveHttp(port: 0);
+      var url = 'http://localhost:${server.port}';
+      var client = httpClientFactoryMemory.newClient();
+      var result = await httpClientRead(client, httpMethodGet, '$url/handler');
+      expect(result, 'test');
       await server.close(force: true);
       client.close();
     });

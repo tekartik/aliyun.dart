@@ -2,16 +2,19 @@
 library tekartik_aliyun_fc_node.fc_interop;
 
 import 'dart:js_util';
+import 'dart:typed_data';
 
 import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
 import 'package:tekartik_aliyun_fc/fc_api.dart';
 import 'package:tekartik_js_utils/js_utils.dart';
+import 'package:tekartik_common_utils/common_utils_import.dart';
+import 'package:tekartik_aliyun_fc/src/mixin/fc_http_request_headers.dart'; // ignore: implementation_imports
 
 @JS()
 @anonymous
 class HttpResponseJs {
-  external void send(String body);
+  external void send(dynamic /*String|Uint8List*/ body);
 }
 
 @JS()
@@ -26,8 +29,14 @@ class HttpContextJs {
   external Map<String, dynamic> get credentials;
 }
 
+@JS('Buffer')
+class Buffer {
+  external static Buffer from(Uint8List bytes);
+}
+
 typedef _GetBodyFn = dynamic Function(dynamic req, [dynamic option]);
 
+/// https://www.npmjs.com/package/raw-body
 _GetBodyFn _getRawBodyFn = require('raw-body');
 
 /*
@@ -79,6 +88,13 @@ class FcHttpRequestNode implements FcHttpRequest {
     return buff.toString();
   }
 
+  @override
+  Future<Uint8List> getBodyBytes() async {
+    var buff = await _getRawBody();
+    // devPrint('rawbody ${buff.runtimeType}');
+    return buff as Uint8List;
+  }
+
   Map<String, dynamic> get queries {
     return jsObjectAsMap(getProperty(req, 'queries'));
   }
@@ -92,19 +108,18 @@ class FcHttpRequestNode implements FcHttpRequest {
   @override
   String get method => getProperty(req, 'method');
 
+  FcHttpRequestHeaders _headers;
   @override
-  Map<String, String> get headers {
-    var headers = <String, String>{};
-
-    // Need to loop through the keys
-    var nativeHeaders = getProperty(req, 'headers');
-    var keys = jsObjectKeys(nativeHeaders);
-    for (var key in keys) {
-      headers[key] = getProperty(nativeHeaders, key);
-    }
-
-    return headers;
-  }
+  Map<String, String> get headers => _headers ??= () {
+        var lowerCaseHaders = <String, String>{};
+        // Need to loop through the keys
+        var nativeHeaders = getProperty(req, 'headers');
+        var keys = jsObjectKeys(nativeHeaders);
+        for (var key in keys) {
+          lowerCaseHaders[key.toLowerCase()] = getProperty(nativeHeaders, key);
+        }
+        return FcHttpRequestHeaders(lowerCaseHaders);
+      }();
 
   @override
   String toString() {
@@ -147,6 +162,11 @@ class FcHttpResponseNode implements FcHttpResponse {
 
   void setContentTypeJson() {
     setHeader('Content-Type', 'application/json');
+  }
+
+  @override
+  Future<void> sendBytes(Uint8List bytes) async {
+    impl.send(Buffer.from(bytes));
   }
 //response.setStatusCode(200);
 //response.setHeader('content-type', 'application/json');

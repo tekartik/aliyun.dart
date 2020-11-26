@@ -3,7 +3,7 @@ library tekartik_aliyun_tablestore_node.ts_interop;
 
 import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
-import 'package:tekartik_aliyun_tablestore_node/src/ts_node_exception.dart';
+import 'package:tekartik_aliyun_tablestore_node/src/ts_exception_node.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_row_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_interop.dart'
     show PrimaryKeyTypeJs, TsClientListTableParamsJs, TsClientTableParamsJs;

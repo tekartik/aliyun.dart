@@ -1,10 +1,11 @@
 name: tekartik_aliyun_fc_http
 description: A starting point for Dart libraries or applications.
-version: 0.1.1
+version: 0.1.5
+publish_to: none
 # homepage: https://www.example.com
 
 environment:
-  sdk: '>=2.8.1 <3.0.0'
+  sdk: '>=2.10.0-0 <3.0.0'
 
 dependencies:
   tekartik_http_io:

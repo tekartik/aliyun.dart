@@ -24,3 +24,6 @@ node_modules/
 /node/example/ts_node_min/deploy/index.js
 /node/example/ts_node_min/pubspec.lock
 package-lock.json
+
+# Local folder
+.local/

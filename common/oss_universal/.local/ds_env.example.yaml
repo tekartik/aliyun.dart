@@ -1,0 +1,12 @@
+# Local Environment path and variable for `Shell.run` calls.
+# See <https://github.com/tekartik/process_run.dart/blob/master/doc/user_config.md> for more information
+#
+var:
+  # Credentials for aliyun account
+  accountId: 1************3
+  accessKeyId: LT******************kn
+  accessKeySecret: pw***************lo
+  # oss endpoint
+  endpoint: oss-c************cs.com
+  # test bucket name
+  ossTestBucketName: my_bucket_name

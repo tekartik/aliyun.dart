@@ -1,0 +1,13 @@
+{
+  "name": "tekartik_aliyun_oss_node",
+  "description": "Aliyun OSS Library",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "tekartik",
+  "license": "BSD-2",
+  "homepage": "https://github.com/tekartik/aliyun.dart",
+  "dependencies": {
+    "ali-oss": "^6.11.2",
+    "tablestore": "^5.0.7"
+  }
+}

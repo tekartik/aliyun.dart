@@ -1,22 +1,12 @@
-A library for Dart developers.
+## Setup
 
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
-
-## Usage
-
-A simple usage example:
-
-```dart
-import 'package:fc/fc.dart';
-
-main() {
-  var awesome = new Awesome();
-}
+`pubspec.yaml`:
+```yaml
+dependencies
+  tekartik_aliyun_fc:
+    git:
+      url: git://github.com/tekartik/aliyun.dart
+      path: common/fc
+      ref: dart2
+    version: '>=0.1.1'
 ```
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: http://example.com/issues/replaceme
