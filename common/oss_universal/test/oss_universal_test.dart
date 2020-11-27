@@ -70,7 +70,12 @@ void main() {
 
         await client.delete(bucket.name, path);
 
-        expect(await client.getAsString(bucket.name, path), isNull);
+        try {
+          expect(await client.getAsString(bucket.name, path), isNull);
+          fail('should fail');
+        } on OssException catch (e) {
+          expect(e.isNotFound, isTrue);
+        }
       });
       test('list files', () async {
         var bucket = await getOrCreateBucket();

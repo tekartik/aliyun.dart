@@ -106,7 +106,7 @@ abstract class OssClientListFilesResponseJs {
 
 List<OssFileJs> ossClientListFilesObjects(
         OssClientListFilesResponseJs response) =>
-    response.objects.cast<OssFileJs>();
+    response.objects?.cast<OssFileJs>();
 /*
 @JS()
 @anonymous

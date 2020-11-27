@@ -11,7 +11,7 @@ class OssClientFs with OssClientMixin {
   final OssServiceFs service;
   final OssClientOptions options;
 
-  String get rootPath => (options as OssClientOptionsFs).rootPath;
+  String get rootPath => (options as OssClientOptionsFs)?.rootPath;
 
   FileSystem get fs => service.fs;
 
@@ -103,8 +103,11 @@ class OssClientFs with OssClientMixin {
     var fsFilePath = getFsFilePath(bucketName, path);
     try {
       return await fs.file(fsFilePath).readAsBytes();
-    } catch (e) {
-      return null;
+    } on FileSystemException catch (e) {
+      if (e.status == FileSystemException.statusNotFound) {
+        throw OssExceptionFs(message: e.toString(), isNotFound: true);
+      }
+      throw OssExceptionFs(message: e.toString());
     }
   }
 
