@@ -108,6 +108,28 @@ void main() {
         expect(names, isNot(contains('test/list_files/no/file0.txt')));
       });
 
+      test('list files meta', () async {
+        // Check meta does not change
+        var bucket = await getOrCreateBucket();
+        var content = 'Hello OSS';
+        await client.putAsString(bucket.name, 'test/meta/file0.txt', content);
+
+        var options = OssListFilesOptions(prefix: 'test/meta', maxResults: 2);
+        var response = await client.list(bucketName, options);
+
+        expect(response.isTruncated, isFalse);
+        expect(response.files, hasLength(1));
+
+        var file1 = response.files.first;
+
+        response = await client.list(bucketName, options);
+
+        var file2 = response.files.first;
+
+        expect(file1.lastModified, file2.lastModified);
+        expect(file1.size, file2.size);
+      });
+
       test('list dummy', () async {
         await getOrCreateBucket();
         var options = OssListFilesOptions(

@@ -7,11 +7,15 @@ class OssExceptionFs implements OssException {
   String toString() => 'OssExceptionFs($message)';
 
   final String message;
+
   /// Default. to true
   @override
   final bool retryable;
 
-  OssExceptionFs({@required this.message, this.retryable = false, this.isNotFound = false});
+  OssExceptionFs(
+      {@required this.message,
+      this.retryable = false,
+      this.isNotFound = false});
 
   @override
   final bool isNotFound;
