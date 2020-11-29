@@ -19,8 +19,8 @@ void main() {
 
   test('api', () {
     // ignore_for_file: unnecessary_statements
-    ossServiceFsMemory;
-    newOssServiceFsMemory;
+    ossServiceMemory;
+    newOssServiceMemory;
     debugAliyunOss;
     ossServiceUniversal;
 

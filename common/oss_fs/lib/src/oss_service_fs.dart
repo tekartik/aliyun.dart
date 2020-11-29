@@ -14,9 +14,16 @@ class OssServiceFs with OssServiceMixin {
   }
 }
 
+@deprecated
+OssService get ossServiceFsMemory => ossServiceMemory;
+
 /// Shared in memory file Oss Service
-final OssService ossServiceFsMemory = OssServiceFs(fs: fileSystemMemory);
+final OssService ossServiceMemory = OssServiceFs(fs: fileSystemMemory);
 
 /// Create a new Oss service in memory (not shared)
-OssService newOssServiceFsMemory([String name]) =>
+@deprecated
+OssService newOssServiceFsMemory([String name]) => newOssServiceMemory(name);
+
+/// Create a new Oss service in memory (not shared)
+OssService newOssServiceMemory([String name]) =>
     OssServiceFs(fs: newFileSystemMemory(name));

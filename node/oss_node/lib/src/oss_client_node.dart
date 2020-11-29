@@ -243,7 +243,8 @@ class OssClientNode with OssClientMixin implements OssClient {
           // error NoSuchKeyError: The specified key does not exist.
           if (e.toString().toLowerCase().contains('nosuchkeyerror')) {
             // not found!
-            return null;
+            throw OssExceptionNode(
+                message: e.toString(), isNotFound: true, isRetryable: false);
           } else {
             rethrow;
           }
@@ -285,11 +286,16 @@ class OssClientNode with OssClientMixin implements OssClient {
           log('<resp>: ${nativeDataToDebugString(result)}');
         }
         /*
-      try {
-        devPrint(nativeDataToDebugString(result));
-      } catch (e) {
-        devPrint(e);
-      }*/
+        if (devWarning(true)) {
+          for (var file in result.objects) {
+            try {
+              devPrint(nativeDataToDebugString(file));
+            } catch (e) {
+              devPrint(e);
+            }
+          }
+        }
+        */
         return result;
       });
 
