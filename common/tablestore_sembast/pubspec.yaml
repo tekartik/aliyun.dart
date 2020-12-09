@@ -1,6 +1,6 @@
 name: tekartik_aliyun_tablestore_sembast
 description: Tablestore mock implementation
-version: 0.2.1
+version: 0.2.3
 publish_to: none
 # homepage: https://www.example.com
 
@@ -13,7 +13,7 @@ dependencies:
       url: git://github.com/tekartik/aliyun.dart
       path: common/tablestore
       ref: dart2
-    version: '>=0.1.0'
+    version: '>=0.2.3'
   sembast: '>=2.4.7+7'
 
 dev_dependencies:

@@ -1,6 +1,6 @@
 name: tekartik_aliyun_tablestore_node
 description: Aliyun tablestore node access
-version: 0.2.0
+version: 0.2.3
 publish_to: none
 # homepage: https://www.example.com
 
@@ -14,7 +14,7 @@ dependencies:
       url: git://github.com/tekartik/aliyun.dart
       path: common/tablestore
       ref: dart2
-    version: '>=0.2.0'
+    version: '>=0.2.3'
   collection:
 
 dev_dependencies:
