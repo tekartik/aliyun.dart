@@ -273,14 +273,14 @@ class TsClientSembast implements TsClient {
       for (var requestTable in request.tables) {
         var table = await getTableContext(txn, requestTable.tableName);
         for (var requestRow in requestTable.rows) {
+          var type = requestRow.type;
           var row = table.row(requestRow.primaryKey);
           var record = row.record(requestRow.data);
           var isOk = true;
           String errorMessage;
-          // int errorCode;
+          int key;
           try {
-            var key =
-                await _checkPutDeleteCondition(record, requestRow.condition);
+            key = await _checkPutDeleteCondition(record, requestRow.condition);
             if (key != null) {
               await record.delete();
             }
@@ -290,7 +290,15 @@ class TsClientSembast implements TsClient {
             // errorCode = e.
 
           }
-          await record.put();
+          if (type == TsWriteRowType.put) {
+            await record.put();
+          } else if (type == TsWriteRowType.delete) {
+            await record.deleteByKey(key);
+          } else {
+            // var TODO;
+            throw UnsupportedError(
+                'type $type of write rows not supported yet');
+          }
           rows.add(TsBatchGetRowResponseRowSembast(
               rowContext: row,
               attributes: TsAttributes([]),

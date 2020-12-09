@@ -233,6 +233,10 @@ void rowTest(TsClient client) {
       var deleteResponse = await client.deleteRow(
           TsDeleteRowRequest(tableName: keyStringTableName, primaryKey: key));
       expect(deleteResponse.toDebugMap(), {});
+
+      var getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key));
+      expect(getResponse.row.primaryKey, isNull);
     });
 
     test('putRow', () async {
@@ -702,6 +706,57 @@ void rowTest(TsClient client) {
   RequestId: '0005aebb-8f18-0f8b-e6c1-720b0b29242f' }
 
        */
+    });
+
+    test('batch_write_update_delete', () async {
+      await _createKeyStringTable();
+      var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_write_update_delete')]);
+      //var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
+      //var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
+      var response =
+          await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+        TsBatchWriteRowsRequestTable(tableName: keyStringTableName, rows: [
+          TsBatchWriteRowsRequestRow(
+              type: TsWriteRowType.put,
+              primaryKey: key1,
+              data: [TsAttribute.int('test', 1)]),
+        ])
+      ]));
+      //devPrint(jsonPretty(response.toDebugMap()));
+      expect(response.toDebugMap(), {
+        'rows': [
+          {
+            'isOk': true,
+            'tableName': 'test_key_string',
+            'primaryKey': [
+              {'key': 'batch_write_update_delete'}
+            ],
+            'attributes': []
+          }
+        ]
+      });
+      response = await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+        TsBatchWriteRowsRequestTable(tableName: keyStringTableName, rows: [
+          TsBatchWriteRowsRequestRow(
+              type: TsWriteRowType.delete, primaryKey: key1)
+        ])
+      ]));
+      //devPrint(jsonPretty(response.toDebugMap()));
+      expect(response.toDebugMap(), {
+        'rows': [
+          {
+            'isOk': true,
+            'tableName': 'test_key_string',
+            'primaryKey': [
+              {'key': 'batch_write_update_delete'}
+            ],
+            'attributes': []
+          }
+        ]
+      });
+      var getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key1));
+      expect(getResponse.row.primaryKey, isNull);
     });
 
     test('no_batch', () async {
