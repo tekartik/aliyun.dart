@@ -9,12 +9,6 @@ environment:
 
 dependencies:
   path: ^1.7.0
-  tekartik_app_node_build:
-    git:
-      url: git://github.com/tekartik/app_node_utils.dart
-      path: app_build
-      ref: dart2
-    version: '>=0.1.0'
   tekartik_aliyun_oss:
     git:
       url: git://github.com/tekartik/aliyun.dart
@@ -41,6 +35,12 @@ dev_dependencies:
       url: git://github.com/tekartik/build_utils.dart
       ref: dart2
     version: '>=0.5.8'
+  tekartik_app_node_build:
+    git:
+      url: git://github.com/tekartik/app_node_utils.dart
+      path: app_build
+      ref: dart2
+    version: '>=0.1.0'
 dependency_overrides:
   tekartik_aliyun_oss_node:
     path: ../../node/oss_node
