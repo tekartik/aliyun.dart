@@ -242,19 +242,51 @@ class TsBatchWriteRowsRequestTable {
   TsBatchWriteRowsRequestTable({@required this.tableName, @required this.rows});
 }
 
-class TsBatchWriteRowsRequestRow {
+class TsBatchWriteRowsRequestDeleteRow extends TsBatchWriteRowsRequestRow {
+  TsBatchWriteRowsRequestDeleteRow(
+      {@required TsPrimaryKey primaryKey, TsCondition condition})
+      : super(
+            type: TsWriteRowType.delete,
+            primaryKey: primaryKey,
+            condition: condition);
+}
+
+class TsBatchWriteRowsRequestUpdateRow extends TsBatchWriteRowsRequestRow {
+  TsBatchWriteRowsRequestUpdateRow(
+      {@required TsPrimaryKey primaryKey,
+      TsCondition condition,
+      @required this.data})
+      : super(
+            type: TsWriteRowType.update,
+            primaryKey: primaryKey,
+            condition: condition);
+  final TsUpdateAttributes data;
+}
+
+class TsBatchWriteRowsRequestPutRow extends TsBatchWriteRowsRequestRow {
+  final TsAttributes data;
+  TsBatchWriteRowsRequestPutRow(
+      {@required TsPrimaryKey primaryKey,
+      TsCondition condition,
+
+      /// Columns values
+      this.data})
+      : super(
+            type: TsWriteRowType.put,
+            primaryKey: primaryKey,
+            condition: condition);
+}
+
+abstract class TsBatchWriteRowsRequestRow {
   final TsWriteRowType type;
   final TsPrimaryKey primaryKey;
   final TsCondition condition;
-  final List<TsAttribute> data;
 
-  TsBatchWriteRowsRequestRow(
-      {@required this.type,
-      @required this.primaryKey,
-      this.condition,
-
-      /// Columns values
-      this.data});
+  TsBatchWriteRowsRequestRow({
+    @required this.type,
+    @required this.primaryKey,
+    this.condition,
+  });
 }
 
 class TsDeleteRowRequest {
@@ -303,7 +335,7 @@ abstract class TsGetRangeResponse {
 // attributes: [{columnName: test, columnValue: {buffer: [1, 0, 0, 0, 0, 0, 0, 0], offset: 0}
 abstract class TsBatchGetRowsResponseRow {
   bool get isOk;
-  int get errorCode;
+  String get errorCode;
   String get errorMessage;
   String get tableName;
   TsPrimaryKey get primaryKey;
@@ -376,7 +408,7 @@ extension TsBatchGetRowsResponseRowExt on TsBatchGetRowsResponseRow {
   Model toDebugMap() {
     return Model({})
       ..setValue('isOk', isOk)
-      ..setValue('errorMessage', errorCode)
+      ..setValue('errorMessage', errorMessage)
       ..setValue('errorCode', errorCode)
       ..setValue('tableName', tableName)
       ..setValue('primaryKey', primaryKey?.toDebugList())

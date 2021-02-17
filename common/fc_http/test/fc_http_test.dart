@@ -33,7 +33,7 @@ void main() {
       var url = 'http://localhost:${server.port}';
       var client = httpClientFactoryMemory.newClient();
       var result = await httpClientRead(
-          client, httpMethodGet, '$url/handler?t=1',
+          client, httpMethodGet, Uri.parse('$url/handler?t=1'),
           headers: {'hk': 'hv', 'Upper': 'Value'}, body: 'body_data');
       var map = jsonDecode(result) as Map;
 
@@ -52,7 +52,8 @@ void main() {
       var server = await functionCompute.serveHttp(port: 0);
       var url = 'http://localhost:${server.port}';
       var client = httpClientFactoryMemory.newClient();
-      var result = await httpClientRead(client, httpMethodGet, '$url/handler');
+      var result = await httpClientRead(
+          client, httpMethodGet, Uri.parse('$url/handler'));
       expect(result, 'test');
       await server.close(force: true);
       client.close();

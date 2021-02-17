@@ -1,0 +1,11 @@
+# Local Environment path and variable for `Shell.run` calls.
+# See <https://github.com/tekartik/process_run.dart/blob/master/doc/user_config.md> for more information
+#
+var:
+  # Credentials for aliyun account
+  accountId: 1************3
+  accessKeyId: LT******************kn
+  secretAccessKey: pw***************lo
+  # tablestore endpoint
+  endpoint: https://************cs.com
+

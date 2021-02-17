@@ -105,7 +105,7 @@ class TsUpdateAttributes with ListMixin<TsUpdateAttribute> {
       throw UnsupportedError('read only');
 }
 
-class TsUpdateAttribute {}
+abstract class TsUpdateAttribute {}
 
 class TsUpdateAttributePut implements TsUpdateAttribute {
   final TsAttributes attributes;

@@ -211,6 +211,22 @@ class TsClientSembast implements TsClient {
               message: 'record found', isConditionFailedError: true);
         }
     }
+
+    // Check column condition
+    if (condition?.columnCondition != null) {
+      if (key == null &&
+          condition?.rowExistenceExpectation !=
+              TsConditionRowExistenceExpectation.expectExist) {
+        // ok
+      } else {
+        var filter = tsConditionToSembastFilter(condition.columnCondition);
+        key = await record.findKey(filter: filter);
+        if (key == null) {
+          throw TsExceptionSembast(
+              message: 'column condition failed', isConditionFailedError: true);
+        }
+      }
+    }
     return key;
   }
 
@@ -273,16 +289,28 @@ class TsClientSembast implements TsClient {
       for (var requestTable in request.tables) {
         var table = await getTableContext(txn, requestTable.tableName);
         for (var requestRow in requestTable.rows) {
+          var type = requestRow.type;
           var row = table.row(requestRow.primaryKey);
-          var record = row.record(requestRow.data);
+          var record = row.record();
           var isOk = true;
           String errorMessage;
-          // int errorCode;
+          int key;
           try {
-            var key =
-                await _checkPutDeleteCondition(record, requestRow.condition);
+            key = await _checkPutDeleteCondition(record, requestRow.condition);
             if (key != null) {
               await record.delete();
+            }
+            if (requestRow is TsBatchWriteRowsRequestPutRow) {
+              record = row.record(requestRow.data);
+              await record.put();
+            } else if (requestRow is TsBatchWriteRowsRequestDeleteRow) {
+              await record.deleteByKey(key);
+            } else if (requestRow is TsBatchWriteRowsRequestUpdateRow) {
+              await _updateRow(key: key, record: record, data: requestRow.data);
+            } else {
+              // var TODO;
+              throw UnsupportedError(
+                  'type $type ${row.runtimeType} of write rows not supported yet');
             }
           } on TsExceptionSembast catch (e) {
             isOk = false;
@@ -290,7 +318,7 @@ class TsClientSembast implements TsClient {
             // errorCode = e.
 
           }
-          await record.put();
+
           rows.add(TsBatchGetRowResponseRowSembast(
               rowContext: row,
               attributes: TsAttributes([]),
@@ -300,6 +328,34 @@ class TsClientSembast implements TsClient {
       }
       return TsBatchWriteRowsResponseSembast(rows);
     });
+  }
+
+  Future<TsRowRecordContextSembast> _updateRow(
+      {@required int key,
+      @required TsRowRecordContextSembast record,
+      @required TsUpdateAttributes data}) async {
+    var list = <TsAttribute>[];
+    if (key != null) {
+      var existing = await record.get(null);
+      if (existing?.attributes?.isNotEmpty ?? false) {
+        list.addAll(existing.attributes);
+      }
+    }
+    // Merge!
+    for (var update in data) {
+      if (update is TsUpdateAttributePut) {
+        for (var attribute in update.attributes) {
+          list.removeWhere((element) => element.name == attribute.name);
+          list.add(attribute);
+        }
+      } else if (update is TsUpdateAttributeDelete) {
+        list.removeWhere((element) => update.fields.contains(element.name));
+      }
+    }
+    record = record.row.record(list);
+    await record.delete();
+    await record.put();
+    return record;
   }
 
   @override
@@ -315,6 +371,7 @@ class TsClientSembast implements TsClient {
                   rowExistenceExpectation:
                       TsConditionRowExistenceExpectation.expectExist));
 
+      record = await _updateRow(key: key, record: record, data: request.data);
       var list = <TsAttribute>[];
       if (key != null) {
         list.addAll((await record.get(null))?.attributes);
@@ -383,7 +440,7 @@ class TsBatchGetRowResponseRowSembast implements TsBatchGetRowsResponseRow {
   final TsAttributes attributes;
 
   @override
-  final int errorCode;
+  final String errorCode;
 
   @override
   final String errorMessage;
@@ -577,12 +634,16 @@ class TsRowRecordContextSembast {
 
   Finder _finder;
 
-  Finder get finder => _finder ??= () {
-        return Finder(
-            filter: Filter.and(sembastPrimaryKeys
-                .map((e) => Filter.equals(e.key, e.value))
-                .toList()));
-      }();
+  Finder get finder => _finder ??= getFinder();
+
+  // Merge filter if needed
+  Finder getFinder({Filter filter}) {
+    var filters = [
+      ...sembastPrimaryKeys.map((e) => Filter.equals(e.key, e.value)).toList(),
+      if (filter != null) filter
+    ];
+    return Finder(filter: Filter.and(filters));
+  }
 
   Future delete() async {
     // delete previous
@@ -594,9 +655,10 @@ class TsRowRecordContextSembast {
     await table.store.record(key).delete(table.client);
   }
 
-  Future<int> findKey() async {
+  Future<int> findKey({Filter filter}) async {
     // delete previous
-    var ids = await table.store.findKeys(client, finder: finder);
+    var ids =
+        await table.store.findKeys(client, finder: getFinder(filter: filter));
     // Delete others..in case any
     if (ids.length > 1) {
       // should not happen

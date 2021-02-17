@@ -233,6 +233,10 @@ void rowTest(TsClient client) {
       var deleteResponse = await client.deleteRow(
           TsDeleteRowRequest(tableName: keyStringTableName, primaryKey: key));
       expect(deleteResponse.toDebugMap(), {});
+
+      var getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key));
+      expect(getResponse.row.primaryKey, isNull);
     });
 
     test('putRow', () async {
@@ -392,8 +396,84 @@ void rowTest(TsClient client) {
         expect(e.isConditionFailedError, isTrue);
       }
 
-      // ignore: unused_local_variable
+      // conditional update ok
       var response = await client.updateRow(TsUpdateRowRequest(
+          tableName: keyStringTableName,
+          condition: TsCondition(
+              rowExistenceExpectation:
+                  TsConditionRowExistenceExpectation.ignore,
+              columnCondition: TsColumnCondition.lessThan(
+                  'col1', TsValueLong.fromNumber(2))),
+          primaryKey: key,
+          data: TsUpdateAttributes([
+            TsUpdateAttributePut(TsAttributes([TsAttribute.int('col1', 2)])),
+          ])));
+      expect(response.toDebugMap(), {
+        'row': {
+          'primaryKey': [
+            {'key': 'updateRow'}
+          ],
+          'attributes': []
+        }
+      });
+      var getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKey': [
+            {'key': 'updateRow'}
+          ],
+          'attributes': [
+            {
+              'col1': {'@long': '2'}
+            },
+            // {'col2': 'value'}, ?
+          ]
+        }
+      });
+
+      try {
+        // conditional update failure
+        response = await client.updateRow(TsUpdateRowRequest(
+            tableName: keyStringTableName,
+            condition: TsCondition(
+                rowExistenceExpectation:
+                    TsConditionRowExistenceExpectation.ignore,
+                columnCondition: TsColumnCondition.lessThan(
+                    'col1', TsValueLong.fromNumber(2))),
+            primaryKey: key,
+            data: TsUpdateAttributes([
+              TsUpdateAttributePut(TsAttributes([TsAttribute.int('col1', 3)])),
+            ])));
+        fail('should fail');
+      } on TsException catch (e) {
+        expect(e.isConditionFailedError, isTrue);
+      }
+      expect(response.toDebugMap(), {
+        'row': {
+          'primaryKey': [
+            {'key': 'updateRow'}
+          ],
+          'attributes': []
+        }
+      });
+      getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key));
+      expect(getResponse.toDebugMap(), {
+        'row': {
+          'primaryKey': [
+            {'key': 'updateRow'}
+          ],
+          'attributes': [
+            {
+              'col1': {'@long': '2'}
+            },
+            // {'col2': 'value'},
+          ]
+        }
+      });
+      // ignore: unused_local_variable
+      response = await client.updateRow(TsUpdateRowRequest(
           tableName: keyStringTableName,
           condition: TsCondition(
               rowExistenceExpectation:
@@ -415,7 +495,7 @@ void rowTest(TsClient client) {
       });
 
       // {"consumed":{"capacityUnit":{"read":0,"write":1}},"row":{"primaryKey":[{"name":"key","value":"updateRow"}],"attributes":[]},"RequestId":"0005aecc-876c-4878-a4c1-720b0ea2c3fd"}
-      var getResponse = await client.getRow(
+      getResponse = await client.getRow(
           TsGetRowRequest(tableName: keyStringTableName, primaryKey: key));
       expect(getResponse.toDebugMap(), {
         'row': {
@@ -662,10 +742,9 @@ void rowTest(TsClient client) {
       var response =
           await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
         TsBatchWriteRowsRequestTable(tableName: keyStringTableName, rows: [
-          TsBatchWriteRowsRequestRow(
-              type: TsWriteRowType.put,
+          TsBatchWriteRowsRequestPutRow(
               primaryKey: key1,
-              data: [TsAttribute.int('test', 1)]),
+              data: TsAttributes([TsAttribute.int('test', 1)])),
         ])
       ]));
       //devPrint(jsonPretty(response.toDebugMap()));
@@ -702,6 +781,105 @@ void rowTest(TsClient client) {
   RequestId: '0005aebb-8f18-0f8b-e6c1-720b0b29242f' }
 
        */
+    });
+
+    test('batch_write_update_delete', () async {
+      await _createKeyStringTable();
+      var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_write_update_delete')]);
+      //var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
+      //var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
+      var response =
+          await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+        TsBatchWriteRowsRequestTable(tableName: keyStringTableName, rows: [
+          TsBatchWriteRowsRequestPutRow(
+              primaryKey: key1,
+              data: TsAttributes([TsAttribute.int('test', 1)])),
+        ])
+      ]));
+      //devPrint(jsonPretty(response.toDebugMap()));
+      expect(response.toDebugMap(), {
+        'rows': [
+          {
+            'isOk': true,
+            'tableName': 'test_key_string',
+            'primaryKey': [
+              {'key': 'batch_write_update_delete'}
+            ],
+            'attributes': []
+          }
+        ]
+      });
+      // update
+      response = await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+        TsBatchWriteRowsRequestTable(tableName: keyStringTableName, rows: [
+          TsBatchWriteRowsRequestUpdateRow(
+              condition: TsCondition(
+                  rowExistenceExpectation:
+                      TsConditionRowExistenceExpectation.expectExist),
+              primaryKey: key1,
+              data: TsUpdateAttributes([
+                TsUpdateAttributePut(TsAttributes([TsAttribute.int('test', 2)]))
+              ]))
+        ])
+      ]));
+      var getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key1));
+      expect(getResponse.row.attributes.list.first, TsAttribute.int('test', 2));
+
+      // conditional update
+      response = await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+        TsBatchWriteRowsRequestTable(tableName: keyStringTableName, rows: [
+          TsBatchWriteRowsRequestUpdateRow(
+              condition: TsCondition(
+                  rowExistenceExpectation:
+                      TsConditionRowExistenceExpectation.expectExist,
+                  columnCondition: TsColumnCondition.equals(
+                      'test', TsValueLong.fromNumber(3))),
+              primaryKey: key1,
+              data: TsUpdateAttributes([
+                TsUpdateAttributePut(TsAttributes([TsAttribute.int('test', 4)]))
+              ]))
+        ])
+      ]));
+      expect(response.rows.first.isOk, isFalse);
+      expect(response.rows.first.tableName, keyStringTableName);
+      /*
+      expect(response.toDebugMap(), {
+        'rows': [
+          {
+            'isOk': false,
+            'errorMessage': 'Condition check failed.',
+            'errorCode': 'OTSConditionCheckFail',
+            'tableName': 'test_key_string'
+          }
+        ]
+      });
+       */
+      getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key1));
+      expect(getResponse.row.attributes.list.first, TsAttribute.int('test', 2));
+
+      response = await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
+        TsBatchWriteRowsRequestTable(
+            tableName: keyStringTableName,
+            rows: [TsBatchWriteRowsRequestDeleteRow(primaryKey: key1)])
+      ]));
+      //devPrint(jsonPretty(response.toDebugMap()));
+      expect(response.toDebugMap(), {
+        'rows': [
+          {
+            'isOk': true,
+            'tableName': 'test_key_string',
+            'primaryKey': [
+              {'key': 'batch_write_update_delete'}
+            ],
+            'attributes': []
+          }
+        ]
+      });
+      getResponse = await client.getRow(
+          TsGetRowRequest(tableName: keyStringTableName, primaryKey: key1));
+      expect(getResponse.row.primaryKey, isNull);
     });
 
     test('no_batch', () async {
@@ -744,18 +922,15 @@ void rowTest(TsClient client) {
       var key3 = TsPrimaryKey([TsKeyValue('key', 'range_3')]);
       await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
         TsBatchWriteRowsRequestTable(tableName: keyStringTableName, rows: [
-          TsBatchWriteRowsRequestRow(
-              type: TsWriteRowType.put,
+          TsBatchWriteRowsRequestPutRow(
               primaryKey: key1,
-              data: [TsAttribute.int('test', 1)]),
-          TsBatchWriteRowsRequestRow(
-              type: TsWriteRowType.put,
+              data: TsAttributes([TsAttribute.int('test', 1)])),
+          TsBatchWriteRowsRequestPutRow(
               primaryKey: key2,
-              data: [TsAttribute.int('test', 2)]),
-          TsBatchWriteRowsRequestRow(
-              type: TsWriteRowType.put,
+              data: TsAttributes([TsAttribute.int('test', 2)])),
+          TsBatchWriteRowsRequestPutRow(
               primaryKey: key3,
-              data: [TsAttribute.int('test', 3)]),
+              data: TsAttributes([TsAttribute.int('test', 3)])),
         ])
       ]));
 
@@ -820,22 +995,18 @@ void rowTest(TsClient client) {
 
           await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
             TsBatchWriteRowsRequestTable(tableName: workTableName, rows: [
-              TsBatchWriteRowsRequestRow(
-                  type: TsWriteRowType.put,
+              TsBatchWriteRowsRequestPutRow(
                   primaryKey: key1,
-                  data: [TsAttribute.int('test', 1)]),
-              TsBatchWriteRowsRequestRow(
-                  type: TsWriteRowType.put,
+                  data: TsAttributes([TsAttribute.int('test', 1)])),
+              TsBatchWriteRowsRequestPutRow(
                   primaryKey: key2,
-                  data: [TsAttribute.int('test', 2)]),
-              TsBatchWriteRowsRequestRow(
-                  type: TsWriteRowType.put,
+                  data: TsAttributes([TsAttribute.int('test', 2)])),
+              TsBatchWriteRowsRequestPutRow(
                   primaryKey: key3,
-                  data: [TsAttribute.int('test', 3)]),
-              TsBatchWriteRowsRequestRow(
-                  type: TsWriteRowType.put,
+                  data: TsAttributes([TsAttribute.int('test', 3)])),
+              TsBatchWriteRowsRequestPutRow(
                   primaryKey: key4,
-                  data: [TsAttribute.int('test', 4)]),
+                  data: TsAttributes([TsAttribute.int('test', 4)])),
             ])
           ]));
           _dataWritten = true;

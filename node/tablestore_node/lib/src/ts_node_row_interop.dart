@@ -171,12 +171,13 @@ extension TsBatchGetRowResponseJsExt on TsBatchGetRowResponseJs {
       .toList(growable: false);
 }
 
+// {"isOk":false,"errorCode":"OTSConditionCheckFail","errorMessage":"Condition check failed.","tableName":"test_key_string","capacityUnit":"","primaryKey":null,"attributes":null}
 @JS()
 @anonymous
 abstract class TsBatchGetRowResponseRowJs {
   bool get isOk;
 
-  int get errorCode;
+  String get errorCode;
 
   String get errorMessage;
 
@@ -640,7 +641,7 @@ class TsBatchGetRowsResponseRowImpl implements TsBatchGetRowsResponseRow {
   final TsAttributes attributes;
 
   @override
-  final int errorCode;
+  final String errorCode;
 
   @override
   final String errorMessage;
@@ -775,23 +776,29 @@ Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
     'tables': request.tables
         .map((table) => <String, dynamic>{
               if (table.tableName != null) 'tableName': table.tableName,
-              'rows': TsArrayHack(table.rows.map((row) => <String, dynamic>{
-                    // Needed
-                    'type': row.type,
+              'rows': TsArrayHack(table.rows.map((row) {
+                return <String, dynamic>{
+                  // Needed
+                  'type': row.type,
 
-                    // Needed
-                    'condition': row.condition ?? TsCondition.ignore,
+                  // Needed
+                  'condition': row.condition ?? TsCondition.ignore,
 
-                    if (row.primaryKey != null)
-                      // !singular
-                      'primaryKey': tsPrimaryKeyParams(row.primaryKey),
+                  if (row.primaryKey != null)
+                    // !singular
+                    'primaryKey': tsPrimaryKeyParams(row.primaryKey),
 
-                    if (row.data != null)
-                      'attributeColumns': tsAttributeColumnsParams(row.data),
-                    'returnContent': {
-                      'returnType': tsNodeCommon.returnType.Primarykey
-                    }
-                  }))
+                  if (row is TsBatchWriteRowsRequestPutRow &&
+                      (row.data != null))
+                    'attributeColumns': tsAttributeColumnsParams(row.data)
+                  else if (row is TsBatchWriteRowsRequestUpdateRow &&
+                      (row.data != null))
+                    'attributeColumns': tsUpdateAttributesParams(row.data),
+                  'returnContent': {
+                    'returnType': tsNodeCommon.returnType.Primarykey
+                  }
+                };
+              }))
             })
         .toList(growable: false)
   };

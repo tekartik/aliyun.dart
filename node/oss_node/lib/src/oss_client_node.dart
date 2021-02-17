@@ -106,7 +106,7 @@ class OssClientNode with OssClientMixin implements OssClient {
           if (debugAliyunOss) {
             if (data != null) {
               try {
-                print('[TS!]: (data): ${jsObjectToDebugString(data)}');
+                print('[OSS!]: (data): ${jsObjectToDebugString(data)}');
               } catch (_) {
                 print('err: some data');
               }
@@ -116,7 +116,7 @@ class OssClientNode with OssClientMixin implements OssClient {
         } else {
           // var response = data;
           if (debugAliyunOss) {
-            print('TSr: ${nativeDataToDebugString(data)}');
+            print('OSSr: ${nativeDataToDebugString(data)}');
           }
           _handleSuccess(completer, data);
         }
