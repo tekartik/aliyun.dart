@@ -44,8 +44,8 @@ void main() {
       var server = await functionCompute.serve(port: 0);
       var uri = server.uri;
       var client = httpClientFactoryMemory.newClient();
-      var result = await httpClientRead(
-          client, httpMethodGet, '${url.join(uri.toString(), 'handler?t=1')}',
+      var result = await httpClientRead(client, httpMethodGet,
+          Uri.parse('${url.join(uri.toString(), 'handler?t=1')}'),
           headers: {'hk': 'hv'}, body: 'body_data');
       var map = jsonDecode(result) as Map;
 
@@ -54,15 +54,15 @@ void main() {
       expect(map['path'], '/handler');
       expect(map['url'], endsWith('/handler?t=1'));
 
-      var response = await httpClientSend(
-          client, httpMethodGet, '${url.join(uri.toString(), 'handler?t=1')}',
+      var response = await httpClientSend(client, httpMethodGet,
+          Uri.parse('${url.join(uri.toString(), 'handler?t=1')}'),
           headers: {'hk': 'hv'}, body: 'body_data');
       expect(response.statusCode, 201);
       expect(response.headers['x-response'], 'test2');
 
       // Async
       result = await httpClientRead(client, httpMethodGet,
-          '${url.join(uri.toString(), 'handler/async?t=1')}',
+          Uri.parse('${url.join(uri.toString(), 'handler/async?t=1')}'),
           headers: {'hk': 'hv'}, body: 'body_data');
       map = jsonDecode(result) as Map;
 

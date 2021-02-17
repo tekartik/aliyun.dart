@@ -37,8 +37,8 @@ void main() {
       var server = await functionCompute.serve(port: 0);
       var uri = server.uri;
       var client = httpClientFactoryMemory.newClient();
-      await httpClientRead(
-          client, httpMethodGet, '${url.join(uri.toString(), 'handler')}');
+      await httpClientRead(client, httpMethodGet,
+          Uri.parse('${url.join(uri.toString(), 'handler')}'));
       //var map = jsonDecode(result) as Map;
 
       await server.close();
@@ -50,8 +50,8 @@ void main() {
       var server = await functionCompute.serve(port: 0);
       var uri = server.uri;
       var client = httpClientFactoryMemory.newClient();
-      await httpClientRead(
-          client, httpMethodGet, '${url.join(uri.toString(), 'handler')}');
+      await httpClientRead(client, httpMethodGet,
+          Uri.parse('${url.join(uri.toString(), 'handler')}'));
       //var map = jsonDecode(result) as Map;
       await server.close();
       client.close();
