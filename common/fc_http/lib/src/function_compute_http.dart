@@ -35,7 +35,7 @@ class AliyunFunctionComputeHttp implements AliyunFunctionCompute {
         await httpServerFactory.bind(InternetAddress.anyIPv4, port);
     var serverPort = requestServer.port;
     for (final info in _functions.values) {
-      print('http://localhost:${serverPort}/${info.name}');
+      print('http://localhost:$serverPort/${info.name}');
     }
     unawaited(Future.sync(() async {
       await for (HttpRequest request in requestServer) {
