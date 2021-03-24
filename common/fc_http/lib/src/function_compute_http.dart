@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:pedantic/pedantic.dart';
 import 'package:tekartik_aliyun_fc/fc.dart';
 import 'package:tekartik_aliyun_fc_http/src/fc_context_http.dart';
