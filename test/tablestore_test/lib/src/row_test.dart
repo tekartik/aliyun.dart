@@ -640,7 +640,9 @@ void rowTest(TsClient client) {
           ]
         }
       });
-      expect(getResponse.toDebugMap()['row']['attributes'][0]['test'],
+      expect(
+          (((getResponse.toDebugMap()['row'] as Map)['attributes'] as List)[0]
+              as Map)['test'],
           {'@long': '90071992547409910'});
 
       expect(getResponse.row.attributes.first.name, 'test');
@@ -678,7 +680,9 @@ void rowTest(TsClient client) {
           ]
         }
       });
-      expect(getResponse.toDebugMap()['row']['attributes'][0]['test'],
+      expect(
+          (((getResponse.toDebugMap()['row'] as Map)['attributes'] as List)[0]
+              as Map)['test'],
           {'@blob': 'AQID'});
       var binary = getResponse.row.attributes.first.value;
       expect(binary, const TypeMatcher<Uint8List>());

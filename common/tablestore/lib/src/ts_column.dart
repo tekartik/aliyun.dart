@@ -6,7 +6,7 @@ import 'package:tekartik_common_utils/model/model.dart';
 
 class TsKeyValue {
   final String name;
-  final dynamic value;
+  final Object value;
 
   TsKeyValue(this.name, this.value) {
     assert(

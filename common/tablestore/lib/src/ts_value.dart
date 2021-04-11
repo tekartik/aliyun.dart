@@ -8,7 +8,7 @@ Model blobToDebugValue(Uint8List bytes) =>
     Model({'@blob': base64Encode(bytes)});
 
 // Can be of any type TsValue, double, String but not int!
-dynamic tsValueToDebugValue(dynamic value) {
+Object tsValueToDebugValue(Object value) {
   assert(
       (value == null ||
           value is TsValue ||
