@@ -14,19 +14,6 @@ external List<String> objectKeys(Object obj);
 @JS('Array.from')
 external Object toJSArray(List source);
 
-DateTime dartifyDate(Object jsObject) {
-  if (util.hasProperty(jsObject, 'toDateString')) {
-    try {
-      var date = jsObject as dynamic;
-      return DateTime.fromMillisecondsSinceEpoch(date.getTime() as int);
-    } on NoSuchMethodError {
-      // so it's not a JsDate!
-      return null;
-    }
-  }
-  return null;
-}
-
 // {"buffer":[1,0,0,0,0,0,0,0],"offset":0}
 TsValueLong dartifyValueLong(Object jsObject) {
   if (util.hasProperty(jsObject, 'offset')) {

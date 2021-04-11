@@ -29,10 +29,7 @@ class OssClientFs with OssClientMixin {
   String fixFsPath(String path) =>
       fs.path.normalize(rootPath == null ? path : fs.path.join(rootPath, path));
 
-  OssClientFs(
-      {@required OssServiceFs service, @required OssClientOptions options})
-      : service = service,
-        options = options;
+  OssClientFs({@required this.service, @required this.options});
 
   Directory get root => fs.directory(fixFsPath('.'));
 
