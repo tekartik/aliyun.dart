@@ -2,17 +2,18 @@
 import 'dart:js_util';
 
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
+import 'package:tekartik_aliyun_tablestore_node/environment_client.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/import_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_interop.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_shim.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/universal/ts_node_universal.dart';
 import 'package:tekartik_aliyun_tablestore_node/tablestore_node.dart';
-import 'package:tekartik_aliyun_tablestore_node/environment_client.dart';
 import 'package:test/test.dart';
 
 TsClient get tsClientTest => tsClientOptionsFromEnv != null
     ? tablestoreNode.client(options: tsClientOptionsFromEnv)
     : null;
+
 void main() {
   var client = tsClientTest; // ignore: unused_local_variable
   group('tablestore_node', () {

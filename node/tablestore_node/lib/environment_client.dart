@@ -4,6 +4,7 @@ import 'package:tekartik_common_utils/env_utils.dart';
 
 var _env = platform.environment;
 TsClientOptions _tsClientOptionsFromEnv;
+
 TsClientOptions getTsClientOptionsFromEnv(Map<String, String> env) {
   var endpoint = env['endpoint'];
   var accessKeyId = env['accessKeyId'];
