@@ -33,17 +33,17 @@ class TsClientOptionsJs {
   external String get instancename;
 
   external factory TsClientOptionsJs(
-      {String accessKeyId,
-      String secretAccessKey,
-      String endpoint,
-      String instancename});
+      {String? accessKeyId,
+      String? secretAccessKey,
+      String? endpoint,
+      String? instancename});
 }
 
 @JS()
 @anonymous
 abstract class TablestoreJs {
   /// Reference to constructor Client.
-  external dynamic get Client;
+  external Object get Client;
 
   /// Key type definition
   external PrimaryKeyTypeJs get PrimaryKeyType;
@@ -61,19 +61,19 @@ abstract class TablestoreJs {
   external TsNodeLongClassJs get Long;
 
   /// key value min
-  external dynamic get INF_MIN;
+  external Object get INF_MIN;
 
   /// key value min
-  external dynamic get INF_MAX;
+  external Object get INF_MAX;
 
   /// Constructors
-  external dynamic get Condition;
+  external Object get Condition;
 
   /// Constructors
-  external dynamic get SingleColumnCondition;
+  external Object get SingleColumnCondition;
 
   /// Constructors
-  external dynamic get CompositeCondition;
+  external Object get CompositeCondition;
 }
 
 /// Wrap a native error
@@ -81,8 +81,8 @@ TsExceptionNode wrapNativeError(dynamic err) {
   if (err is TsExceptionNode) {
     return err;
   }
-  Map errMap;
-  String message;
+  Map? errMap;
+  String? message;
   // Try json
   try {
     errMap = jsObjectAsMap(err);
@@ -128,11 +128,11 @@ class TsClientJs {
   external void startLocalTransaction(dynamic params, Function callback);
 }
 
-final tablestoreJs = require('tablestore') as TablestoreJs;
+final tablestoreJs = require('tablestore') as TablestoreJs?;
 
 /// Convert a native object to a debug string
-String nativeDataToDebugString(dynamic data) {
-  String text;
+String? nativeDataToDebugString(dynamic data) {
+  String? text;
   try {
     text = jsonEncode(jsObjectAsMap(data));
   } catch (_) {

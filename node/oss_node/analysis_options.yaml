@@ -3,4 +3,4 @@ include: package:tekartik_common_utils/pedantic/analysis_options.strong_mode.yam
 
 analyzer:
   exclude:
-     - build/**
+    - build/**

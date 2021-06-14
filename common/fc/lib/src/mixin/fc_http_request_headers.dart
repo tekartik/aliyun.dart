@@ -6,8 +6,8 @@ class FcHttpRequestHeaders with MapMixin<String, String> {
   FcHttpRequestHeaders(this.lowerCaseHeaders);
 
   @override
-  String operator [](Object key) {
-    return lowerCaseHeaders[key?.toString()?.toLowerCase()];
+  String? operator [](Object? key) {
+    return lowerCaseHeaders[key?.toString().toLowerCase()];
   }
 
   @override
@@ -24,7 +24,7 @@ class FcHttpRequestHeaders with MapMixin<String, String> {
   Iterable<String> get keys => lowerCaseHeaders.keys;
 
   @override
-  String remove(Object key) {
+  String remove(Object? key) {
     throw StateError('read-only');
   }
 }

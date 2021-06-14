@@ -33,7 +33,7 @@ Future<void> main() async {
         'headers': request.headers,
         'env': platform.environment,
       };
-      await response.sendString(jsonPretty(map));
+      await response.sendString(jsonPretty(map)!);
     }
 
     if (command == 'async') {

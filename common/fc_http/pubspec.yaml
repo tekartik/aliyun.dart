@@ -2,23 +2,22 @@ name: tekartik_aliyun_fc_http
 description: A starting point for Dart libraries or applications.
 version: 0.1.5
 publish_to: none
-# homepage: https://www.example.com
 
 environment:
-  sdk: '>=2.10.0-0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   tekartik_http_io:
     git:
       url: git://github.com/tekartik/http.dart
       path: http_io
-      ref: dart2
+      ref: null_safety
     version: '>=0.2.0+2'
   tekartik_aliyun_fc:
     git:
       url: git://github.com/tekartik/aliyun.dart
       path: common/fc
-      ref: dart2
+      ref: null_safety
     version: '>=0.1.1'
 dev_dependencies:
   pedantic: ^1.9.0

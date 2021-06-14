@@ -6,7 +6,7 @@ class FcServerNode implements FcServer {
   Future<void> close() async {}
 
   @override
-  Uri get uri => null;
+  Uri? get uri => null;
 }
 
 /// Node implementation
@@ -14,7 +14,7 @@ class AliyunFunctionComputeNodeUniversal extends AliyunFunctionComputeNode
     implements AliyunFunctionComputeUniversal {
   /// Dummy implementation on node
   @override
-  Future<FcServer> serve({int port}) async => FcServerNode();
+  Future<FcServer> serve({int? port}) async => FcServerNode();
 }
 
 AliyunFunctionComputeUniversal aliyunFunctionComputeUniversal =

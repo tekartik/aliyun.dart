@@ -2,11 +2,12 @@ import 'package:tekartik_aliyun_oss/oss.dart';
 
 bool _debugAliyunOss = false; // devWarning(true); true for now until it works
 bool get debugAliyunOss => _debugAliyunOss;
+
 @deprecated
 set debugAliyunOss(bool debug) => _debugAliyunOss = debug;
 
 abstract class OssService {
-  OssClient client({OssClientOptions options});
+  OssClient client({OssClientOptions? options});
 }
 
 mixin OssServiceMixin implements OssService {}

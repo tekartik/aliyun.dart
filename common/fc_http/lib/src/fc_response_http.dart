@@ -7,6 +7,7 @@ class FcHttpResponseHttp implements FcHttpResponse {
   final impl.HttpRequest requestImpl;
 
   FcHttpResponseHttp(this.requestImpl);
+
   @override
   Future<void> sendString(String body) async {
     requestImpl.response.write(body);

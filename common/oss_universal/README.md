@@ -14,6 +14,6 @@ Oss universal import (io/node)
       git:
         url: git://github.com/tekartik/aliyun.dart
         path: common/oss_universal
-        ref: dart2
+        ref: null_safety
       version: '>=0.1.0'
   ```

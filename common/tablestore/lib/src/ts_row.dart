@@ -1,15 +1,14 @@
 import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
-import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_common_utils/model/model.dart';
 
 class TsGetRowRequest {
   final String tableName;
   final TsPrimaryKey primaryKey;
-  final List<String> columns;
+  final List<String>? columns;
 
   TsGetRowRequest(
-      {@required this.tableName,
-      @required this.primaryKey,
+      {required this.tableName,
+      required this.primaryKey,
 
       /// Optional
       this.columns});
@@ -32,15 +31,15 @@ abstract class TsKeyBoundary {
 
 class TsGetRangeRequest {
   final String tableName;
-  TsPrimaryKey inclusiveStartPrimaryKey;
-  TsPrimaryKey exclusiveEndPrimaryKey;
-  final List<String> columns;
-  final TsDirection direction;
-  final int limit;
-  final TsColumnCondition columnCondition;
+  TsPrimaryKey? inclusiveStartPrimaryKey;
+  TsPrimaryKey? exclusiveEndPrimaryKey;
+  final List<String>? columns;
+  final TsDirection? direction;
+  final int? limit;
+  final TsColumnCondition? columnCondition;
 
   TsGetRangeRequest(
-      {@required this.tableName,
+      {required this.tableName,
 
       /// Optional
       this.inclusiveStartPrimaryKey,
@@ -54,9 +53,9 @@ class TsGetRangeRequest {
 // Condition for put and delete
 class TsCondition {
   final TsConditionRowExistenceExpectation rowExistenceExpectation;
-  final TsColumnCondition columnCondition;
+  final TsColumnCondition? columnCondition;
 
-  TsCondition({this.rowExistenceExpectation, this.columnCondition});
+  TsCondition({required this.rowExistenceExpectation, this.columnCondition});
 
   /// Helpers
   static final TsCondition ignore = TsCondition(
@@ -148,8 +147,7 @@ class TsColumnCompositeCondition implements TsColumnCondition {
   @override
   Model toDebugMap() => Model()
     ..setValue('operator', operator)
-    ..setValue(
-        'list', list?.map((e) => e.toDebugMap())?.toList(growable: false));
+    ..setValue('list', list.map((e) => e.toDebugMap()).toList(growable: false));
 }
 
 enum TsConditionRowExistenceExpectation {
@@ -168,7 +166,7 @@ class TsPrimaryKey {
   String toString() => list.toString();
 
   ModelList toDebugList() =>
-      ModelList(list.map((e) => e?.toDebugMap())?.toList(growable: false));
+      ModelList(list.map((e) => e.toDebugMap()).toList(growable: false));
 
   Map<String, TsKeyValue> toMap() =>
       list.fold(<String, TsKeyValue>{}, (map, kv) {
@@ -179,49 +177,49 @@ class TsPrimaryKey {
 class TsPutRowRequest {
   final String tableName;
   final TsPrimaryKey primaryKey;
-  final TsCondition condition;
+  final TsCondition? condition;
   final TsAttributes data;
 
   TsPutRowRequest(
-      {@required this.tableName,
-      @required this.primaryKey,
+      {required this.tableName,
+      required this.primaryKey,
       this.condition,
 
       /// Columns values
-      @required this.data});
+      required this.data});
 }
 
 class TsUpdateRowRequest {
   final String tableName;
   final TsPrimaryKey primaryKey;
-  final TsCondition condition;
+  final TsCondition? condition;
   final TsUpdateAttributes data;
 
   TsUpdateRowRequest(
-      {@required this.tableName,
-      @required this.primaryKey,
+      {required this.tableName,
+      required this.primaryKey,
       this.condition,
 
       /// Columns values
-      @required this.data});
+      required this.data});
 }
 
 class TsBatchGetRowsRequest {
   final List<TsBatchGetRowsRequestTable> tables;
 
   TsBatchGetRowsRequest({
-    @required this.tables,
+    required this.tables,
   });
 }
 
 class TsBatchGetRowsRequestTable {
   final String tableName;
   final List<TsPrimaryKey> primaryKeys;
-  final List<String> columns;
+  final List<String>? columns;
 
   TsBatchGetRowsRequestTable(
-      {@required this.tableName,
-      @required this.primaryKeys,
+      {required this.tableName,
+      required this.primaryKeys,
 
       /// Optional
       this.columns});
@@ -232,19 +230,19 @@ enum TsWriteRowType { put, update, delete }
 class TsBatchWriteRowsRequest {
   final List<TsBatchWriteRowsRequestTable> tables;
 
-  TsBatchWriteRowsRequest({@required this.tables});
+  TsBatchWriteRowsRequest({required this.tables});
 }
 
 class TsBatchWriteRowsRequestTable {
   final String tableName;
   final List<TsBatchWriteRowsRequestRow> rows;
 
-  TsBatchWriteRowsRequestTable({@required this.tableName, @required this.rows});
+  TsBatchWriteRowsRequestTable({required this.tableName, required this.rows});
 }
 
 class TsBatchWriteRowsRequestDeleteRow extends TsBatchWriteRowsRequestRow {
   TsBatchWriteRowsRequestDeleteRow(
-      {@required TsPrimaryKey primaryKey, TsCondition condition})
+      {required TsPrimaryKey primaryKey, TsCondition? condition})
       : super(
             type: TsWriteRowType.delete,
             primaryKey: primaryKey,
@@ -253,9 +251,9 @@ class TsBatchWriteRowsRequestDeleteRow extends TsBatchWriteRowsRequestRow {
 
 class TsBatchWriteRowsRequestUpdateRow extends TsBatchWriteRowsRequestRow {
   TsBatchWriteRowsRequestUpdateRow(
-      {@required TsPrimaryKey primaryKey,
-      TsCondition condition,
-      @required this.data})
+      {required TsPrimaryKey primaryKey,
+      TsCondition? condition,
+      required this.data})
       : super(
             type: TsWriteRowType.update,
             primaryKey: primaryKey,
@@ -264,10 +262,11 @@ class TsBatchWriteRowsRequestUpdateRow extends TsBatchWriteRowsRequestRow {
 }
 
 class TsBatchWriteRowsRequestPutRow extends TsBatchWriteRowsRequestRow {
-  final TsAttributes data;
+  final TsAttributes? data;
+
   TsBatchWriteRowsRequestPutRow(
-      {@required TsPrimaryKey primaryKey,
-      TsCondition condition,
+      {required TsPrimaryKey primaryKey,
+      TsCondition? condition,
 
       /// Columns values
       this.data})
@@ -280,11 +279,11 @@ class TsBatchWriteRowsRequestPutRow extends TsBatchWriteRowsRequestRow {
 abstract class TsBatchWriteRowsRequestRow {
   final TsWriteRowType type;
   final TsPrimaryKey primaryKey;
-  final TsCondition condition;
+  final TsCondition? condition;
 
   TsBatchWriteRowsRequestRow({
-    @required this.type,
-    @required this.primaryKey,
+    required this.type,
+    required this.primaryKey,
     this.condition,
   });
 }
@@ -292,11 +291,11 @@ abstract class TsBatchWriteRowsRequestRow {
 class TsDeleteRowRequest {
   final String tableName;
   final TsPrimaryKey primaryKey;
-  final TsCondition condition;
+  final TsCondition? condition;
 
   TsDeleteRowRequest(
-      {@required this.tableName,
-      @required this.primaryKey,
+      {required this.tableName,
+      required this.primaryKey,
 
       /// Optional
       this.condition});
@@ -306,9 +305,9 @@ abstract class TsGetRow {
   bool get exists;
 
   /// Null if the record was not found
-  TsPrimaryKey get primaryKey;
+  TsPrimaryKey? get primaryKey;
 
-  TsAttributes get attributes;
+  TsAttributes? get attributes;
 }
 
 abstract class TsGetRowResponse {
@@ -327,7 +326,8 @@ abstract class TsDeleteRowResponse {}
 
 abstract class TsGetRangeResponse {
   List<TsGetRow> get rows;
-  TsPrimaryKey get nextStartPrimaryKey;
+
+  TsPrimaryKey? get nextStartPrimaryKey;
 }
 
 // {isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string,
@@ -335,11 +335,21 @@ abstract class TsGetRangeResponse {
 // attributes: [{columnName: test, columnValue: {buffer: [1, 0, 0, 0, 0, 0, 0, 0], offset: 0}
 abstract class TsBatchGetRowsResponseRow {
   bool get isOk;
-  String get errorCode;
-  String get errorMessage;
+
+  /// if error
+  String? get errorCode;
+
+  /// if error
+  String? get errorMessage;
+
+  /// if no error
   String get tableName;
-  TsPrimaryKey get primaryKey;
-  TsAttributes get attributes;
+
+  /// if no error
+  TsPrimaryKey? get primaryKey;
+
+  /// if no error
+  TsAttributes? get attributes;
 }
 
 abstract class TsBatchGetRowsResponse {
@@ -352,19 +362,19 @@ abstract class TsBatchWriteRowsResponse {
 
 extension TsGetRowResponseExt on TsGetRowResponse {
   Model toDebugMap() {
-    return Model({})..setValue('row', row?.toDebugMap());
+    return Model({})..setValue('row', row.toDebugMap());
   }
 }
 
 extension TsPutRowResponseExt on TsPutRowResponse {
   Model toDebugMap() {
-    return Model({})..setValue('row', row?.toDebugMap());
+    return Model({})..setValue('row', row.toDebugMap());
   }
 }
 
 extension TsUpdateRowResponseExt on TsUpdateRowResponse {
   Model toDebugMap() {
-    return Model({})..setValue('row', row?.toDebugMap());
+    return Model({})..setValue('row', row.toDebugMap());
   }
 }
 
@@ -378,7 +388,7 @@ extension TsStartLocalTransactionResponseExt
 extension TsGetRangeResponseExt on TsGetRangeResponse {
   Model toDebugMap() {
     return Model({})
-      ..setValue('rows', rows?.map((row) => row.toDebugMap()))
+      ..setValue('rows', rows.map((row) => row.toDebugMap()))
       ..setValue('nextStartPrimaryKey', nextStartPrimaryKey?.toDebugList());
     //return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
   }
@@ -390,17 +400,17 @@ extension TsBatchGetRowsResponseExt on TsBatchGetRowsResponse {
       ..setValue(
           'tables',
           tables
-              ?.map((table) =>
+              .map((table) =>
                   table.map((row) => row.toDebugMap()).toList(growable: false))
-              ?.toList(growable: false));
+              .toList(growable: false));
   }
 }
 
 extension TsBatchWriteRowsResponseExt on TsBatchWriteRowsResponse {
   Model toDebugMap() {
     return Model({})
-      ..setValue('rows',
-          rows?.map((row) => row.toDebugMap())?.toList(growable: false));
+      ..setValue(
+          'rows', rows.map((row) => row.toDebugMap()).toList(growable: false));
   }
 }
 
@@ -436,7 +446,7 @@ class TsStartLocalTransactionRequest {
 
   // Primary key must contain only the partition key (i.e. single key value
   TsStartLocalTransactionRequest(
-      {@required this.tableName, @required this.primaryKey});
+      {required this.tableName, required this.primaryKey});
 }
 
 abstract class TsStartLocalTransactionResponse {

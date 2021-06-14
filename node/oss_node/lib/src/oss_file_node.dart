@@ -2,8 +2,8 @@ import 'package:tekartik_aliyun_oss/oss.dart';
 
 import 'oss_interop.dart' as interop;
 
-interop.OssClientListFilesParamsJs unwrapListFilesOptions(
-    OssListFilesOptions options) {
+interop.OssClientListFilesParamsJs? unwrapListFilesOptions(
+    OssListFilesOptions? options) {
   if (options == null) {
     return null;
   }
@@ -19,7 +19,7 @@ class OssFileNode implements OssFile {
   OssFileNode(this.nativeInstance);
 
   @override
-  DateTime get lastModified => DateTime.tryParse(nativeInstance.lastModified);
+  DateTime get lastModified => DateTime.tryParse(nativeInstance.lastModified)!;
 
   @override
   String get name => nativeInstance.name;
@@ -32,13 +32,12 @@ class OssListFilesResponseNode implements OssListFilesResponse {
   final interop.OssClientListFilesResponseJs nativeInstance;
 
   OssListFilesResponseNode(this.nativeInstance);
+
   @override
-  List<OssFile> get files =>
-      interop
-          .ossClientListFilesObjects(nativeInstance)
-          ?.map((e) => OssFileNode(e))
-          ?.toList() ??
-      <OssFile>[];
+  List<OssFile> get files => interop
+      .ossClientListFilesObjects(nativeInstance)
+      .map((e) => OssFileNode(e))
+      .toList();
 
   @override
   bool get isTruncated => nativeInstance.isTruncated;

@@ -7,16 +7,15 @@ Map<String, dynamic> toPrimaryKeyValueParam(TsKeyValue keyValue) =>
     <String, dynamic>{keyValue.name: keyValue.value};
 
 /// Weird list handling workaround
-/* List | TsArrayHack */ dynamic toListParam(List list) {
+/* List | TsArrayHack */
+dynamic toListParam(List list) {
   return TsArrayHack(list);
 }
 
 Map<String, dynamic> toGetRowParams(TsGetRowRequest request) {
   var map = Model({
-    if (request.tableName != null) 'tableName': request.tableName,
-    if (request.primaryKey != null)
-      // !singular
-      'primaryKey': tsPrimaryKeyParams(request.primaryKey),
+    'tableName': request.tableName,
+    'primaryKey': tsPrimaryKeyParams(request.primaryKey),
     if (request.columns != null) 'columnsToGet': request.columns,
   });
   return map;
@@ -24,14 +23,12 @@ Map<String, dynamic> toGetRowParams(TsGetRowRequest request) {
 
 Map<String, dynamic> toPutRowParams(TsPutRowRequest request) {
   var map = Model({
-    if (request.tableName != null) 'tableName': request.tableName,
+    'tableName': request.tableName,
     // Needed
     'condition': request.condition ?? TsCondition.ignore,
-    if (request.primaryKey != null)
-      // !singular
-      'primaryKey': tsPrimaryKeyParams(request.primaryKey),
-    if (request.data != null)
-      'attributeColumns': tsAttributeColumnsParams(request.data),
+    'primaryKey': tsPrimaryKeyParams(request.primaryKey),
+
+    'attributeColumns': tsAttributeColumnsParams(request.data),
     'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey}
   });
   return map;
@@ -39,14 +36,14 @@ Map<String, dynamic> toPutRowParams(TsPutRowRequest request) {
 
 Map<String, dynamic> toUpdateRowParams(TsUpdateRowRequest request) {
   var map = Model({
-    if (request.tableName != null) 'tableName': request.tableName,
+    'tableName': request.tableName,
     // Needed
     'condition': request.condition ?? TsCondition.expectExist,
-    if (request.primaryKey != null)
-      // !singular
-      'primaryKey': tsPrimaryKeyParams(request.primaryKey),
-    if (request.data != null)
-      'updateOfAttributeColumns': tsUpdateAttributesParams(request.data),
+
+    // !singular
+    'primaryKey': tsPrimaryKeyParams(request.primaryKey),
+
+    'updateOfAttributeColumns': tsUpdateAttributesParams(request.data),
     'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey}
   });
   return map;
@@ -80,12 +77,10 @@ List<Map<String, dynamic>> primaryKeyAsList(TsPrimaryKey primaryKey) =>
 
 Map<String, dynamic> toDeleteRowParams(TsDeleteRowRequest request) {
   var map = Model({
-    if (request.tableName != null) 'tableName': request.tableName,
+    'tableName': request.tableName,
     // Needed
     'condition': request.condition ?? TsCondition.ignore,
-    if (request.primaryKey != null)
-      // !singular
-      'primaryKey': primaryKeyAsList(request.primaryKey),
+    'primaryKey': primaryKeyAsList(request.primaryKey),
   });
   return map;
 }
@@ -94,14 +89,14 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
   var map = Model({
     'maxVersions': 1,
     'limit': request.limit,
-    if (request.tableName != null) 'tableName': request.tableName,
+    'tableName': request.tableName,
     if (request.columns != null) 'columnsToGet': request.columns,
     if (request.inclusiveStartPrimaryKey != null)
       'inclusiveStartPrimaryKey':
-          primaryKeyAsList(request.inclusiveStartPrimaryKey),
+          primaryKeyAsList(request.inclusiveStartPrimaryKey!),
     if (request.exclusiveEndPrimaryKey != null)
       'exclusiveEndPrimaryKey':
-          primaryKeyAsList(request.exclusiveEndPrimaryKey),
+          primaryKeyAsList(request.exclusiveEndPrimaryKey!),
     'direction': request.direction ?? TsDirection.forward,
     if (request.columnCondition is TsColumnSingleCondition)
       'columnFilter': request.columnCondition,
@@ -131,7 +126,7 @@ int tsConditionRowExistenceExpectationToNative(
     case TsConditionRowExistenceExpectation.expectNotExist:
       return tsNodeCommon.rowExistenceExpectation.EXPECT_NOT_EXIST;
   }
-  throw 'condition $rowExistenceExpecation not supported';
+  //throw 'condition $rowExistenceExpecation not supported';
 }
 
 int tsComparatorTypeToNative(TsComparatorType operatorType) {
@@ -149,7 +144,7 @@ int tsComparatorTypeToNative(TsComparatorType operatorType) {
     case TsComparatorType.lessThanOrEquals:
       return tsNodeCommon.comparatorType.LESS_EQUAL;
   }
-  throw 'condition $operatorType not supported';
+  // throw 'condition $operatorType not supported';
 }
 
 int tsLogicalOperatorTypeToNative(TsLogicalOperator operatorType) {
@@ -161,5 +156,5 @@ int tsLogicalOperatorTypeToNative(TsLogicalOperator operatorType) {
     case TsLogicalOperator.not:
       return tsNodeCommon.logicalOperator.NOT;
   }
-  throw 'operator $operatorType not supported';
+  // throw 'operator $operatorType not supported';
 }

@@ -12,5 +12,5 @@ void tablestoreTest(TsClient client) {
   group('tablestore', () {
     rowTest(client);
     tablesTest(client);
-  }, skip: client == null);
+  });
 }

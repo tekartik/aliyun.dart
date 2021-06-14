@@ -1,4 +1,4 @@
-import 'package:tekartik_app_node_build/app_build.dart';
+import 'package:tekartik_build_node/build_node.dart';
 
 Future main() async {
   await nodeRunTest();

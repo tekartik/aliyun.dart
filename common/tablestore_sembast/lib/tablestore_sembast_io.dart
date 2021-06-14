@@ -11,7 +11,7 @@ final Tablestore tablestoreSembastIo =
     getTablestoreSembast(factory: databaseFactoryIo);
 
 /// Get an io factory
-Tablestore getTablestoreSembastIo({String rootPath}) =>
+Tablestore getTablestoreSembastIo({String? rootPath}) =>
     getTablestoreSembast(factory: createDatabaseFactoryIo(rootPath: rootPath));
 
 // TODO: Export any libraries intended for clients of this package.

@@ -3,14 +3,14 @@ import 'package:tekartik_common_utils/env_utils.dart';
 import 'package:test/test.dart';
 
 void main() {
-  void _expectNode([Object e]) {
+  void _expectNode([Object? e]) {
     if (e != null) {
       expect(e, isNot(const TypeMatcher<TestFailure>()));
     }
     expect(isRunningAsJavascript, isTrue);
   }
 
-  void _expectIo([Object e]) {
+  void _expectIo([Object? e]) {
     if (e != null) {
       expect(e, isNot(const TypeMatcher<TestFailure>()));
     }

@@ -6,16 +6,17 @@ Map<String, dynamic> toCreateTableParams(TsTableDescription description) {
   var map = Model({
     if (description.tableMeta != null)
       'tableMeta': {
-        'tableName': description.tableMeta.tableName,
+        'tableName': description.tableMeta!.tableName,
         // TsArrayHack needed
-        'primaryKey': TsArrayHack(description.tableMeta.primaryKeys.map((item) {
+        'primaryKey':
+            TsArrayHack(description.tableMeta!.primaryKeys!.map((item) {
           return {'name': item.name, 'type': columnTypeToNativeType(item.type)};
         }))
       },
     if (description.reservedThroughput != null)
-      'reservedThroughput': description.reservedThroughput.toMap(),
+      'reservedThroughput': description.reservedThroughput!.toMap(),
     if (description.tableOptions != null)
-      'tableOptions': description.tableOptions.toMap()
+      'tableOptions': description.tableOptions!.toMap()
   });
   return map;
 }
@@ -31,7 +32,7 @@ TsColumnType nativeTypeToColumnType(int type) {
   throw 'type $type not supported';
 }
 
-int columnTypeToNativeType(TsColumnType type) {
+int columnTypeToNativeType(TsColumnType? type) {
   if (type == TsColumnType.integer) {
     return tsNodeCommon.primaryKeyType.INTEGER;
   } else if (type == TsColumnType.string) {

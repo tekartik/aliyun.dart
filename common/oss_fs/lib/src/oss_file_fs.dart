@@ -10,7 +10,8 @@ class OssFileFs implements OssFile {
   @override
   final DateTime lastModified;
 
-  OssFileFs({this.name, this.size, this.lastModified});
+  OssFileFs(
+      {required this.name, required this.size, required this.lastModified});
 
   @override
   String toString() =>
@@ -18,7 +19,10 @@ class OssFileFs implements OssFile {
 }
 
 class OssListFilesResponseFs implements OssListFilesResponse {
-  OssListFilesResponseFs({this.isTruncated, this.nextMarker, this.files});
+  OssListFilesResponseFs(
+      {required this.isTruncated,
+      required this.nextMarker,
+      required this.files});
 
   @override
   final List<OssFile> files;
@@ -27,5 +31,5 @@ class OssListFilesResponseFs implements OssListFilesResponse {
   final bool isTruncated;
 
   @override
-  final String nextMarker;
+  final String? nextMarker;
 }

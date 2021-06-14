@@ -4,15 +4,15 @@ import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 import 'package:tekartik_aliyun_oss_universal/oss_universal.dart';
 import 'package:tekartik_aliyun_oss_universal/src/import.dart';
 
-OssClient get ossClientTest => ossClientOptionsFromEnv != null
+OssClient? get ossClientTest => ossClientOptionsFromEnv != null
     ? ossServiceUniversal.client(options: ossClientOptionsFromEnv)
     : null;
 
 bool get isLocalTest => !isRunningAsJavascript;
 
-OssClientOptions _ossClientOptionsFromEnv;
+OssClientOptions? _ossClientOptionsFromEnv;
 
-OssClientOptions get ossClientOptionsFromEnv =>
+OssClientOptions? get ossClientOptionsFromEnv =>
     _ossClientOptionsFromEnv ??= () {
       if (isRunningAsJavascript) {
         return ossNodeClientOptionsFromEnv;

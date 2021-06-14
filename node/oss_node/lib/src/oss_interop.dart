@@ -73,11 +73,11 @@ class OssListFilesOptions {
 class OssClientListFilesParamsJs {
   // We cannot add 'max-keys' here
   @protected
-  external factory OssClientListFilesParamsJs({String prefix, String marker});
+  external factory OssClientListFilesParamsJs({String? prefix, String? marker});
 }
 
 OssClientListFilesParamsJs newOssClientListFilesParamsJs(
-    {int maxKeys, String prefix, String marker}) {
+    {int? maxKeys, String? prefix, String? marker}) {
   var param = OssClientListFilesParamsJs(prefix: prefix, marker: marker);
   if (maxKeys != null) {
     setProperty(param, 'max-keys', maxKeys);
@@ -91,7 +91,9 @@ OssClientListFilesParamsJs newOssClientListFilesParamsJs(
 // "size":120,"storageClass":"Standard","owner":{"id":"1932171136714243","displayName":"1932171136714243"}
 abstract class OssFileJs {
   external String get name;
+
   external String get lastModified;
+
   external int get size;
 }
 
@@ -100,13 +102,15 @@ abstract class OssFileJs {
 // {"objects":[...],"nextMarker":"test/list_files/yes/file1.txt","isTruncated":true}
 abstract class OssClientListFilesResponseJs {
   external List get objects;
+
   external String get nextMarker;
+
   external bool get isTruncated;
 }
 
 List<OssFileJs> ossClientListFilesObjects(
         OssClientListFilesResponseJs response) =>
-    response.objects?.cast<OssFileJs>();
+    response.objects.cast<OssFileJs>();
 /*
 @JS()
 @anonymous
@@ -167,6 +171,7 @@ abstract class OssClientDeleteResponseJs {}
 // "requestUrls":["http://yyyy-haw-test.oss-cn-shanghai.aliyuncs.com/test/file.txt"],"timing":null,"remoteAddress":"106.14.228.106","remotePort":80,"socketHandledRequests":3,"socketHandledResponses":3},"content":[72,101,108,108,111,32,79,83,83]}
 abstract class OssClientGetResultJs {
   external String get name;
+
   external Buffer get data;
 }
 
@@ -192,7 +197,7 @@ class OssClientOptionsJs {
   external String get endpoint;
 
   external factory OssClientOptionsJs(
-      {String accessKeyId, String accessKeySecret, String endpoint});
+      {String? accessKeyId, String? accessKeySecret, String? endpoint});
 }
 
 /// Wrap a native error
@@ -200,8 +205,8 @@ OssExceptionNode wrapNativeError(dynamic err) {
   if (err is OssExceptionNode) {
     return err;
   }
-  Map errMap;
-  String message;
+  Map? errMap;
+  String? message;
   // Try json
   try {
     errMap = jsObjectAsMap(err);
@@ -234,11 +239,11 @@ class OssClientJs {
 
   external Promise delete(String path);
 
-  external Promise list(OssClientListFilesParamsJs params);
+  external Promise list(OssClientListFilesParamsJs? params);
 }
 
 Future<OssClientListFilesResponseJs> ossClientJsListFiles(
-    OssClientJs client, OssClientListFilesParamsJs params) async {
+    OssClientJs client, OssClientListFilesParamsJs? params) async {
   return (await promiseToFuture(client.list(params)))
       as OssClientListFilesResponseJs;
 }
@@ -254,16 +259,16 @@ Future<OssClientListFilesResponseJs> ossClientJsListFiles(
 ///   accessKeySecret: '<Your AccessKeySecret>'
 /// });
 /// ```
-final ossServiceJs = require('ali-oss');
+final ossServiceJs = require('ali-oss') as Object;
 
 /// Convert a native object to a debug string
-String nativeDataToDebugString(dynamic data) {
+String? nativeDataToDebugString(dynamic data) {
   try {
     // Handle common types
     if (data is String) {
       return data;
     }
-    String text;
+    String? text;
     try {
       text = jsonEncode(jsObjectAsMap(data));
     } catch (_) {

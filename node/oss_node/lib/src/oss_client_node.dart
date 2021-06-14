@@ -158,7 +158,7 @@ class OssClientNode with OssClientMixin implements OssClient {
     return wrapNativeBuckets(List.from(nativeResponse.buckets));
   }
 
-  String lastUsedBucketName;
+  String? lastUsedBucketName;
 
   void useBucket(String name) {
     if (debugAliyunOss) {
@@ -252,7 +252,7 @@ class OssClientNode with OssClientMixin implements OssClient {
       });
       // devPrint(nativeDataToDebugString(nativeResponse));
       // Need to wrap result first
-      return nativeResponse?.res?.data as Uint8List;
+      return nativeResponse.res.data as Uint8List;
     });
   }
 
@@ -275,7 +275,7 @@ class OssClientNode with OssClientMixin implements OssClient {
 
   @override
   Future<OssListFilesResponse> list(String bucketName,
-      [OssListFilesOptions options]) async {
+      [OssListFilesOptions? options]) async {
     return inBucket<OssListFilesResponseNode>(bucketName, () async {
       var nativeResponse =
           await _nativeOperation<OssClientListFilesResponseJs>(() async {

@@ -3,13 +3,13 @@ import 'package:tekartik_aliyun_oss_node/src/oss_interop.dart';
 
 class OssBucketNode with OssBucketMixin implements OssBucket {
   @override
-  String name;
+  late String name;
 
   @override
   String toString() => 'bucket $name';
 
   @override
-  String location;
+  late String location;
 }
 
 OssBucket wrapNativeBucket(OssClientListBucketJs nativeBucket) {

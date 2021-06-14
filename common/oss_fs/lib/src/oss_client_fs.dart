@@ -9,14 +9,14 @@ import 'oss_service_fs.dart';
 
 class OssClientFs with OssClientMixin {
   final OssServiceFs service;
-  final OssClientOptions options;
+  final OssClientOptions? options;
 
-  String get rootPath => (options as OssClientOptionsFs)?.rootPath;
+  String? get rootPath => (options as OssClientOptionsFs?)?.rootPath;
 
   FileSystem get fs => service.fs;
 
   /// if init is needed later
-  Future<FileSystem> _fsReady;
+  Future<FileSystem>? _fsReady;
 
   Future<FileSystem> get fsReady => _fsReady ??= () async {
         await root.create(recursive: true);
@@ -24,12 +24,12 @@ class OssClientFs with OssClientMixin {
       }();
 
   /// Use the endpoint as the location
-  String get location => options.endpoint;
+  String get location => options!.endpoint;
 
-  String fixFsPath(String path) =>
-      fs.path.normalize(rootPath == null ? path : fs.path.join(rootPath, path));
+  String fixFsPath(String path) => fs.path
+      .normalize(rootPath == null ? path : fs.path.join(rootPath!, path));
 
-  OssClientFs({@required this.service, @required this.options});
+  OssClientFs({required this.service, required this.options});
 
   Directory get root => fs.directory(fixFsPath('.'));
 
@@ -73,17 +73,16 @@ class OssClientFs with OssClientMixin {
     if (await bucketDir.exists()) {
       return OssBucketFs(this, name);
     } else {
-      return null;
+      throw OssExceptionFs(message: '$bucketDir not found', isNotFound: true);
     }
   }
 
-  String getFsFilePath(String bucketName, String path) =>
+  String getFsFilePath(String bucketName, String? path) =>
       fixFsPath(path == null ? bucketName : fs.path.join(bucketName, path));
 
   @override
   Future<void> putAsBytes(
       String bucketName, String path, Uint8List bytes) async {
-    assert(bytes != null);
     var fs = await fsReady;
     // Create parent dir
     var fsFilePath = getFsFilePath(bucketName, path);
@@ -116,7 +115,7 @@ class OssClientFs with OssClientMixin {
       if (debugAliyunOssFs) {
         info('delete($bucketName, $path)');
       }
-      return await fs.file(fsFilePath).delete();
+      await fs.file(fsFilePath).delete();
     } catch (e) {
       return null;
     }
@@ -124,7 +123,7 @@ class OssClientFs with OssClientMixin {
 
   @override
   Future<OssListFilesResponse> list(String bucketName,
-      [OssListFilesOptions options]) async {
+      [OssListFilesOptions? options]) async {
     var fs = await fsReady;
     var bucketPath = getFsBucketPath(bucketName);
     var parentPath = getFsFilePath(bucketName, options?.prefix);
@@ -149,9 +148,9 @@ class OssClientFs with OssClientMixin {
     // marker?
     // TODO too slow for now
     if (options?.marker != null) {
-      int startIndex;
+      int? startIndex;
       for (var i = 0; i < paths.length; i++) {
-        if (options.marker.compareTo(_toOssPath(paths[i])) <= 0) {
+        if (options!.marker!.compareTo(_toOssPath(paths[i])) <= 0) {
           startIndex = i;
         }
       }
@@ -163,7 +162,7 @@ class OssClientFs with OssClientMixin {
     // limit?
     var maxResults = options?.maxResults ?? 1000;
     var isTruncated = false;
-    String nextMarker;
+    String? nextMarker;
     if (paths.length > maxResults) {
       // set next marker
       isTruncated = true;
@@ -194,5 +193,8 @@ class OssClientFs with OssClientMixin {
 
 // Allow setting a root path
 class OssClientOptionsFs extends OssClientOptions {
-  String rootPath;
+  String? rootPath;
+
+  OssClientOptionsFs()
+      : super(accessKeyId: '', accessKeySecret: '', endpoint: '');
 }

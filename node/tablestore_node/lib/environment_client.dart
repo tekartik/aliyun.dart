@@ -3,9 +3,9 @@ import 'package:tekartik_app_node_utils/node_utils.dart';
 import 'package:tekartik_common_utils/env_utils.dart';
 
 var _env = platform.environment;
-TsClientOptions _tsClientOptionsFromEnv;
+TsClientOptions? _tsClientOptionsFromEnv;
 
-TsClientOptions getTsClientOptionsFromEnv(Map<String, String> env) {
+TsClientOptions? getTsClientOptionsFromEnv(Map<String, String> env) {
   var endpoint = env['endpoint'];
   var accessKeyId = env['accessKeyId'];
   var secretAccessKey = env['secretAccessKey'];
@@ -33,12 +33,12 @@ TsClientOptions getTsClientOptionsFromEnv(Map<String, String> env) {
       instanceName: instanceName);
 }
 
-TsClientOptions get tsClientOptionsFromEnv => _tsClientOptionsFromEnv ??= () {
+TsClientOptions? get tsClientOptionsFromEnv => _tsClientOptionsFromEnv ??= () {
       if (isRunningAsJavascript) {
         return getTsClientOptionsFromEnv(_env);
       } else {
         // io sim
         return TsClientOptions(
-            endpoint: 'local', accessKeyId: null, secretAccessKey: null);
+            endpoint: 'local', accessKeyId: '', secretAccessKey: '');
       }
     }();

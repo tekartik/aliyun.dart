@@ -9,7 +9,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('memory', () {
-    AliyunFunctionComputeUniversal functionCompute;
+    late AliyunFunctionComputeUniversal functionCompute;
     setUp(() {
       functionCompute =
           AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);

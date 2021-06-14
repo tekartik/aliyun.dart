@@ -3,14 +3,13 @@ import 'dart:typed_data';
 
 import 'package:tekartik_aliyun_fc_http/src/function_compute_http.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
-import 'package:tekartik_http/http.dart'
-    hide httpClientFactoryMemory, httpServerFactoryMemory;
+import 'package:tekartik_http/http.dart' hide httpClientFactoryMemory;
 import 'package:tekartik_http/http_memory.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('memory', () {
-    AliyunFunctionComputeHttp functionCompute;
+    late AliyunFunctionComputeHttp functionCompute;
     setUp(() {
       functionCompute = AliyunFunctionComputeHttp(httpServerFactoryMemory);
     });

@@ -3,8 +3,8 @@ import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 import 'import.dart';
 
 class OssExceptionNode implements OssException {
-  final String _message;
-  final Map /*?*/ map;
+  final String? _message;
+  final Map? map;
 
   @override
   String toString() => 'OssExceptionNode($message)';
@@ -12,21 +12,21 @@ class OssExceptionNode implements OssException {
   String get message =>
       _message ?? _errMapValue('message')?.toString() ?? 'error';
 
-  dynamic _errMapValue(String key) => map != null ? map[key] : null;
+  dynamic _errMapValue(String key) => map != null ? map![key] : null;
 
   // Message can be null
   OssExceptionNode(
-      {String /*?*/ message,
+      {String? message,
       this.map /*?*/
       ,
-      bool isNotFound,
-      bool isRetryable})
+      bool? isNotFound,
+      bool? isRetryable})
       : _message = message,
         _isNotFound = isNotFound,
         _isRetryable = isRetryable;
 
   // TableStoreNodeException(404:OTSObjec
-  int get code => parseInt(_errMapValue('code'));
+  int? get code => parseInt(_errMapValue('code'));
 
   @override
   bool get retryable =>
@@ -35,6 +35,6 @@ class OssExceptionNode implements OssException {
   @override
   bool get isNotFound => _isNotFound ?? false;
 
-  final bool _isNotFound;
-  final bool _isRetryable;
+  final bool? _isNotFound;
+  final bool? _isRetryable;
 }

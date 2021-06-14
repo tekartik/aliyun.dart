@@ -5,5 +5,5 @@ import 'package:tekartik_aliyun_tablestore_node/tablestore_node.dart';
 Tablestore get tablestore => tablestoreNode;
 
 /// Ignore arguments
-Tablestore getTablestore({String localRootPath, bool localInMemory}) =>
+Tablestore getTablestore({String? localRootPath, bool? localInMemory}) =>
     tablestore;

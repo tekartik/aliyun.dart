@@ -26,7 +26,7 @@ Future<void> renamedHandler(FcHttpRequest httpRequest, FcHttpResponse httpResp,
 
 void main() {
   group('memory', () {
-    AliyunFunctionComputeUniversal functionCompute;
+    late AliyunFunctionComputeUniversal functionCompute;
     setUp(() {
       functionCompute =
           AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);
