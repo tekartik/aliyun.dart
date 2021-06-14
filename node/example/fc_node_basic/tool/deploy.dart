@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:http/http.dart';
+import 'package:path/path.dart';
 import 'package:process_run/shell_run.dart';
 import 'package:process_run/utils/process_result_extension.dart';
-import 'package:path/path.dart';
 
 Future<void> main() async {
   await deploy();
@@ -12,7 +12,7 @@ Future<void> main() async {
 Future<void> deploy() async {
   var shell = Shell(workingDirectory: 'deploy');
   var lines = (await shell.run('fun deploy')).outLines;
-  String foundUrl;
+  String? foundUrl;
   // Extract from 'url: https://xxxxx.eu-central-1.fc.aliyuncs.com/xxxxxx/'
   for (var line in lines) {
     var text = line.trim();
@@ -23,28 +23,30 @@ Future<void> deploy() async {
   }
   if (foundUrl != null) {
     print('url: $foundUrl');
-    var response = await get(foundUrl, headers: {'x-in': 'in-value'});
+    var response =
+        await get(Uri.parse(foundUrl), headers: {'x-in': 'in-value'});
     print('status code: ${response.statusCode}');
     print('headers: ${response.headers}');
     print(response.body);
 
     var asyncUrl = url.join(foundUrl, 'async');
     print('url: $asyncUrl');
-    response = await get(asyncUrl, headers: {'x-in': 'in-value'});
+    response = await get(Uri.parse(asyncUrl), headers: {'x-in': 'in-value'});
     print('status code: ${response.statusCode}');
     print('headers: ${response.headers}');
     print(response.body);
 
     var bodyStringUrl = url.join(foundUrl, 'bodyString');
     print('url: $bodyStringUrl');
-    response = await post(bodyStringUrl, body: 'some text');
+    response = await post(Uri.parse(bodyStringUrl), body: 'some text');
     print('status code: ${response.statusCode}');
     print('headers: ${response.headers}');
     print(response.body);
 
     var bodyBytesUrl = url.join(foundUrl, 'bodyBytes');
     print('url: $bodyBytesUrl');
-    response = await post(bodyBytesUrl, body: Uint8List.fromList([1, 2, 3]));
+    response = await post(Uri.parse(bodyBytesUrl),
+        body: Uint8List.fromList([1, 2, 3]));
     print('status code: ${response.statusCode}');
     print('headers: ${response.headers}');
     print(response.bodyBytes);

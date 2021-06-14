@@ -16,4 +16,4 @@ Resources:
           Type: HTTP
           Properties:
             AuthType: ANONYMOUS
-            Methods: ['POST', 'GET']
+            Methods: [ 'POST', 'GET' ]

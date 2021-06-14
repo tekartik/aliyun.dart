@@ -58,13 +58,14 @@ class TsNodeLongClassShim implements TsNodeLongClass {
 
 class TsNodeCommonShim implements TsNodeCommon {
   @override
-  final primaryKeyType = TsConstantPrimaryKeyShim();
+  final TsConstantPrimaryKey primaryKeyType = TsConstantPrimaryKeyShim();
 
   @override
-  final rowExistenceExpectation = TsConstantRowExistenceExpectationShim();
+  final TsConstantRowExistenceExpectation rowExistenceExpectation =
+      TsConstantRowExistenceExpectationShim();
 
   @override
-  final returnType = TsConstantReturnTypeShim();
+  final TsConstantReturnType returnType = TsConstantReturnTypeShim();
 
   @override
   // TODO: implement long

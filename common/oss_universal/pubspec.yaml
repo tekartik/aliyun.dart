@@ -5,7 +5,7 @@ publish_to: none
 # homepage: https://www.example.com
 
 environment:
-  sdk: '>=2.10.0-0 <3.0.0'
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   path: ^1.7.0
@@ -13,34 +13,38 @@ dependencies:
     git:
       url: git://github.com/tekartik/aliyun.dart
       path: common/oss
-      ref: dart2
+      ref: null_safety
     version: '>=0.1.1'
   tekartik_aliyun_oss_node:
     git:
       url: git://github.com/tekartik/aliyun.dart
       path: node/oss_node
-      ref: dart2
+      ref: null_safety
     version: '>=0.3.1'
   tekartik_aliyun_oss_fs:
     git:
       url: git://github.com/tekartik/aliyun.dart
       path: common/oss_fs
-      ref: dart2
+      ref: null_safety
     version: '>=0.3.1'
 dev_dependencies:
+  tekartik_test_menu_io:
+    git:
+      url: git://github.com/tekartik/test_menu.dart
+      path: test_menu_io
+      ref: null_safety
+    version: '>=0.1.0'
   pedantic: ^1.9.0
   test: ^1.14.4
-  tekartik_build_utils:
+  # needed node dev dependencies
+  build_runner:
+  build_web_compilers:
+  tekartik_build_node:
     git:
-      url: git://github.com/tekartik/build_utils.dart
-      ref: dart2
-    version: '>=0.5.8'
-  tekartik_app_node_build:
-    git:
-      url: git://github.com/tekartik/app_node_utils.dart
-      path: app_build
-      ref: dart2
-    version: '>=0.1.0'
+      url: git://github.com/tekartik/build_node.dart
+      path: packages/build_node
+      ref: null_safety
+
 dependency_overrides:
   tekartik_aliyun_oss_node:
     path: ../../node/oss_node

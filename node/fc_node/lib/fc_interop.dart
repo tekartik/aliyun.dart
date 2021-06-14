@@ -7,9 +7,9 @@ import 'dart:typed_data';
 import 'package:js/js.dart';
 import 'package:node_interop/node_interop.dart';
 import 'package:tekartik_aliyun_fc/fc_api.dart';
-import 'package:tekartik_js_utils/js_utils.dart';
-import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:tekartik_aliyun_fc/src/mixin/fc_http_request_headers.dart'; // ignore: implementation_imports
+import 'package:tekartik_common_utils/common_utils_import.dart';
+import 'package:tekartik_js_utils/js_utils.dart';
 
 @JS()
 @anonymous
@@ -37,7 +37,7 @@ class Buffer {
 typedef _GetBodyFn = dynamic Function(dynamic req, [dynamic option]);
 
 /// https://www.npmjs.com/package/raw-body
-_GetBodyFn _getRawBodyFn = require('raw-body');
+var _getRawBodyFn = require('raw-body') as _GetBodyFn?;
 
 /*
 // Example
@@ -54,7 +54,7 @@ class FcHttpContextNode implements FcHttpContext {
 
   FcHttpContextNode(this.native);
 
-  Map<String, dynamic> get credentials => jsObjectAsMap(native.credentials);
+  Map<String, dynamic>? get credentials => jsObjectAsMap(native.credentials);
 
   @override
   String toString() {
@@ -68,17 +68,17 @@ class FcHttpContextNode implements FcHttpContext {
 // ["_events","_eventsCount","_maxListeners","method","clientIP","url","path","queries","headers","getHeader"
 class FcHttpRequestNode implements FcHttpRequest {
   final HttpReqJs req;
-  Future _rawBody;
+  Future? _rawBody;
 
   FcHttpRequestNode(this.req);
 
   Future getRawBody() {
-    return _rawBody ??= promiseToFuture(_getRawBodyFn(req));
+    return _rawBody ??= promiseToFuture(_getRawBodyFn!(req) as Object);
   }
 
-  Future _getRawBody({bool encoding}) {
-    return _rawBody ??=
-        promiseToFuture(_getRawBodyFn(req, jsify({'encoding': encoding})));
+  Future _getRawBody({bool? encoding}) {
+    return _rawBody ??= promiseToFuture(
+        _getRawBodyFn!(req, jsify({'encoding': encoding})) as Object);
   }
 
   @override
@@ -95,7 +95,7 @@ class FcHttpRequestNode implements FcHttpRequest {
     return buff as Uint8List;
   }
 
-  Map<String, dynamic> get queries {
+  Map<String, dynamic>? get queries {
     return jsObjectAsMap(getProperty(req, 'queries'));
   }
 
@@ -103,20 +103,22 @@ class FcHttpRequestNode implements FcHttpRequest {
   String get url => req.url;
 
   @override
-  String get path => getProperty(req, 'path');
+  String get path => getProperty(req, 'path') as String;
 
   @override
-  String get method => getProperty(req, 'method');
+  String get method => getProperty(req, 'method') as String;
 
-  FcHttpRequestHeaders _headers;
+  FcHttpRequestHeaders? _headers;
+
   @override
   Map<String, String> get headers => _headers ??= () {
         var lowerCaseHaders = <String, String>{};
         // Need to loop through the keys
         var nativeHeaders = getProperty(req, 'headers');
-        var keys = jsObjectKeys(nativeHeaders);
+        var keys = jsObjectKeys(nativeHeaders as Object);
         for (var key in keys) {
-          lowerCaseHaders[key.toLowerCase()] = getProperty(nativeHeaders, key);
+          lowerCaseHaders[key.toLowerCase()] =
+              getProperty(nativeHeaders, key) as String;
         }
         return FcHttpRequestHeaders(lowerCaseHaders);
       }();

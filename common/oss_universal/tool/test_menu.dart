@@ -1,5 +1,4 @@
 import 'package:dev_test/package.dart';
-
 //import 'package:yyyy_haw_support/gcf_deploy_config.dart';
 import 'package:process_run/shell.dart';
 import 'package:tekartik_aliyun_oss_universal/src/import.dart';
@@ -27,9 +26,9 @@ Future main(List<String> arguments) async {
 
     menu('oss', () {
       item('listBuckets', () async {
-        write(jsonPretty((await client.listBuckets())
+        write(jsonPretty((await client!.listBuckets())
             .map((e) => (e as OssBucketMixin).toDebugMap())
-            .toList()));
+            .toList())!);
       });
     });
   });

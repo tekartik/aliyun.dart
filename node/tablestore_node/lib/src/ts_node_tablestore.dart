@@ -23,18 +23,14 @@ typedef ErrDataCallback = dynamic Function(dynamic err, dynamic data);
 class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
   @override
   @override
-  TsClient client({TsClientOptions options}) {
-    var nativeClient = callConstructor(tablestoreJs.Client, [
+  TsClient client({TsClientOptions? options}) {
+    var nativeClient = callConstructor(tablestoreJs!.Client, [
       TsClientOptionsJs(
-          accessKeyId: options.accessKeyId,
+          accessKeyId: options!.accessKeyId,
           secretAccessKey: options.secretAccessKey,
           endpoint: options.endpoint,
           instancename: options.instanceName)
     ]);
-    if (nativeClient == null) {
-      return null;
-    }
-
     // devPrint('tablestoreJs: ${jsObjectKeys(_tablestoreJs)}');
     //  [util, rowExistenceExpectation, Direction, UpdateType, BatchWriteType, ReturnType, DefinedColumnType, PrimaryKeyType, PrimaryKeyOption,
     //  IndexUpdateMode, IndexType, INF_MIN, INF_MAX, PK_AUTO_INCR, Long, plainBufferConsts, plainBufferCrc8, PlainBufferInputStream,
@@ -54,26 +50,27 @@ class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
   }
 
   @override
-  TsConstantPrimaryKey get primaryKeyType => tablestoreJs.PrimaryKeyType;
+  TsConstantPrimaryKey get primaryKeyType => tablestoreJs!.PrimaryKeyType;
 
   @override
   TsConstantRowExistenceExpectation get rowExistenceExpectation =>
-      tablestoreJs.RowExistenceExpectation;
+      tablestoreJs!.RowExistenceExpectation;
 
   @override
-  TsConstantReturnType get returnType => tablestoreJs.ReturnType;
+  TsConstantReturnType get returnType => tablestoreJs!.ReturnType;
 
   @override
-  TsConstantComparatorType get comparatorType => tablestoreJs.ComparatorType;
+  TsConstantComparatorType get comparatorType => tablestoreJs!.ComparatorType;
 
   @override
-  TsConstantLogicalOperator get logicalOperator => tablestoreJs.LogicalOperator;
+  TsConstantLogicalOperator get logicalOperator =>
+      tablestoreJs!.LogicalOperator;
 
   @override
-  final long = TsNodeLongClassImpl();
+  final TsNodeLongClass long = TsNodeLongClassImpl();
 
   @override
-  TsConstantDirection get direction => tablestoreJs.Direction;
+  TsConstantDirection get direction => tablestoreJs!.Direction;
 }
 
 class TsClientNode with TsClientMixin implements TsClient {
@@ -151,13 +148,13 @@ class TsClientNode with TsClientMixin implements TsClient {
   }
 
   @override
-  Future<TsTableDescription> deleteTable(String tableName) async {
+  Future<TsTableDescription?> deleteTable(String tableName) async {
     var nativeDesc = await _nativeOperationWithCallback((callback) {
       native.deleteTable(
           _debugNativeRequestParams(
               'deleteTable', TsClientTableParamsJs(tableName: tableName)),
           callback);
-    });
+    }) as Object;
     return tableDescriptionFromNative(nativeDesc);
   }
 
@@ -239,7 +236,7 @@ class TsClientNode with TsClientMixin implements TsClient {
           _debugNativeRequestParams(
               'describeTable', TsClientTableParamsJs(tableName: tableName)),
           callback);
-    });
+    }) as Object;
     return tableDescriptionFromNative(nativeDesc);
   }
 

@@ -9,13 +9,13 @@ import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 external String stringify(Object obj);
 
 @JS('Object.keys')
-external List<String> objectKeys(Object obj);
+external List<String> objectKeys(Object? obj);
 
 @JS('Array.from')
 external Object toJSArray(List source);
 
 // {"buffer":[1,0,0,0,0,0,0,0],"offset":0}
-TsValueLong dartifyValueLong(Object jsObject) {
+TsValueLong? dartifyValueLong(Object jsObject) {
   if (util.hasProperty(jsObject, 'offset')) {
     try {
       if (util.getProperty(jsObject, 'buffer') is Iterable) {

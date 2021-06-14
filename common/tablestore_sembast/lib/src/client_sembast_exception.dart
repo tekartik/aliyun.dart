@@ -1,5 +1,4 @@
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
-import 'package:tekartik_aliyun_tablestore_sembast/src/import.dart';
 
 class TsExceptionSembast implements TsException {
   @override
@@ -26,7 +25,7 @@ class TsExceptionSembast implements TsException {
       this.isTableNotExistError = false,
       this.isPrimaryKeySizeError = false,
       this.isPrimaryKeyTypeError = false,
-      @required this.message,
+      required this.message,
       this.retryable = false});
 
   @override

@@ -12,8 +12,10 @@ var _columnTypes = [
   TsColumnType.string,
   TsColumnType.binary
 ];
+
 String enumText(dynamic value) => value.toString().split('.').last;
-TsColumnType _columnTypeFromText(String text) {
+
+TsColumnType? _columnTypeFromText(String? text) {
   for (var type in _columnTypes) {
     if (text == enumText(type)) {
       return type;
@@ -23,10 +25,11 @@ TsColumnType _columnTypeFromText(String text) {
 }
 
 class TsPrimaryKeyDef {
-  final String name;
-  final TsColumnType type;
+  final String? name;
+  final TsColumnType? type;
+
   // integer only
-  final bool autoIncrement;
+  final bool? autoIncrement;
 
   TsPrimaryKeyDef({this.name, this.type, this.autoIncrement});
 
@@ -42,7 +45,7 @@ class TsPrimaryKeyDef {
     return map;
   }
 
-  factory TsPrimaryKeyDef.fromMap(Map map) {
+  factory TsPrimaryKeyDef.fromMap(Map? map) {
     var model = Model(map);
     var name = model.getValue('name')?.toString();
     var type = _columnTypeFromText(model.getValue('type')?.toString());
@@ -53,8 +56,8 @@ class TsPrimaryKeyDef {
 }
 
 class TsTableDescriptionTableMeta {
-  final String tableName;
-  List<TsPrimaryKeyDef> primaryKeys;
+  final String? tableName;
+  List<TsPrimaryKeyDef>? primaryKeys;
 
   TsTableDescriptionTableMeta({this.tableName, this.primaryKeys});
 
@@ -63,7 +66,7 @@ class TsTableDescriptionTableMeta {
       'name': tableName,
       if (primaryKeys != null)
         'primaryKeys':
-            primaryKeys.map((key) => key.toMap()).toList(growable: false)
+            primaryKeys!.map((key) => key.toMap()).toList(growable: false)
     });
     return map;
   }
@@ -71,7 +74,7 @@ class TsTableDescriptionTableMeta {
   factory TsTableDescriptionTableMeta.fromMap(Map map) {
     var model = Model(map);
     var tableName = model.getValue('name')?.toString();
-    List<TsPrimaryKeyDef> primaryKeys;
+    List<TsPrimaryKeyDef>? primaryKeys;
     var rawPrimaryKeys = model.getValue('primaryKeys');
     if (rawPrimaryKeys is List) {
       primaryKeys = rawPrimaryKeys
@@ -84,19 +87,19 @@ class TsTableDescriptionTableMeta {
 }
 
 class TsTableDescriptionReservedThroughput {
-  final TsTableCapacityUnit capacityUnit;
+  final TsTableCapacityUnit? capacityUnit;
 
   TsTableDescriptionReservedThroughput({this.capacityUnit});
 
   Model toMap() {
-    var map =
-        Model({if (capacityUnit != null) 'capacityUnit': capacityUnit.toMap()});
+    var map = Model(
+        {if (capacityUnit != null) 'capacityUnit': capacityUnit!.toMap()});
     return map;
   }
 
   factory TsTableDescriptionReservedThroughput.fromMap(Map map) {
     var model = Model(map);
-    TsTableCapacityUnit capacityUnit;
+    TsTableCapacityUnit? capacityUnit;
     var rawCapacityUnit = model.getValue('capacityUnit');
     if (rawCapacityUnit is Map) {
       capacityUnit = TsTableCapacityUnit.fromMap(rawCapacityUnit);
@@ -106,8 +109,8 @@ class TsTableDescriptionReservedThroughput {
 }
 
 class TsTableCapacityUnit {
-  final int read;
-  final int write;
+  final int? read;
+  final int? write;
 
   TsTableCapacityUnit({this.read, this.write});
 
@@ -126,8 +129,8 @@ class TsTableCapacityUnit {
 }
 
 class TsTableDescriptionOptions {
-  final int timeToLive;
-  final int maxVersions;
+  final int? timeToLive;
+  final int? maxVersions;
 
   TsTableDescriptionOptions({this.timeToLive, this.maxVersions});
 
@@ -167,42 +170,44 @@ var tableCreateOptionsDefault =
 // In/Out
 class TsTableDescription {
   // In/Out
-  final TsTableDescriptionTableMeta tableMeta;
+  final TsTableDescriptionTableMeta? tableMeta;
+
   // In/Out
-  final TsTableDescriptionReservedThroughput reservedThroughput;
+  final TsTableDescriptionReservedThroughput? reservedThroughput;
+
   // In/Out
-  final TsTableDescriptionOptions tableOptions;
+  final TsTableDescriptionOptions? tableOptions;
 
   TsTableDescription(
       {this.tableMeta, this.reservedThroughput, this.tableOptions});
 
   @override
   String toString() =>
-      'name ${tableMeta.tableName}, primaryKeys: ${tableMeta.primaryKeys}';
+      'name ${tableMeta!.tableName}, primaryKeys: ${tableMeta!.primaryKeys}';
 
   Model toMap() {
     var map = Model({
-      if (tableMeta != null) 'tableMeta': tableMeta.toMap(),
+      if (tableMeta != null) 'tableMeta': tableMeta!.toMap(),
       if (reservedThroughput != null)
-        'reservedThroughput': reservedThroughput.toMap(),
-      if (tableOptions != null) 'tableOptions': tableOptions.toMap()
+        'reservedThroughput': reservedThroughput!.toMap(),
+      if (tableOptions != null) 'tableOptions': tableOptions!.toMap()
     });
     return map;
   }
 
   factory TsTableDescription.fromMap(Map map) {
     var model = Model(map);
-    TsTableDescriptionTableMeta tableMeta;
+    TsTableDescriptionTableMeta? tableMeta;
     var rawTableMeta = model.getValue('tableMeta');
     if (rawTableMeta is Map) {
       tableMeta = TsTableDescriptionTableMeta.fromMap(rawTableMeta);
     }
-    TsTableDescriptionOptions tableOptions;
+    TsTableDescriptionOptions? tableOptions;
     var rawOptions = model.getValue('tableOptions');
     if (rawOptions is Map) {
       tableOptions = TsTableDescriptionOptions.fromMap(rawOptions);
     }
-    TsTableDescriptionReservedThroughput reservedThroughput;
+    TsTableDescriptionReservedThroughput? reservedThroughput;
     var rawReservedThroughput = model.getValue('reservedThroughput');
     if (rawReservedThroughput is Map) {
       reservedThroughput =

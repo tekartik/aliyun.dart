@@ -110,12 +110,12 @@ abstract class TsNodeLongClassJs implements TsNodeLongClass {
 class TsNodeLongClassImpl implements TsNodeLongClass {
   @override
   TsNodeLong fromNumber(int value) {
-    return tablestoreJs.Long.fromNumber(value);
+    return tablestoreJs!.Long.fromNumber(value);
   }
 
   @override
   TsNodeLong fromString(String value) {
-    return tablestoreJs.Long.fromString(value);
+    return tablestoreJs!.Long.fromString(value);
   }
 }
 
@@ -139,28 +139,28 @@ class TsRowAttributeKeyValueJs {
 @anonymous
 class TsGetRowParamsJs {
   external factory TsGetRowParamsJs(
-      {int maxVersions, String tableName, List<dynamic> primaryKey});
+      {int? maxVersions, String? tableName, List<dynamic>? primaryKey});
 }
 
 @JS()
 @anonymous
 class TsBatchGetRowParamsJs {
   external factory TsBatchGetRowParamsJs(
-      {List<TsBatchGetRowParamsTableJs> tables});
+      {List<TsBatchGetRowParamsTableJs>? tables});
 }
 
 @JS()
 @anonymous
 class TsBatchGetRowParamsTableJs {
   external factory TsBatchGetRowParamsTableJs(
-      {int maxVersions, String tableName, dynamic primaryKey});
+      {int? maxVersions, String? tableName, dynamic primaryKey});
 }
 
 // {tables: [[{isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string, capacityUnit: {read: 1, write: 0}, primaryKey: [{name: key, value: batch_1}], attributes: [{columnName: test, columnValue: {buffer: [1, 0, 0, 0, 0, 0, 0, 0], offset: 0}, timestamp: {buffer: [105, 65, 90, 108, 116, 1, 0, 0], offset: 0}}]}, {isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string, capacityUnit: {read: 1, write: 0}, primaryKey: null, attributes: null}]], RequestId: 0005aec7-4095-ae6b-e5c1-720b0b23b32a}
 @JS()
 @anonymous
 abstract class TsBatchGetRowResponseJs {
-  List/*<List<TsBatchGetRowResponseRowJs>>*/ tables;
+  external List/*<List<TsBatchGetRowResponseRowJs>>*/ tables;
 }
 
 extension TsBatchGetRowResponseJsExt on TsBatchGetRowResponseJs {
@@ -190,16 +190,16 @@ abstract class TsBatchGetRowResponseRowJs {
 
 Iterable<TsRowPrimaryKeyValueJs> batchRowPrimaryKeyValuesJs(
         TsBatchGetRowResponseRowJs js) =>
-    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
 
 Iterable<TsRowAttributeKeyValueJs> batchRowAttributeKeyValuesJs(
         TsBatchGetRowResponseRowJs js) =>
-    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
+    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
 
 @JS()
 @anonymous
 abstract class TsBatchWriteRowResponseJs {
-  List/*<TsBatchGetRowResponseRowJs>*/ tables;
+  external List/*<TsBatchGetRowResponseRowJs>*/ tables;
 }
 
 extension TsBatchWriteRowResponseJsExt on TsBatchWriteRowResponseJs {
@@ -245,10 +245,11 @@ TsGetRowParamsJs toGetRowParamsJs(TsGetRowRequest request) {
 }
 
 @JS('Object.keys')
-external void jsObjectDefineProperty(Object obj, String name, dynamic property);
+external void jsObjectDefineProperty(
+    Object? obj, String name, dynamic property);
 
 class JsArrayWrapper<T> {
-  dynamic native = util.newObject();
+  var native = util.newObject() as Object;
   var _length = 0;
 
   int get length => _length;
@@ -259,7 +260,7 @@ class JsArrayWrapper<T> {
 
   void _setLength(int length) {
     _length = length;
-    var property = util.newObject();
+    var property = util.newObject() as Object;
     util.setProperty(property, 'value', length);
 
     jsObjectDefineProperty(native, 'length', property);
@@ -278,20 +279,20 @@ class JsArrayWrapper<T> {
 }
 
 dynamic toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
-  var requestJs = util.newObject();
+  var requestJs = util.newObject() as Object;
 
   var tablesJs = [];
   /*util.newObject();
   var tablesJsIndex = 0;*/
   request.tables.forEach((table) {
-    var tableJs = util.newObject();
+    var tableJs = util.newObject() as Object;
     util.setProperty(tableJs, 'tableName', table.tableName);
     var pksJs = JsArrayWrapper();
     table.primaryKeys.forEach((pk) {
       var pkcsJs = [];
       // var pkcsJsIndex = 0;
       pk.list.forEach((pkc) {
-        var pkcJs = util.newObject();
+        var pkcJs = util.newObject() as Object;
         util.setProperty(pkcJs, 'key', 'batch_1');
         //util.setProperty(pkcsJs, pkcsJsIndex++, pkcJs);
         pkcsJs.add(pkcJs);
@@ -350,34 +351,22 @@ class TsPutRowParamsJs {}
 
 // Response to native
 TsPutRowResponse putRowResponseFromNative(dynamic nativeResponseJs) {
-  if (nativeResponseJs != null) {
-    return TsPutRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
-  }
-  return null;
+  return TsPutRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
 }
 
 TsUpdateRowResponse updateRowResponseFromNative(dynamic nativeResponseJs) {
-  if (nativeResponseJs != null) {
-    return TsUpdateRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
-  }
-  return null;
+  return TsUpdateRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
 }
 
 TsStartLocalTransactionResponse startLocalTransactionRowResponseFromNative(
     dynamic nativeResponseJs) {
-  if (nativeResponseJs != null) {
-    return TsStartLocalTransactionResponseNode(
-        nativeResponseJs as TsStartLocalTransactionResponseJs);
-  }
-  return null;
+  return TsStartLocalTransactionResponseNode(
+      nativeResponseJs as TsStartLocalTransactionResponseJs);
 }
 
 // Response to native
 TsDeleteRowResponse deleteRowResponseFromNative(dynamic nativeResponseJs) {
-  if (nativeResponseJs != null) {
-    return TsDeleteRowResponseNode();
-  }
-  return null;
+  return TsDeleteRowResponseNode();
 }
 
 //
@@ -437,12 +426,13 @@ class TsStartLocalTransactionResponseJs {
 @anonymous
 class TsGetRangeResponseJs {
   external List get rows;
+
   external List get nextStartPrimaryKey;
 }
 
 Iterable<TsRowPrimaryKeyValueJs> getRangeResponseNextStartPrimaryKeyValuesJs(
         TsGetRangeResponseJs js) =>
-    js.nextStartPrimaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.nextStartPrimaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
 
 @JS()
 @anonymous
@@ -453,17 +443,14 @@ class TsReadRowJs {
 }
 
 Iterable<TsRowPrimaryKeyValueJs> rowPrimaryKeyValuesJs(TsReadRowJs js) =>
-    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
 
 Iterable<TsRowAttributeKeyValueJs> rowAttributeKeyValuesJs(TsReadRowJs js) =>
-    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
+    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
 
 // Response to native
 TsGetRowResponse getRowResponseFromNative(dynamic nativeResponseJs) {
-  if (nativeResponseJs != null) {
-    return TsGetRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
-  }
-  return null;
+  return TsGetRowResponseNode(nativeResponseJs as TsReadRowResponseJs);
 }
 
 class TsGetRowNode implements TsGetRow {
@@ -472,11 +459,11 @@ class TsGetRowNode implements TsGetRow {
   TsGetRowNode(this.rowJs);
 
   @override
-  TsPrimaryKey get primaryKey =>
-      fromNativePrimaryKey(rowPrimaryKeyValuesJs(rowJs));
+  TsPrimaryKey? get primaryKey =>
+      fromNativePrimaryKeyOrNull(rowPrimaryKeyValuesJs(rowJs));
 
   @override
-  TsAttributes get attributes =>
+  TsAttributes? get attributes =>
       fromNativeAttributes(rowAttributeKeyValuesJs(rowJs));
 
   @override
@@ -487,21 +474,32 @@ class TsGetRowNode implements TsGetRow {
 }
 
 TsAttributes fromNativeAttributes(Iterable<TsRowAttributeKeyValueJs> native) {
-  if (native == null) {
-    return null;
-  }
   return TsAttributes(native.map((kvJs) {
-    return TsAttribute(kvJs.columnName, tsDartifyValue(kvJs.columnValue));
+    return TsAttribute(
+        kvJs.columnName, tsDartifyValue(kvJs.columnValue) as Object);
   }).toList());
 }
 
-TsPrimaryKey fromNativePrimaryKey(Iterable<TsRowPrimaryKeyValueJs> native) {
+TsAttributes? fromNativeAttributesOrNull(
+    Iterable<TsRowAttributeKeyValueJs>? native) {
   if (native == null) {
     return null;
   }
+  return fromNativeAttributes(native);
+}
+
+TsPrimaryKey fromNativePrimaryKey(Iterable<TsRowPrimaryKeyValueJs> native) {
   return TsPrimaryKey(native.map((kvJs) {
-    return TsKeyValue(kvJs.name, tsDartifyValue(kvJs.value));
+    return TsKeyValue(kvJs.name, tsDartifyValue(kvJs.value) as Object);
   }).toList());
+}
+
+TsPrimaryKey? fromNativePrimaryKeyOrNull(
+    Iterable<TsRowPrimaryKeyValueJs>? native) {
+  if (native == null) {
+    return null;
+  }
+  return fromNativePrimaryKey(native);
 }
 
 abstract class TsReadRowResponseNode {
@@ -539,6 +537,7 @@ class TsUpdateRowResponseNode extends TsReadRowResponseNode
 class TsStartLocalTransactionResponseNode
     implements TsStartLocalTransactionResponse {
   final TsStartLocalTransactionResponseJs responseJs;
+
   TsStartLocalTransactionResponseNode(this.responseJs);
 
   @override
@@ -562,7 +561,7 @@ class TsBatchWriteRowsResponseNode implements TsBatchWriteRowsResponse {
   }
 
   @override
-  List<TsBatchGetRowsResponseRow> rows;
+  late List<TsBatchGetRowsResponseRow> rows;
 }
 
 class TsBatchGetRowsResponseNode implements TsBatchGetRowsResponse {
@@ -577,7 +576,7 @@ class TsBatchGetRowsResponseNode implements TsBatchGetRowsResponse {
   }
 
   @override
-  List<List<TsBatchGetRowsResponseRow>> tables;
+  late List<List<TsBatchGetRowsResponseRow>> tables;
 
   @override
   String toString() => toDebugMap().toString();
@@ -620,37 +619,38 @@ TsBatchGetRowsResponseRow fromBatchGetRowResponseRowNative(
       errorCode: rowJs.errorCode,
       errorMessage: rowJs.errorMessage,
       tableName: rowJs.tableName,
-      primaryKey: fromNativePrimaryKey(batchRowPrimaryKeyValuesJs(rowJs)),
-      attributes: fromNativeAttributes(batchRowAttributeKeyValuesJs(rowJs)));
+      primaryKey: fromNativePrimaryKeyOrNull(batchRowPrimaryKeyValuesJs(rowJs)),
+      attributes:
+          fromNativeAttributesOrNull(batchRowAttributeKeyValuesJs(rowJs)));
 }
 
 /// It seems we cannot use Js here
 class TsBatchGetRowsResponseRowImpl implements TsBatchGetRowsResponseRow {
   TsBatchGetRowsResponseRowImpl(
-      {this.errorCode,
-      this.errorMessage,
-      this.tableName,
-      this.isOk,
-      this.attributes,
-      this.primaryKey});
+      {required this.errorCode,
+      required this.errorMessage,
+      required this.tableName,
+      required this.isOk,
+      required this.attributes,
+      required this.primaryKey});
 
   @override
   String toString() => toDebugMap().toString();
 
   @override
-  final TsAttributes attributes;
+  final TsAttributes? attributes;
 
   @override
-  final String errorCode;
+  final String? errorCode;
 
   @override
-  final String errorMessage;
+  final String? errorMessage;
 
   @override
   final bool isOk;
 
   @override
-  final TsPrimaryKey primaryKey;
+  final TsPrimaryKey? primaryKey;
 
   @override
   final String tableName;
@@ -663,8 +663,8 @@ class TsGetRangeResponseNode implements TsGetRangeResponse {
 
   @override
   List<TsGetRow> get rows => responseJs.rows
-      ?.map((e) => TsGetRowNode(e as TsReadRowJs))
-      ?.toList(growable: false);
+      .map((e) => TsGetRowNode(e as TsReadRowJs))
+      .toList(growable: false);
 
   @override
   TsPrimaryKey get nextStartPrimaryKey => fromNativePrimaryKey(
@@ -674,15 +674,12 @@ class TsGetRangeResponseNode implements TsGetRangeResponse {
 // Response to native
 TsGetRangeResponse getRangeResponseFromNative(
     TsGetRangeResponseJs nativeResponseJs) {
-  if (nativeResponseJs != null) {
-    return TsGetRangeResponseNode(nativeResponseJs);
-  }
-  return null;
+  return TsGetRangeResponseNode(nativeResponseJs);
 }
 
 dynamic tsSingleConditionToNative(TsColumnSingleCondition condition) {
   var columnConditionJs =
-      util.callConstructor(tablestoreJs.SingleColumnCondition, [
+      util.callConstructor(tablestoreJs!.SingleColumnCondition, [
     condition.name,
     tsValueToNative(condition.value),
     tsComparatorTypeToNative(condition.operator)
@@ -698,11 +695,11 @@ abstract class CompositeConditionJs {
 }
 
 dynamic tsCompositeConditionToNative(TsColumnCompositeCondition condition) {
-  var columnConditionJs = util.callConstructor(tablestoreJs.CompositeCondition,
+  var columnConditionJs = util.callConstructor(tablestoreJs!.CompositeCondition,
           [tsLogicalOperatorTypeToNative(condition.operator)])
-      as CompositeConditionJs;
+      as CompositeConditionJs?;
   for (var sub in condition.list) {
-    columnConditionJs.addSubCondition(tsColumnConditionToNative(sub));
+    columnConditionJs!.addSubCondition(tsColumnConditionToNative(sub));
   }
 
   return columnConditionJs;
@@ -725,7 +722,7 @@ dynamic tsDirectionToNative(TsDirection direction) {
     case TsDirection.backward:
       return tablestoreNode.direction.BACKWARD;
   }
-  throw UnsupportedError('invalid direction $direction');
+  // throw UnsupportedError('invalid direction $direction');
 }
 
 dynamic tsWriteRowTypeToNative(TsWriteRowType type) {
@@ -737,7 +734,7 @@ dynamic tsWriteRowTypeToNative(TsWriteRowType type) {
     case TsWriteRowType.delete:
       return 'DELETE';
   }
-  throw UnsupportedError('invalid write row type $type');
+  //throw UnsupportedError('invalid write row type $type');
 }
 
 dynamic tsConditionToNative(TsCondition condition) {
@@ -746,7 +743,7 @@ dynamic tsConditionToNative(TsCondition condition) {
   if (columnCondition != null) {
     columnConditionJs = tsColumnConditionToNative(columnCondition);
   }
-  return util.callConstructor(tablestoreJs.Condition, [
+  return util.callConstructor(tablestoreJs!.Condition, [
     tsConditionRowExistenceExpectationToNative(
         condition.rowExistenceExpectation),
     columnConditionJs
@@ -755,15 +752,15 @@ dynamic tsConditionToNative(TsCondition condition) {
 
 /// Value long (going though string to handle number at the limit
 dynamic tsValueLongToNative(TsValueLong value) =>
-    tablestoreJs.Long.fromString(value.toString());
+    tablestoreJs!.Long.fromString(value.toString());
 
 /// Value infinite
 dynamic tsValueInfiniteToNative(TsValueInfinite value) {
   if (value == TsValueInfinite.min) {
-    return tablestoreJs.INF_MIN;
+    return tablestoreJs!.INF_MIN;
   }
   if (value == TsValueInfinite.max) {
-    return tablestoreJs.INF_MAX;
+    return tablestoreJs!.INF_MAX;
   }
   throw 'Unsupported TsValueInfinite($value)';
 }
@@ -775,7 +772,7 @@ Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
   var map = <String, dynamic>{
     'tables': request.tables
         .map((table) => <String, dynamic>{
-              if (table.tableName != null) 'tableName': table.tableName,
+              'tableName': table.tableName,
               'rows': TsArrayHack(table.rows.map((row) {
                 return <String, dynamic>{
                   // Needed
@@ -784,15 +781,12 @@ Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
                   // Needed
                   'condition': row.condition ?? TsCondition.ignore,
 
-                  if (row.primaryKey != null)
-                    // !singular
-                    'primaryKey': tsPrimaryKeyParams(row.primaryKey),
+                  'primaryKey': tsPrimaryKeyParams(row.primaryKey),
 
                   if (row is TsBatchWriteRowsRequestPutRow &&
                       (row.data != null))
-                    'attributeColumns': tsAttributeColumnsParams(row.data)
-                  else if (row is TsBatchWriteRowsRequestUpdateRow &&
-                      (row.data != null))
+                    'attributeColumns': tsAttributeColumnsParams(row.data!)
+                  else if (row is TsBatchWriteRowsRequestUpdateRow)
                     'attributeColumns': tsUpdateAttributesParams(row.data),
                   'returnContent': {
                     'returnType': tsNodeCommon.returnType.Primarykey
@@ -810,7 +804,7 @@ Map<String, dynamic> toBatchGetRowsParams(TsBatchGetRowsRequest request) {
   var map = <String, dynamic>{
     'tables': request.tables
         .map((table) => <String, dynamic>{
-              if (table.tableName != null) 'tableName': table.tableName,
+              'tableName': table.tableName,
               // exp: TODO not hardcode
               'maxVersions': 1,
               // !singular

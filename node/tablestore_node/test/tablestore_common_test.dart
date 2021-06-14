@@ -33,10 +33,7 @@ void main() {
     });
 
     test('toGetRowParams', () {
-      var getRowRequest =
-          TsGetRowRequest(tableName: null, primaryKey: null, columns: null);
-      expect(toGetRowParams(getRowRequest), {});
-      getRowRequest = TsGetRowRequest(
+      var getRowRequest = TsGetRowRequest(
           tableName: 'test',
           primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]));
       expect(toGetRowParams(getRowRequest), {
@@ -59,27 +56,7 @@ void main() {
     });
 
     test('toPutRowParams', () {
-      var r = TsPutRowRequest(tableName: null, primaryKey: null, data: null);
-
-      expect(toPutRowParams(r), {
-        'condition': TsCondition.ignore,
-        'returnContent': {'returnType': 1}
-      });
-
-      r = TsPutRowRequest(
-          // Not supported for real...
-          data: null,
-          tableName: 'test',
-          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]));
-      expect(toPutRowParams(r), {
-        'tableName': 'test',
-        'condition': TsCondition.ignore,
-        'primaryKey': [
-          {'key': TsValueLong.fromNumber(1)},
-        ],
-        'returnContent': {'returnType': 1},
-      });
-      r = TsPutRowRequest(
+      var r = TsPutRowRequest(
           tableName: 'test',
           primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
           data: TsAttributes(
@@ -99,27 +76,7 @@ void main() {
     });
 
     test('toUpdateRowParams', () {
-      var r = TsUpdateRowRequest(tableName: null, primaryKey: null, data: null);
-
-      expect(toUpdateRowParams(r), {
-        'condition': TsCondition.expectExist,
-        'returnContent': {'returnType': 1}
-      });
-
-      r = TsUpdateRowRequest(
-          // Not supported for real...
-          data: null,
-          tableName: 'test',
-          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]));
-      expect(toUpdateRowParams(r), {
-        'tableName': 'test',
-        'condition': TsCondition.expectExist,
-        'primaryKey': [
-          {'key': TsValueLong.fromNumber(1)},
-        ],
-        'returnContent': {'returnType': 1},
-      });
-      r = TsUpdateRowRequest(
+      var r = TsUpdateRowRequest(
           tableName: 'test',
           primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
           data: TsUpdateAttributes([

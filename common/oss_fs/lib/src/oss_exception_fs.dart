@@ -13,9 +13,7 @@ class OssExceptionFs implements OssException {
   final bool retryable;
 
   OssExceptionFs(
-      {@required this.message,
-      this.retryable = false,
-      this.isNotFound = false});
+      {required this.message, this.retryable = false, this.isNotFound = false});
 
   @override
   final bool isNotFound;

@@ -3,9 +3,7 @@ import 'package:tekartik_aliyun_fc/fc.dart';
 import 'package:tekartik_aliyun_fc_http/src/fc_context_http.dart';
 import 'package:tekartik_aliyun_fc_http/src/fc_request_http.dart';
 import 'package:tekartik_aliyun_fc_http/src/fc_response_http.dart';
-import 'package:tekartik_http/http.dart' hide httpServerFactoryMemory;
 import 'package:tekartik_http/http_memory.dart';
-import 'package:tekartik_http/http_server.dart' hide httpServerFactoryMemory;
 
 class _HandlerInfo {
   final String name;
@@ -27,7 +25,7 @@ class AliyunFunctionComputeHttp implements AliyunFunctionCompute {
     _functions[name] = _HandlerInfo(name, handler);
   }
 
-  Future<HttpServer> serveHttp({int port}) async {
+  Future<HttpServer> serveHttp({required int port}) async {
     assert(_functions.isNotEmpty, 'No handler exported');
 
     var requestServer =

@@ -4,6 +4,7 @@ import 'package:test/test.dart';
 
 var twoKeysTable = 'test_create';
 bool _table1Created = false;
+
 Future createTable1(TsClient client) async {
   if (!_table1Created) {
     var names = await client.listTableNames();
@@ -27,7 +28,8 @@ Future createTable1(TsClient client) async {
 var keyStringTableName = 'test_key_string';
 
 var _keyStringTableCreated = false;
-Future createKeyStringTable(TsClient client, {String name}) async {
+
+Future createKeyStringTable(TsClient client, {String? name}) async {
   if (name != null || !_keyStringTableCreated) {
     // We are limited in the number of create, test it well and sometimes delete!
     var tableName = name ?? keyStringTableName;
@@ -50,6 +52,7 @@ Future createKeyStringTable(TsClient client, {String name}) async {
 
 bool _tableWorkCreated = false;
 var workTableName = 'test_work';
+
 Future createWorkTable(TsClient client) async {
   if (!_tableWorkCreated) {
     var description = TsTableDescription(
@@ -71,7 +74,7 @@ Future createWorkTable(TsClient client) async {
 }
 
 TsPrimaryKey getWorkTableKey(
-    String col1, dynamic col2, dynamic col3, dynamic col4) {
+    String col1, Object col2, Object col3, Object col4) {
   return TsPrimaryKey([
     TsKeyValue('key1', col1),
     TsKeyValue('key2', col2 is int ? TsValueLong.fromNumber(col2) : col2),
@@ -137,7 +140,7 @@ void tablesTest(TsClient client) {
       await createKeyStringTable(client, name: name);
       names = await client.listTableNames();
       expect(names, contains(name));
-      expect((await client.describeTable(name)).tableMeta.toMap(), {
+      expect((await client.describeTable(name)).tableMeta!.toMap(), {
         'name': name,
         'primaryKeys': [
           {'name': 'key', 'type': 'string'}
@@ -177,7 +180,7 @@ void tablesTest(TsClient client) {
     test('createWorkTable', () async {
       await createWorkTable(client);
       var tableDescription = await client.describeTable(workTableName);
-      var tableMeta = tableDescription.tableMeta;
+      var tableMeta = tableDescription.tableMeta!;
       expect(tableMeta.toMap(), {
         'name': workTableName,
         'primaryKeys': [

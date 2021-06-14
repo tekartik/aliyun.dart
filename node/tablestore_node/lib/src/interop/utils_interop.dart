@@ -9,7 +9,7 @@ import 'package:tekartik_aliyun_tablestore_node/src/universal/ts_node_universal.
 import 'js_node_interop.dart' as js;
 
 /// Returns Dart representation from JS Object.
-dynamic tsDartifyValue(Object jsObject) {
+dynamic tsDartifyValue(Object? jsObject) {
   // devPrint('js: ${jsObjectAsCollection(jsObject)}');
   if (_isBasicType(jsObject)) {
     return jsObject;
@@ -26,7 +26,7 @@ dynamic tsDartifyValue(Object jsObject) {
     // No!
     throw ArgumentError.value(jsObject, 'list not supported');
   }
-  var jsLong = js.dartifyValueLong(jsObject);
+  var jsLong = js.dartifyValueLong(jsObject!);
   if (jsLong != null) {
     return jsLong;
   }
@@ -71,11 +71,11 @@ dynamic tsDartifyValue(Object jsObject) {
   return dartifyMap(jsObject);
 }
 
-Map<String, dynamic> dartifyMap(Object jsObject) {
+Map<String, dynamic> dartifyMap(Object? jsObject) {
   var keys = js.objectKeys(jsObject);
   var map = <String, dynamic>{};
   for (var key in keys) {
-    map[key] = tsDartifyValue(util.getProperty(jsObject, key));
+    map[key] = tsDartifyValue(util.getProperty(jsObject!, key));
   }
   return map;
 }
@@ -100,7 +100,7 @@ dynamic tsValueToNative(dynamic value) {
 }
 
 /// Returns the JS implementation from Dart Object.
-dynamic tsJsify(Object dartObject) {
+dynamic tsJsify(Object? dartObject) {
   if (_isBasicType(dartObject)) {
     return dartObject;
   }
@@ -121,7 +121,7 @@ dynamic tsJsify(Object dartObject) {
   if (dartObject is Map) {
     var jsMap = util.newObject();
     dartObject.forEach((key, value) {
-      util.setProperty(jsMap, key, tsJsify(value));
+      util.setProperty(jsMap as Object, key as Object, tsJsify(value));
     });
     return jsMap;
   }
@@ -165,7 +165,7 @@ dynamic callMethod(Object jsObject, String method, List<dynamic> args) =>
 
 /// Returns `true` if the [value] is a very basic built-in type - e.g.
 /// `null`, [num], [bool] or [String]. It returns `false` in the other case.
-bool _isBasicType(Object value) {
+bool _isBasicType(Object? value) {
   if (value == null || value is num || value is bool || value is String) {
     return true;
   }

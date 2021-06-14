@@ -2,10 +2,15 @@ import 'dart:typed_data';
 
 abstract class FcHttpRequest {
   String get path;
+
   String get url;
+
   String get method;
+
   Map<String, String> get headers;
+
   Future<String> getBodyString();
+
   Future<Uint8List> getBodyBytes();
 }
 

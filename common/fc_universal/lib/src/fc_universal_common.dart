@@ -7,13 +7,14 @@ export 'package:tekartik_aliyun_fc/fc_api.dart';
 export 'package:tekartik_aliyun_fc_http/src/function_compute_http.dart';
 
 abstract class FcServer {
-  Uri get uri;
+  Uri? get uri;
+
   Future<void> close();
 }
 
 abstract class AliyunFunctionComputeUniversal extends AliyunFunctionCompute {
   /// No effect on node
-  Future<FcServer> serve({int port});
+  Future<FcServer> serve({int? port});
 }
 
 class FcServerHttp implements FcServer {
@@ -36,12 +37,9 @@ class AliyunFunctionComputeHttpUniversal extends AliyunFunctionComputeHttp
       : super(httpServerFactory);
 
   @override
-  Future<FcServer> serve({int port}) async {
-    var httpServer = await serveHttp(port: port);
-    if (httpServer != null) {
-      return FcServerHttp(httpServer);
-    }
-    return null;
+  Future<FcServer> serve({int? port}) async {
+    var httpServer = await serveHttp(port: port!);
+    return FcServerHttp(httpServer);
   }
 }
 

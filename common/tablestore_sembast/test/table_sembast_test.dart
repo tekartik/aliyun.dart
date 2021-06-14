@@ -3,8 +3,8 @@ import 'package:tekartik_aliyun_tablestore_sembast/tablestore_sembast.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:test/test.dart';
 
-var options = TsClientOptions(
-    endpoint: 'sembast', secretAccessKey: null, accessKeyId: null);
+var options =
+    TsClientOptions(endpoint: 'sembast', secretAccessKey: '', accessKeyId: '');
 var tablestore = tablestoreSembastMemory;
 
 void main() {
@@ -12,7 +12,7 @@ void main() {
 }
 
 void tablesTest(TsClientOptions options) {
-  TsClient client;
+  late TsClient client;
   setUpAll(() {
     client = tablestore.client(options: options);
   });
@@ -62,14 +62,14 @@ void tablesTest(TsClientOptions options) {
     //expect(names, contains(tableName));
 
     var tableDescription = await client.describeTable(tableName);
-    var tableMeta = tableDescription.tableMeta;
+    var tableMeta = tableDescription.tableMeta!;
     expect(tableMeta.tableName, tableName);
 
     // devPrint(jsonPretty(tableDescription.tableMeta.toMap()));
     // TODO only for node, to check soon!
-    expect(tableMeta.primaryKeys.length, 2);
-    expect(tableMeta.primaryKeys[0].name, 'gid');
-    expect(tableMeta.primaryKeys[0].type, TsColumnType.integer);
+    expect(tableMeta.primaryKeys!.length, 2);
+    expect(tableMeta.primaryKeys![0].name, 'gid');
+    expect(tableMeta.primaryKeys![0].type, TsColumnType.integer);
   });
 }
 

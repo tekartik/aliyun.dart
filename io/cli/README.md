@@ -8,6 +8,6 @@ dependencies:
     git:
       url: git://github.com/tekartik/aliyun.dart
       path: io/cli
-      ref: dart2
+      ref: null_safety
     version: '>=0.1.0'
 ```

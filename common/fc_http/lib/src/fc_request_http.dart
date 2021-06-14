@@ -8,18 +8,18 @@ import 'package:tekartik_http/http.dart' as impl;
 
 class FcHttpRequestHttp implements FcHttpRequest {
   final impl.HttpRequest requestImpl;
-  Uint8List _body;
+  Uint8List? _body;
 
   final _bodyLock = Lock();
 
   Future<Uint8List> _readBody() async {
     if (_body != null) {
-      return _body;
+      return _body!;
     }
 
     return _bodyLock.synchronized(() async {
       if (_body != null) {
-        return _body;
+        return _body!;
       }
       var list = await requestImpl.toList();
       return Uint8List.fromList(list.expand((element) => element).toList());
@@ -43,7 +43,7 @@ class FcHttpRequestHttp implements FcHttpRequest {
   @override
   String get url => requestImpl.uri.toString();
 
-  FcHttpRequestHeaders _headers;
+  FcHttpRequestHeaders? _headers;
 
   @override
   Map<String, String> get headers => _headers ??= () {

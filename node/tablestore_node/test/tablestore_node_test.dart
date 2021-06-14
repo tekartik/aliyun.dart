@@ -10,7 +10,7 @@ import 'package:tekartik_aliyun_tablestore_node/src/universal/ts_node_universal.
 import 'package:tekartik_aliyun_tablestore_node/tablestore_node.dart';
 import 'package:test/test.dart';
 
-TsClient get tsClientTest => tsClientOptionsFromEnv != null
+TsClient? get tsClientTest => tsClientOptionsFromEnv != null
     ? tablestoreNode.client(options: tsClientOptionsFromEnv)
     : null;
 
@@ -41,7 +41,7 @@ void main() {
           tsNodeCommonShim.rowExistenceExpectation.EXPECT_NOT_EXIST);
     });
     test('ReturnType', () {
-      expect(jsObjectAsMap(getProperty(tablestoreJs, 'ReturnType')),
+      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'ReturnType')),
           {'NONE': 0, 'Primarykey': 1, 'AfterModify': 2});
       expect(tsNodeCommon.returnType.NONE, tsNodeCommonShim.returnType.NONE);
       expect(tsNodeCommon.returnType.Primarykey,
@@ -50,7 +50,7 @@ void main() {
           tsNodeCommonShim.returnType.AfterModify);
     });
     test('ComparatorType', () {
-      expect(jsObjectAsMap(getProperty(tablestoreJs, 'ComparatorType')), {
+      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'ComparatorType')), {
         'EQUAL': 1,
         'NOT_EQUAL': 2,
         'GREATER_THAN': 3,
@@ -73,7 +73,7 @@ void main() {
     });
 
     test('LogicalOperator', () {
-      expect(jsObjectAsMap(getProperty(tablestoreJs, 'LogicalOperator')),
+      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'LogicalOperator')),
           {'NOT': 1, 'AND': 2, 'OR': 3});
       expect(tsNodeCommon.logicalOperator.NOT,
           tsNodeCommonShim.logicalOperator.NOT);
@@ -84,7 +84,7 @@ void main() {
     });
 
     test('Direction', () {
-      expect(jsObjectAsMap(getProperty(tablestoreJs, 'Direction')),
+      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'Direction')),
           {'FORWARD': 'FORWARD', 'BACKWARD': 'BACKWARD'});
       expect(
           tsNodeCommon.direction.FORWARD, tsNodeCommonShim.direction.FORWARD);
@@ -93,8 +93,8 @@ void main() {
     });
 
     test('INF_MIN/MAX', () {
-      expect(jsObjectAsMap(getProperty(tablestoreJs, 'INF_MIN')), {});
-      expect(jsObjectAsMap(getProperty(tablestoreJs, 'INF_MAX')), {});
+      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'INF_MIN')), {});
+      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'INF_MAX')), {});
     });
   }, skip: client == null);
 }

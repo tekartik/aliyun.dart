@@ -54,7 +54,6 @@ export 'src/ts_row.dart'
         TsStartLocalTransactionRequest,
         TsStartLocalTransactionResponse,
         TsStartLocalTransactionResponseExt;
-
 export 'src/ts_table.dart'
     show
         TsTableDescription,

@@ -100,7 +100,7 @@ void rowTest(TsClient client) {
       var getResponse = await client.getRow(
           TsGetRowRequest(tableName: keyStringTableName, primaryKey: key));
       expect(
-          getResponse.row.attributes.map((attr) => attr.name).toList()..sort(),
+          getResponse.row.attributes!.map((attr) => attr.name).toList()..sort(),
           ['test1', 'test2', 'test3']);
       // With column
       getResponse = await client.getRow(TsGetRowRequest(
@@ -178,12 +178,12 @@ void rowTest(TsClient client) {
       getResponse = await client.getRow(TsGetRowRequest(
           tableName: keyStringTableName, primaryKey: key, columns: []));
       // Implementation reads all attributes
-      expect(getResponse.row.attributes.length, 3);
+      expect(getResponse.row.attributes!.length, 3);
 
       // With key columns
       getResponse = await client.getRow(TsGetRowRequest(
           tableName: keyStringTableName, primaryKey: key, columns: ['key']));
-      expect(getResponse.row.attributes.length, 0);
+      expect(getResponse.row.attributes!.length, 0);
     });
 
     test('getRow missing table', () async {
@@ -272,6 +272,7 @@ void rowTest(TsClient client) {
         expect(e.retryable, isFalse);
       }
 
+      /*
       var nullKey = TsPrimaryKey([TsKeyValue('key', null)]);
       try {
         await client.putRow(TsPutRowRequest(
@@ -295,10 +296,13 @@ void rowTest(TsClient client) {
         // expect(e.isPrimaryKeyTypeError, isTrue);
         expect(e.retryable, isFalse);
       }
+       */
 
       // Null data
       response = await client.putRow(TsPutRowRequest(
-          tableName: keyStringTableName, primaryKey: key, data: null));
+          tableName: keyStringTableName,
+          primaryKey: key,
+          data: TsAttributes([])));
       expect(response.toDebugMap(), {
         'row': {
           'primaryKey': [
@@ -311,7 +315,7 @@ void rowTest(TsClient client) {
           (await client.getRow(TsGetRowRequest(
                   tableName: keyStringTableName, primaryKey: key)))
               .row
-              .attributes
+              .attributes!
               .toDebugList(),
           []);
 
@@ -332,7 +336,7 @@ void rowTest(TsClient client) {
           (await client.getRow(TsGetRowRequest(
                   tableName: keyStringTableName, primaryKey: key)))
               .row
-              .attributes
+              .attributes!
               .toDebugList(),
           [
             {'test': 'text'}
@@ -341,7 +345,7 @@ void rowTest(TsClient client) {
           (await client.getRow(TsGetRowRequest(
                   tableName: keyStringTableName, primaryKey: key)))
               .row
-              .attributes
+              .attributes!
               .toMap(),
           {'test': TsAttribute('test', 'text')});
 
@@ -645,8 +649,8 @@ void rowTest(TsClient client) {
               as Map)['test'],
           {'@long': '90071992547409910'});
 
-      expect(getResponse.row.attributes.first.name, 'test');
-      var long = getResponse.row.attributes.first.value as TsValueLong;
+      expect(getResponse.row.attributes!.first.name, 'test');
+      var long = getResponse.row.attributes!.first.value as TsValueLong;
       if (isRunningAsJavascript) {
         expect(TsValueLong.fromNumber(long.toNumber()).toString(),
             isNot('90071992547409910'));
@@ -684,7 +688,7 @@ void rowTest(TsClient client) {
           (((getResponse.toDebugMap()['row'] as Map)['attributes'] as List)[0]
               as Map)['test'],
           {'@blob': 'AQID'});
-      var binary = getResponse.row.attributes.first.value;
+      var binary = getResponse.row.attributes!.first.value;
       expect(binary, const TypeMatcher<Uint8List>());
       expect(binary, buffer);
     });
@@ -828,7 +832,8 @@ void rowTest(TsClient client) {
       ]));
       var getResponse = await client.getRow(
           TsGetRowRequest(tableName: keyStringTableName, primaryKey: key1));
-      expect(getResponse.row.attributes.list.first, TsAttribute.int('test', 2));
+      expect(
+          getResponse.row.attributes!.list.first, TsAttribute.int('test', 2));
 
       // conditional update
       response = await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
@@ -861,7 +866,8 @@ void rowTest(TsClient client) {
        */
       getResponse = await client.getRow(
           TsGetRowRequest(tableName: keyStringTableName, primaryKey: key1));
-      expect(getResponse.row.attributes.list.first, TsAttribute.int('test', 2));
+      expect(
+          getResponse.row.attributes!.list.first, TsAttribute.int('test', 2));
 
       response = await client.batchWriteRows(TsBatchWriteRowsRequest(tables: [
         TsBatchWriteRowsRequestTable(
@@ -949,8 +955,8 @@ void rowTest(TsClient client) {
               TsPrimaryKey([TsKeyValue('key', TsValueInfinite.max)])));
       expect(
           response.rows
-              .where(
-                  (element) => element.primaryKey.list.first.value == 'range_1')
+              .where((element) =>
+                  element.primaryKey!.list.first.value == 'range_1')
               .map((e) => e.toDebugMap()),
           [
             {

@@ -10,13 +10,12 @@ class TsKeyValue {
 
   TsKeyValue(this.name, this.value) {
     assert(
-        (value == null ||
-            value is TsValueLong ||
+        (value is TsValueLong ||
             value is TsValueInfinite ||
             value is String ||
             value is Uint8List ||
             value is double),
-        'TsKeyValue: value \'$name\': $value (type ${value?.runtimeType} not supported');
+        'TsKeyValue: value \'$name\': $value (type ${value.runtimeType} not supported');
   }
 
   TsKeyValue.string(String name, String value) : this(name, value);
@@ -73,7 +72,7 @@ class TsAttributes with ListMixin<TsAttribute> {
 
 // Read only
 class TsAttribute extends TsKeyValue {
-  TsAttribute(String name, value) : super(name, value);
+  TsAttribute(String name, Object value) : super(name, value);
 
   TsAttribute.int(String name, int value) : super.int(name, value);
 

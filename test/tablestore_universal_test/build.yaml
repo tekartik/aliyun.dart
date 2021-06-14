@@ -6,8 +6,8 @@ targets:
       - "bin/**"
       - "test/**"
     builders:
-      build_node_compilers|entrypoint:
+      build_web_compilers|entrypoint:
         generate_for:
-        - bin/**
+          - bin/**
         options:
           compiler: dart2js

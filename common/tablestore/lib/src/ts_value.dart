@@ -10,12 +10,11 @@ Model blobToDebugValue(Uint8List bytes) =>
 // Can be of any type TsValue, double, String but not int!
 Object tsValueToDebugValue(Object value) {
   assert(
-      (value == null ||
-          value is TsValue ||
+      (value is TsValue ||
           value is String ||
           value is Uint8List ||
           value is double),
-      'value $value (type ${value?.runtimeType} not supported');
+      'value $value (type ${value.runtimeType} not supported');
   if (value is TsValueBase) {
     return value.toDebugMap();
   } else if (value is Uint8List) {
@@ -35,19 +34,25 @@ abstract class TsValueBase implements TsValue {
 abstract class TsValueLong extends TsValueBase {
   // From caller only
   factory TsValueLong.fromNumber(int value) => _TsValueLongNumber(value);
+
   // From caller only
   factory TsValueLong.fromString(String value) => _TsValueLongString(value);
+
   // Convert to int
   int toNumber();
+
   @override
   String toString();
 }
 
 class TsValueInfinite implements TsValueBase {
   final String _label;
+
   const TsValueInfinite._(this._label);
+
   static const min = TsValueInfinite._('INF_MIN');
   static const max = TsValueInfinite._('INF_MAX');
+
   @override
   String toString() => _label;
 

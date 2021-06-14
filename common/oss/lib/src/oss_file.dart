@@ -17,19 +17,19 @@ abstract class OssListFilesResponse {
   bool get isTruncated;
 
   /// Next marker
-  String get nextMarker;
+  String? get nextMarker;
 }
 
 /// List request
 class OssListFilesOptions {
   /// Max number of items (1000 being the default).
-  final int maxResults;
+  final int? maxResults;
 
   /// Filter.
-  final String prefix;
+  final String? prefix;
 
   /// Marker (start marker), can be modified for the next query.
-  String marker;
+  String? marker;
 
   /// List files options.
   OssListFilesOptions({this.maxResults, this.prefix, this.marker});

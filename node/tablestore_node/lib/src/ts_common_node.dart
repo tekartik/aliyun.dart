@@ -28,23 +28,31 @@ abstract class TsConstantRowExistenceExpectation {
 //         'LESS_EQUAL': 6
 abstract class TsConstantComparatorType {
   int get EQUAL;
+
   int get NOT_EQUAL;
+
   int get GREATER_THAN;
+
   int get GREATER_EQUAL;
+
   int get LESS_THAN;
+
   int get LESS_EQUAL;
 }
 
 // {'FORWARD': 'FORWARD', 'BACKWARD': 'BACKWARD'}
 abstract class TsConstantDirection {
   String get FORWARD;
+
   String get BACKWARD;
 }
 
 //  {'NOT': 1, 'AND': 2, 'OR': 3}
 abstract class TsConstantLogicalOperator {
   int get NOT;
+
   int get AND;
+
   int get OR;
 }
 
@@ -60,21 +68,29 @@ abstract class TsConstantReturnType {
 abstract class TsNodeLong implements TsValueLong {
   @override
   int toNumber();
+
   @override
   String toString();
 }
 
 abstract class TsNodeLongClass {
   TsNodeLong fromNumber(int value);
+
   TsNodeLong fromString(String value);
 }
 
 abstract class TsNodeCommon {
   TsConstantPrimaryKey get primaryKeyType;
+
   TsConstantRowExistenceExpectation get rowExistenceExpectation;
+
   TsConstantReturnType get returnType;
+
   TsConstantComparatorType get comparatorType;
+
   TsConstantLogicalOperator get logicalOperator;
+
   TsConstantDirection get direction;
+
   TsNodeLongClass get long;
 }

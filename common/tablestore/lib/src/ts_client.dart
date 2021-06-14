@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 
@@ -14,12 +13,12 @@ class TsClientOptions {
   final String endpoint;
 
   /// Table store instance name
-  final String instanceName;
+  final String? instanceName;
 
   TsClientOptions(
-      {@required this.accessKeyId,
-      @required this.secretAccessKey,
-      @required this.endpoint,
+      {required this.accessKeyId,
+      required this.secretAccessKey,
+      required this.endpoint,
       this.instanceName});
 
   @override

@@ -2,14 +2,10 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:meta/meta.dart';
 import 'package:tekartik_aliyun_oss/oss.dart';
 import 'package:tekartik_aliyun_oss/src/oss_bucket.dart';
 
 String obfuscate(String text) {
-  if (text == null) {
-    return null;
-  }
   var keepCount = min(4, text.length ~/ 2);
   return '${List.generate(text.length - keepCount, (_) => '*').join()}${text.substring(text.length - keepCount)}';
 }
@@ -26,9 +22,9 @@ class OssClientOptions {
   final String endpoint;
 
   OssClientOptions(
-      {@required this.accessKeyId,
-      @required this.accessKeySecret,
-      @required this.endpoint});
+      {required this.accessKeyId,
+      required this.accessKeySecret,
+      required this.endpoint});
 
   @override
   String toString() {
@@ -58,13 +54,13 @@ abstract class OssClient {
   /// Get a file as bytes
   ///
   /// null if not found.
-  Future<Uint8List> getAsBytes(String bucketName, String path);
+  Future<Uint8List?> getAsBytes(String bucketName, String path);
 
   /// Write a file as a string
   Future<void> putAsString(String bucketName, String path, String text);
 
   /// Read a file as a string
-  Future<String> getAsString(String bucketName, String path);
+  Future<String?> getAsString(String bucketName, String path);
 
   /// Delete a file
   ///
@@ -73,7 +69,7 @@ abstract class OssClient {
 
   /// List all object in a bucket
   Future<OssListFilesResponse> list(String bucketName,
-      [OssListFilesOptions options]);
+      [OssListFilesOptions? options]);
 }
 
 mixin OssClientMixin implements OssClient {
@@ -83,7 +79,7 @@ mixin OssClientMixin implements OssClient {
 
   @override
   Future<OssListFilesResponse> list(String bucketName,
-      [OssListFilesOptions options]) {
+      [OssListFilesOptions? options]) {
     throw UnimplementedError(
         'list($bucketName${options != null ? ', $options' : ''})');
   }
@@ -109,7 +105,7 @@ mixin OssClientMixin implements OssClient {
       putAsBytes(bucketName, path, Uint8List.fromList(utf8.encode(text)));
 
   @override
-  Future<String /*?*/ > getAsString(String bucketName, String path) async {
+  Future<String?> getAsString(String bucketName, String path) async {
     var bytes = await getAsBytes(bucketName, path);
     if (bytes != null) {
       return utf8.decode(bytes);
@@ -118,7 +114,7 @@ mixin OssClientMixin implements OssClient {
   }
 
   @override
-  Future<Uint8List /*?*/ > getAsBytes(String bucketName, String path) {
+  Future<Uint8List?> getAsBytes(String bucketName, String path) {
     throw UnimplementedError('getAsBytes($bucketName, $path)');
   }
 

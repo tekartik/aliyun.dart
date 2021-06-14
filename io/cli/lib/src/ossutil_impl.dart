@@ -7,9 +7,9 @@ import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_common_utils/version_utils.dart';
 
 /// Exe path
-String ossutil;
+String? ossutil;
 
-String get ossutilShell => shellArgument(ossutil);
+String get ossutilShell => shellArgument(ossutil!);
 var _lock = Lock();
 
 Future setupOssutil() async {
@@ -46,11 +46,9 @@ Future<Version> getOssutilVersion() async {
       }
       try {
         var version = parseVersion(versionText);
-        if (version != null) {
-          return version;
-        }
+        return version;
       } catch (_) {}
     }
   }
-  return null;
+  throw StateError('$ossutil not found');
 }
