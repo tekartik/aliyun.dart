@@ -295,7 +295,7 @@ class TsClientSembast implements TsClient {
           var row = table.row(requestRow.primaryKey);
           var record = row.record();
           var isOk = true;
-          late String errorMessage;
+          String? errorMessage;
           int? key;
           try {
             key = await _checkPutDeleteCondition(record, requestRow.condition);
@@ -339,8 +339,8 @@ class TsClientSembast implements TsClient {
     var list = <TsAttribute>[];
     if (key != null) {
       var existing = await record.get(null);
-      if (existing?.attributes.isNotEmpty ?? false) {
-        list.addAll(existing!.attributes);
+      if (existing?.attributes?.isNotEmpty ?? false) {
+        list.addAll(existing!.attributes!);
       }
     }
     // Merge!
@@ -376,7 +376,7 @@ class TsClientSembast implements TsClient {
       record = await _updateRow(key: key, record: record, data: request.data);
       var list = <TsAttribute?>[];
       if (key != null) {
-        list.addAll((await record.get(null))!.attributes);
+        list.addAll((await record.get(null))!.attributes!);
       }
       // Merge!
       for (var update in request.data) {
@@ -464,9 +464,9 @@ class TsGetRowSembast implements TsGetRow {
   TsGetRowSembast(this.exists, this.primaryKey, this.attributes);
 
   @override
-  final TsPrimaryKey primaryKey;
+  final TsPrimaryKey? primaryKey;
   @override
-  final TsAttributes attributes;
+  final TsAttributes? attributes;
 }
 
 dynamic valueToSembastValue(dynamic value) {
@@ -753,7 +753,7 @@ class TsGetRowResponseSembast extends TsReadRowResponseSembast
       : super(rowContext, exists);
 
   @override
-  TsGetRow get row => TsGetRowSembast(exists, primaryKey!, attributes!);
+  TsGetRow get row => TsGetRowSembast(exists, primaryKey, attributes);
 }
 
 class TsReadRowResponseSembast {
