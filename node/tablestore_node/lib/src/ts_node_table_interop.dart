@@ -215,10 +215,10 @@ TsTableDescription tableDescriptionFromNative(Object nativeDesc) {
     var nativePrimaryKeys = tableMetaPrimaryKeys(nativeTableMeta);
 
     primaryKeys = <TsPrimaryKeyDef>[];
-    nativePrimaryKeys.forEach((element) {
-      primaryKeys!.add(TsPrimaryKeyDef(
+    for (var element in nativePrimaryKeys) {
+      primaryKeys.add(TsPrimaryKeyDef(
           type: nativeTypeToColumnType(element.type), name: element.name));
-    });
+    }
     tableMeta = TsTableDescriptionTableMeta(
         tableName: nativeTableMeta.tableName, primaryKeys: primaryKeys);
   }

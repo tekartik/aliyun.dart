@@ -38,7 +38,7 @@ void main() {
       var uri = server.uri;
       var client = httpClientFactoryMemory.newClient();
       await httpClientRead(client, httpMethodGet,
-          Uri.parse('${url.join(uri.toString(), 'handler')}'));
+          Uri.parse(url.join(uri.toString(), 'handler')));
       //var map = jsonDecode(result) as Map;
 
       await server.close();
@@ -51,7 +51,7 @@ void main() {
       var uri = server.uri;
       var client = httpClientFactoryMemory.newClient();
       await httpClientRead(client, httpMethodGet,
-          Uri.parse('${url.join(uri.toString(), 'handler')}'));
+          Uri.parse(url.join(uri.toString(), 'handler')));
       //var map = jsonDecode(result) as Map;
       await server.close();
       client.close();

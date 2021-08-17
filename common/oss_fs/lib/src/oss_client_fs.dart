@@ -117,7 +117,9 @@ class OssClientFs with OssClientMixin {
       }
       await fs.file(fsFilePath).delete();
     } catch (e) {
-      return null;
+      if (debugAliyunOssFs) {
+        info('delete failed $e');
+      }
     }
   }
 

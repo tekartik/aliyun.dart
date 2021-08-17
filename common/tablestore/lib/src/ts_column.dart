@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:cv/cv.dart';
 import 'package:tekartik_aliyun_tablestore/src/ts_value.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
-import 'package:tekartik_common_utils/model/model.dart';
 
 class TsKeyValue {
   final String name;
@@ -30,7 +30,7 @@ class TsKeyValue {
   TsKeyValue.binary(String name, Uint8List value) : this(name, value);
 
   // Json
-  Model toDebugMap() => Model({name: tsValueToDebugValue(value)});
+  Model toDebugMap() => asModel({name: tsValueToDebugValue(value)});
 
   @override
   String toString() => toDebugMap().toString();
@@ -62,7 +62,7 @@ class TsAttributes with ListMixin<TsAttribute> {
       throw UnsupportedError('read only');
 
   ModelList toDebugList() =>
-      ModelList(list.map((e) => e.toDebugMap()).toList(growable: false));
+      asModelList(list.map((e) => e.toDebugMap()).toList(growable: false));
 
   Map<String, TsAttribute> toMap() =>
       list.fold(<String, TsAttribute>{}, (map, attr) {

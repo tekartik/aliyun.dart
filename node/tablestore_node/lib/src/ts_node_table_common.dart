@@ -1,9 +1,9 @@
+import 'package:cv/cv.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore_common.dart';
-import 'package:tekartik_common_utils/model/model.dart';
 
 Map<String, dynamic> toCreateTableParams(TsTableDescription description) {
-  var map = Model({
+  var map = asModel({
     if (description.tableMeta != null)
       'tableMeta': {
         'tableName': description.tableMeta!.tableName,

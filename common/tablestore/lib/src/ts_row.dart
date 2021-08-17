@@ -1,5 +1,5 @@
+import 'package:cv/cv.dart';
 import 'package:tekartik_aliyun_tablestore/src/ts_column.dart';
-import 'package:tekartik_common_utils/model/model.dart';
 
 class TsGetRowRequest {
   final String tableName;
@@ -67,7 +67,7 @@ class TsCondition {
           TsConditionRowExistenceExpectation.expectNotExist);
 
   Model toDebugMap() {
-    return Model()
+    return asModel({})
       ..setValue('column', columnCondition?.toDebugMap())
       ..setValue('rowExistence', rowExistenceExpectation);
   }
@@ -130,7 +130,7 @@ class TsColumnSingleCondition implements TsColumnCondition {
   final dynamic value;
 
   @override
-  Model toDebugMap() => Model()
+  Model toDebugMap() => asModel({})
     ..setValue('name', name)
     ..setValue('operator', operator)
     ..setValue('value', value);
@@ -145,7 +145,7 @@ class TsColumnCompositeCondition implements TsColumnCondition {
   TsColumnCompositeCondition(this.operator, this.list);
 
   @override
-  Model toDebugMap() => Model()
+  Model toDebugMap() => asModel({})
     ..setValue('operator', operator)
     ..setValue('list', list.map((e) => e.toDebugMap()).toList(growable: false));
 }
@@ -166,7 +166,7 @@ class TsPrimaryKey {
   String toString() => list.toString();
 
   ModelList toDebugList() =>
-      ModelList(list.map((e) => e.toDebugMap()).toList(growable: false));
+      asModelList(list.map((e) => e.toDebugMap()).toList(growable: false));
 
   Map<String, TsKeyValue> toMap() =>
       list.fold(<String, TsKeyValue>{}, (map, kv) {
@@ -362,41 +362,41 @@ abstract class TsBatchWriteRowsResponse {
 
 extension TsGetRowResponseExt on TsGetRowResponse {
   Model toDebugMap() {
-    return Model({})..setValue('row', row.toDebugMap());
+    return asModel({})..setValue('row', row.toDebugMap());
   }
 }
 
 extension TsPutRowResponseExt on TsPutRowResponse {
   Model toDebugMap() {
-    return Model({})..setValue('row', row.toDebugMap());
+    return asModel({})..setValue('row', row.toDebugMap());
   }
 }
 
 extension TsUpdateRowResponseExt on TsUpdateRowResponse {
   Model toDebugMap() {
-    return Model({})..setValue('row', row.toDebugMap());
+    return asModel({})..setValue('row', row.toDebugMap());
   }
 }
 
 extension TsStartLocalTransactionResponseExt
     on TsStartLocalTransactionResponse {
   Model toDebugMap() {
-    return Model({})..setValue('transactionId', transactionId);
+    return asModel({})..setValue('transactionId', transactionId);
   }
 }
 
 extension TsGetRangeResponseExt on TsGetRangeResponse {
   Model toDebugMap() {
-    return Model({})
+    return asModel({})
       ..setValue('rows', rows.map((row) => row.toDebugMap()))
       ..setValue('nextStartPrimaryKey', nextStartPrimaryKey?.toDebugList());
-    //return Model({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
+    //return asModel({})..setValue('rows', rows?.map((row) => row.toDebugMap()));
   }
 }
 
 extension TsBatchGetRowsResponseExt on TsBatchGetRowsResponse {
   Model toDebugMap() {
-    return Model({})
+    return asModel({})
       ..setValue(
           'tables',
           tables
@@ -408,7 +408,7 @@ extension TsBatchGetRowsResponseExt on TsBatchGetRowsResponse {
 
 extension TsBatchWriteRowsResponseExt on TsBatchWriteRowsResponse {
   Model toDebugMap() {
-    return Model({})
+    return asModel({})
       ..setValue(
           'rows', rows.map((row) => row.toDebugMap()).toList(growable: false));
   }
@@ -416,7 +416,7 @@ extension TsBatchWriteRowsResponseExt on TsBatchWriteRowsResponse {
 
 extension TsBatchGetRowsResponseRowExt on TsBatchGetRowsResponseRow {
   Model toDebugMap() {
-    return Model({})
+    return asModel({})
       ..setValue('isOk', isOk)
       ..setValue('errorMessage', errorMessage)
       ..setValue('errorCode', errorCode)
@@ -428,13 +428,13 @@ extension TsBatchGetRowsResponseRowExt on TsBatchGetRowsResponseRow {
 
 extension TsDeleteRowResponseExt on TsDeleteRowResponse {
   Model toDebugMap() {
-    return Model({});
+    return asModel({});
   }
 }
 
 extension TsGetRowExt on TsGetRow {
   Model toDebugMap() {
-    return Model()
+    return asModel({})
       ..setValue('primaryKey', primaryKey?.toDebugList())
       ..setValue('attributes', attributes?.toDebugList());
   }
