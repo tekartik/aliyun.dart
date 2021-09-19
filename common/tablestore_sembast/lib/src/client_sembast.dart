@@ -599,14 +599,14 @@ List<TsAttribute> readAttributesColumnsBut(
   }
   var list = <TsAttribute>[];
 
-  columns.forEach((key) {
+  for (var key in columns) {
     if (!but.contains(key)) {
       if (map!.containsKey(key)) {
         var value = sembastValueToValue(map[key]) as Object;
         list.add(TsAttribute(key, value));
       }
     }
-  });
+  }
   return list;
 }
 
@@ -618,7 +618,7 @@ class TsRowRecordContextSembast {
   DatabaseClient get client => table.client;
   final List<TsAttribute>? attributes;
 
-  final _data = Model();
+  final _data = asModel({});
   final _keys = <String?>[];
   List<KeyValueSembast>? _sembastPrimaryKeys;
   List<KeyValueSembast>? _sembastAttributes;

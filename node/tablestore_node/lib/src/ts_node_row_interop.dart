@@ -272,9 +272,9 @@ class JsArrayWrapper<T> {
   }
 
   void addAll(Iterable<T> list) {
-    list.forEach((element) {
+    for (var element in list) {
       add(element);
-    });
+    }
   }
 }
 
@@ -284,27 +284,27 @@ dynamic toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
   var tablesJs = [];
   /*util.newObject();
   var tablesJsIndex = 0;*/
-  request.tables.forEach((table) {
+  for (var table in request.tables) {
     var tableJs = util.newObject() as Object;
     util.setProperty(tableJs, 'tableName', table.tableName);
     var pksJs = JsArrayWrapper();
-    table.primaryKeys.forEach((pk) {
+    for (var pk in table.primaryKeys) {
       var pkcsJs = [];
       // var pkcsJsIndex = 0;
-      pk.list.forEach((pkc) {
+      for (var pkc in pk.list) {
         var pkcJs = util.newObject() as Object;
-        util.setProperty(pkcJs, 'key', 'batch_1');
+        util.setProperty(pkcJs, pkc.name, pkc.value);
         //util.setProperty(pkcsJs, pkcsJsIndex++, pkcJs);
         pkcsJs.add(pkcJs);
-      });
+      }
 
       pksJs.add(pkcsJs);
-    });
+    }
     util.setProperty(tableJs, 'primaryKey', pksJs.native);
     //util.callMethod(tablesJs, 'push', [tableJs]);
     tablesJs.add(tableJs);
     //util.setProperty(tablesJs, tablesJsIndex++, tableJs);
-  });
+  }
   util.setProperty(requestJs, 'tables', tablesJs);
 
   /*

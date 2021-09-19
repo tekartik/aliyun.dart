@@ -1,4 +1,4 @@
-import 'package:tekartik_common_utils/model/model.dart';
+import 'package:cv/cv.dart';
 
 abstract class OssBucket {
   /// Oss bucket name
@@ -10,7 +10,7 @@ abstract class OssBucket {
 
 mixin OssBucketMixin implements OssBucket {
   Model toDebugMap() {
-    return Model({'name': name})..setValue('location', location);
+    return asModel({'name': name})..setValue('location', location);
   }
 
   @override

@@ -1,11 +1,11 @@
 import 'dart:typed_data';
 
+import 'package:cv/cv.dart';
 import 'package:meta/meta.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
-import 'package:tekartik_common_utils/model/model.dart';
 
 Model blobToDebugValue(Uint8List bytes) =>
-    Model({'@blob': base64Encode(bytes)});
+    asModel({'@blob': base64Encode(bytes)});
 
 // Can be of any type TsValue, double, String but not int!
 Object tsValueToDebugValue(Object value) {
@@ -27,7 +27,7 @@ abstract class TsValue {}
 
 abstract class TsValueBase implements TsValue {
   @mustCallSuper
-  Model toDebugMap() => Model();
+  Model toDebugMap() => asModel({});
 }
 
 // Can be implemented too
@@ -57,7 +57,7 @@ class TsValueInfinite implements TsValueBase {
   String toString() => _label;
 
   @override
-  Model toDebugMap() => Model({
+  Model toDebugMap() => asModel({
         '@infinite': this == min
             ? 'min'
             : (this == max)
@@ -79,7 +79,7 @@ mixin _TsValueLongMixin implements TsValueLong {
   }
 
   @override
-  Model toDebugMap() => Model({'@long': toString()});
+  Model toDebugMap() => asModel({'@long': toString()});
 }
 
 // Only for valid js int(s)

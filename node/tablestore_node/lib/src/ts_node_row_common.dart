@@ -1,7 +1,7 @@
+import 'package:cv/cv.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/import.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_node_tablestore_common.dart';
-import 'package:tekartik_common_utils/model/model.dart';
 
 Map<String, dynamic> toPrimaryKeyValueParam(TsKeyValue keyValue) =>
     <String, dynamic>{keyValue.name: keyValue.value};
@@ -13,7 +13,7 @@ dynamic toListParam(List list) {
 }
 
 Map<String, dynamic> toGetRowParams(TsGetRowRequest request) {
-  var map = Model({
+  var map = asModel({
     'tableName': request.tableName,
     'primaryKey': tsPrimaryKeyParams(request.primaryKey),
     if (request.columns != null) 'columnsToGet': request.columns,
@@ -22,7 +22,7 @@ Map<String, dynamic> toGetRowParams(TsGetRowRequest request) {
 }
 
 Map<String, dynamic> toPutRowParams(TsPutRowRequest request) {
-  var map = Model({
+  var map = asModel({
     'tableName': request.tableName,
     // Needed
     'condition': request.condition ?? TsCondition.ignore,
@@ -35,7 +35,7 @@ Map<String, dynamic> toPutRowParams(TsPutRowRequest request) {
 }
 
 Map<String, dynamic> toUpdateRowParams(TsUpdateRowRequest request) {
-  var map = Model({
+  var map = asModel({
     'tableName': request.tableName,
     // Needed
     'condition': request.condition ?? TsCondition.expectExist,
@@ -76,7 +76,7 @@ List<Map<String, dynamic>> primaryKeyAsList(TsPrimaryKey primaryKey) =>
     primaryKey.list.map(toPrimaryKeyValueParam).toList(growable: false);
 
 Map<String, dynamic> toDeleteRowParams(TsDeleteRowRequest request) {
-  var map = Model({
+  var map = asModel({
     'tableName': request.tableName,
     // Needed
     'condition': request.condition ?? TsCondition.ignore,
@@ -86,7 +86,7 @@ Map<String, dynamic> toDeleteRowParams(TsDeleteRowRequest request) {
 }
 
 Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
-  var map = Model({
+  var map = asModel({
     'maxVersions': 1,
     'limit': request.limit,
     'tableName': request.tableName,
@@ -108,7 +108,7 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
 
 Map<String, dynamic> toStartLocalTransactionParams(
     TsStartLocalTransactionRequest request) {
-  var map = Model({
+  var map = asModel({
     'tableName': request.tableName,
     // Needed
     'primaryKey': tsPrimaryKeyParams(request.primaryKey),

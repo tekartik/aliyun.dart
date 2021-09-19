@@ -1,5 +1,5 @@
+import 'package:cv/cv.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
-import 'package:tekartik_common_utils/model/model.dart';
 
 enum TsColumnType {
   integer,
@@ -37,7 +37,7 @@ class TsPrimaryKeyDef {
   String toString() => 'pk($name, ${enumText(type)})';
 
   Model toMap() {
-    var map = Model({
+    var map = asModel({
       if (name != null) 'name': name,
       if (type != null) 'type': enumText(type),
       if (autoIncrement ?? false) 'autoIncrement': true
@@ -46,7 +46,7 @@ class TsPrimaryKeyDef {
   }
 
   factory TsPrimaryKeyDef.fromMap(Map? map) {
-    var model = Model(map);
+    var model = asModel(map ?? {});
     var name = model.getValue('name')?.toString();
     var type = _columnTypeFromText(model.getValue('type')?.toString());
     var autoIncrement = parseBool(model.getValue('autoIncrement'));
@@ -62,7 +62,7 @@ class TsTableDescriptionTableMeta {
   TsTableDescriptionTableMeta({this.tableName, this.primaryKeys});
 
   Model toMap() {
-    var map = Model({
+    var map = asModel({
       'name': tableName,
       if (primaryKeys != null)
         'primaryKeys':
@@ -72,13 +72,13 @@ class TsTableDescriptionTableMeta {
   }
 
   factory TsTableDescriptionTableMeta.fromMap(Map map) {
-    var model = Model(map);
+    var model = asModel(map);
     var tableName = model.getValue('name')?.toString();
     List<TsPrimaryKeyDef>? primaryKeys;
     var rawPrimaryKeys = model.getValue('primaryKeys');
     if (rawPrimaryKeys is List) {
       primaryKeys = rawPrimaryKeys
-          .map((raw) => TsPrimaryKeyDef.fromMap(asModel(raw)))
+          .map((raw) => TsPrimaryKeyDef.fromMap(asModel(raw as Map)))
           .toList(growable: false);
     }
     return TsTableDescriptionTableMeta(
@@ -92,13 +92,13 @@ class TsTableDescriptionReservedThroughput {
   TsTableDescriptionReservedThroughput({this.capacityUnit});
 
   Model toMap() {
-    var map = Model(
+    var map = asModel(
         {if (capacityUnit != null) 'capacityUnit': capacityUnit!.toMap()});
     return map;
   }
 
   factory TsTableDescriptionReservedThroughput.fromMap(Map map) {
-    var model = Model(map);
+    var model = asModel(map);
     TsTableCapacityUnit? capacityUnit;
     var rawCapacityUnit = model.getValue('capacityUnit');
     if (rawCapacityUnit is Map) {
@@ -115,7 +115,7 @@ class TsTableCapacityUnit {
   TsTableCapacityUnit({this.read, this.write});
 
   Model toMap() {
-    var map = Model(
+    var map = asModel(
         {if (read != null) 'read': read, if (write != null) 'write': write});
     return map;
   }
@@ -135,7 +135,7 @@ class TsTableDescriptionOptions {
   TsTableDescriptionOptions({this.timeToLive, this.maxVersions});
 
   Model toMap() {
-    var map = Model({
+    var map = asModel({
       if (timeToLive != null) 'timeToLive': timeToLive,
       if (maxVersions != null) 'maxVersions': maxVersions
     });
@@ -186,7 +186,7 @@ class TsTableDescription {
       'name ${tableMeta!.tableName}, primaryKeys: ${tableMeta!.primaryKeys}';
 
   Model toMap() {
-    var map = Model({
+    var map = asModel({
       if (tableMeta != null) 'tableMeta': tableMeta!.toMap(),
       if (reservedThroughput != null)
         'reservedThroughput': reservedThroughput!.toMap(),
@@ -196,7 +196,7 @@ class TsTableDescription {
   }
 
   factory TsTableDescription.fromMap(Map map) {
-    var model = Model(map);
+    var model = asModel(map);
     TsTableDescriptionTableMeta? tableMeta;
     var rawTableMeta = model.getValue('tableMeta');
     if (rawTableMeta is Map) {
