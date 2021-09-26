@@ -3,7 +3,6 @@ import 'dart:typed_data';
 import 'package:http/http.dart';
 import 'package:path/path.dart';
 import 'package:process_run/shell_run.dart';
-import 'package:process_run/utils/process_result_extension.dart';
 
 Future<void> main() async {
   await deploy();

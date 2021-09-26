@@ -1,11 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:path/path.dart' as p;
-import 'package:tekartik_aliyun_oss_fs/oss_fs.dart';
 import 'package:tekartik_aliyun_oss_fs/src/oss_file_fs.dart';
 
 import 'import.dart';
-import 'oss_service_fs.dart';
 
 class OssClientFs with OssClientMixin {
   final OssServiceFs service;

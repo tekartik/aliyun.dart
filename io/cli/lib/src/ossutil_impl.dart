@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:process_run/shell_run.dart';
-import 'package:process_run/utils/process_result_extension.dart';
-import 'package:process_run/which.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:tekartik_common_utils/version_utils.dart';
 

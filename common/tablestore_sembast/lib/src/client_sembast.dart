@@ -6,7 +6,6 @@ import 'package:sembast/sembast.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/src/client_sembast_exception.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/src/tablestore_sembast.dart';
-import 'package:tekartik_common_utils/common_utils_import.dart';
 
 import 'import.dart';
 
