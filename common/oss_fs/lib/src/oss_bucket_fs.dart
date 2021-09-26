@@ -1,4 +1,3 @@
-import 'package:tekartik_aliyun_oss_fs/oss_fs.dart';
 import 'package:tekartik_aliyun_oss_fs/src/import.dart';
 
 class OssBucketFs with OssBucketMixin implements OssBucket {

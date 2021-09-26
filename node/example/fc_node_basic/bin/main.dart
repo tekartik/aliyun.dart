@@ -2,7 +2,6 @@
   print('Hello');
 }
 */
-import 'package:tekartik_aliyun_fc/fc.dart';
 import 'package:tekartik_aliyun_fc_universal/fc_universal.dart';
 import 'package:tekartik_app_node_utils/node_utils.dart';
 import 'package:tekartik_common_utils/json_utils.dart';

@@ -1,4 +1,3 @@
-import 'package:tekartik_aliyun_tablestore/src/ts_row.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 
 /// Client options

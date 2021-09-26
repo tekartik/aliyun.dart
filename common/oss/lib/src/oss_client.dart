@@ -3,7 +3,6 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:tekartik_aliyun_oss/oss.dart';
-import 'package:tekartik_aliyun_oss/src/oss_bucket.dart';
 
 String obfuscate(String text) {
   var keepCount = min(4, text.length ~/ 2);

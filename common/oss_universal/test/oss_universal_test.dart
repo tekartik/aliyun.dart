@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:tekartik_aliyun_oss_node/oss_node.dart';
-import 'package:tekartik_aliyun_oss_universal/oss_universal.dart';
 import 'package:tekartik_aliyun_oss_universal/src/import.dart';
 import 'package:tekartik_aliyun_oss_universal/test/environment_client.dart';
 import 'package:tekartik_app_node_utils/node_utils.dart';
