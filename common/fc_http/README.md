@@ -6,8 +6,8 @@
 dependencies
   tekartik_aliyun_fc_http:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: common/fc_http
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.1.1'
 ```

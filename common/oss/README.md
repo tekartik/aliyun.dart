@@ -6,8 +6,8 @@
 dependencies:
   tekartik_aliyun_oss:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: common/oss
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.1.0'
 ```

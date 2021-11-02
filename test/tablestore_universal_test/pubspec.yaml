@@ -19,9 +19,9 @@ dev_dependencies:
   build_web_compilers:
   tekartik_build_node:
     git:
-      url: git://github.com/tekartik/build_node.dart
+      url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: null_safety
+      ref: dart2_3
 
 dependency_overrides:
   # WARNING

@@ -10,9 +10,9 @@ environment:
 dependencies:
   tekartik_aliyun_fc_universal:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: common/fc_universal
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.1.0'
 
 dev_dependencies:
@@ -21,18 +21,18 @@ dev_dependencies:
   # Aliyun function build
   tekartik_app_node_build:
     git:
-      url: git://github.com/tekartik/app_node_utils.dart
+      url: https://github.com/tekartik/app_node_utils.dart
       path: app_build
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.1.0'
   # needed node dev dependencies
   build_runner:
   build_web_compilers:
   tekartik_build_node:
     git:
-      url: git://github.com/tekartik/build_node.dart
+      url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: null_safety
+      ref: dart2_3
 
 dependency_overrides:
   tekartik_aliyun_fc_universal:
