@@ -9,21 +9,21 @@ environment:
 dependencies:
   tekartik_aliyun_tablestore:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: common/tablestore
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.2.3'
   tekartik_aliyun_tablestore_node:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: node/tablestore_node
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.2.3'
   tekartik_aliyun_tablestore_sembast:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: common/tablestore_sembast
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.2.3'
   dev_test: '>=0.13.3-dev.1'
 
@@ -35,9 +35,9 @@ dev_dependencies:
   build_web_compilers:
   tekartik_build_node:
     git:
-      url: git://github.com/tekartik/build_node.dart
+      url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: null_safety
+      ref: dart2_3
 dependency_overrides:
   tekartik_aliyun_tablestore:
     path: ../tablestore

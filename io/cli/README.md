@@ -6,8 +6,8 @@
 dependencies:
   tekartik_aliyun_cli:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: io/cli
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.1.0'
 ```

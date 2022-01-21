@@ -11,28 +11,28 @@ dependencies:
   path: ^1.7.0
   tekartik_aliyun_oss:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: common/oss
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.1.1'
   tekartik_aliyun_oss_node:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: node/oss_node
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.3.1'
   tekartik_aliyun_oss_fs:
     git:
-      url: git://github.com/tekartik/aliyun.dart
+      url: https://github.com/tekartik/aliyun.dart
       path: common/oss_fs
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.3.1'
 dev_dependencies:
   tekartik_test_menu_io:
     git:
-      url: git://github.com/tekartik/test_menu.dart
+      url: https://github.com/tekartik/test_menu.dart
       path: test_menu_io
-      ref: null_safety
+      ref: dart2_3
     version: '>=0.1.0'
   pedantic: ^1.9.0
   test: ^1.14.4
@@ -41,9 +41,9 @@ dev_dependencies:
   build_web_compilers:
   tekartik_build_node:
     git:
-      url: git://github.com/tekartik/build_node.dart
+      url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: null_safety
+      ref: dart2_3
 
 dependency_overrides:
   tekartik_aliyun_oss_node:
