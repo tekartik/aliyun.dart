@@ -427,12 +427,12 @@ class TsStartLocalTransactionResponseJs {
 class TsGetRangeResponseJs {
   external List get rows;
 
-  external List get nextStartPrimaryKey;
+  external List? get nextStartPrimaryKey;
 }
 
-Iterable<TsRowPrimaryKeyValueJs> getRangeResponseNextStartPrimaryKeyValuesJs(
+Iterable<TsRowPrimaryKeyValueJs>? getRangeResponseNextStartPrimaryKeyValuesJs(
         TsGetRangeResponseJs js) =>
-    js.nextStartPrimaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.nextStartPrimaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
 @JS()
 @anonymous
@@ -667,7 +667,7 @@ class TsGetRangeResponseNode implements TsGetRangeResponse {
       .toList(growable: false);
 
   @override
-  TsPrimaryKey get nextStartPrimaryKey => fromNativePrimaryKey(
+  TsPrimaryKey? get nextStartPrimaryKey => fromNativePrimaryKeyOrNull(
       getRangeResponseNextStartPrimaryKeyValuesJs(responseJs));
 }
 
