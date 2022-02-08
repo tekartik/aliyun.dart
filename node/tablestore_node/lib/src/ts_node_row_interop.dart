@@ -437,16 +437,16 @@ Iterable<TsRowPrimaryKeyValueJs> getRangeResponseNextStartPrimaryKeyValuesJs(
 @JS()
 @anonymous
 class TsReadRowJs {
-  external List get primaryKey;
+  external List? get primaryKey;
 
-  external List get attributes;
+  external List? get attributes;
 }
 
-Iterable<TsRowPrimaryKeyValueJs> rowPrimaryKeyValuesJs(TsReadRowJs js) =>
-    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+Iterable<TsRowPrimaryKeyValueJs>? rowPrimaryKeyValuesJs(TsReadRowJs js) =>
+    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
-Iterable<TsRowAttributeKeyValueJs> rowAttributeKeyValuesJs(TsReadRowJs js) =>
-    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
+Iterable<TsRowAttributeKeyValueJs>? rowAttributeKeyValuesJs(TsReadRowJs js) =>
+    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
 
 // Response to native
 TsGetRowResponse getRowResponseFromNative(dynamic nativeResponseJs) {
@@ -464,7 +464,7 @@ class TsGetRowNode implements TsGetRow {
 
   @override
   TsAttributes? get attributes =>
-      fromNativeAttributes(rowAttributeKeyValuesJs(rowJs));
+      fromNativeAttributesOrNull(rowAttributeKeyValuesJs(rowJs));
 
   @override
   String toString() => toDebugMap().toString();

@@ -12,7 +12,7 @@ import 'package:tekartik_aliyun_tablestore_node/src/ts_node_table_interop.dart'
 
 import 'import_interop.dart';
 
-bool debugTs = false; // true; // devWarning(true); true for now until it works
+bool debugTs = devWarning(true); // true for now until it works
 
 /// A structure for options provided to Firebase.
 @JS()
