@@ -183,18 +183,18 @@ abstract class TsBatchGetRowResponseRowJs {
 
   String get tableName;
 
-  List get primaryKey;
+  List? get primaryKey;
 
-  List get attributes;
+  List? get attributes;
 }
 
-Iterable<TsRowPrimaryKeyValueJs> batchRowPrimaryKeyValuesJs(
+Iterable<TsRowPrimaryKeyValueJs>? batchRowPrimaryKeyValuesJs(
         TsBatchGetRowResponseRowJs js) =>
-    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
-Iterable<TsRowAttributeKeyValueJs> batchRowAttributeKeyValuesJs(
+Iterable<TsRowAttributeKeyValueJs>? batchRowAttributeKeyValuesJs(
         TsBatchGetRowResponseRowJs js) =>
-    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
+    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
 
 @JS()
 @anonymous
