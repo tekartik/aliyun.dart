@@ -1,6 +1,6 @@
 name: tekartik_aliyun_fc_node
 description: A starting point for Dart libraries or applications.
-version: 0.2.2
+version: 0.2.2+1
 publish_to: none
 # homepage: https://www.example.com
 
@@ -30,9 +30,10 @@ dependencies:
     version: '>=0.10.14'
   tekartik_js_utils:
     git:
-      url: https://github.com/tekartik/common_js_utils.dart
+      url: https://github.com/tekartik/js_utils.dart
       ref: dart2_3
-    version: '>=0.10.14'
+      path: js_utils
+    version: '>=0.1.0'
 dev_dependencies:
 
   test: ^1.14.4

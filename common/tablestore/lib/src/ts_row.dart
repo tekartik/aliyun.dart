@@ -118,6 +118,7 @@ enum TsDirection {
   forward,
   backward,
 }
+
 enum TsLogicalOperator {
   and,
   or,
