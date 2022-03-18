@@ -1,7 +1,7 @@
 name: tekartik_aliyun_tablestore_universal_test
 description: Tablestore tests
 publish_to: none
-# version: 1.0.0
+version: 0.1.0
 # homepage: https://www.example.com
 
 environment:
@@ -23,6 +23,12 @@ dependencies:
       path: common/tablestore_universal
       ref: dart2_3
     version: '>=0.2.3'
+  tekartik_aliyun_tablestore_test:
+    git:
+      url: https://github.com/tekartik/aliyun.dart
+      path: test/tablestore_test
+      ref: dart2_3
+    # version: '>=0.1.0'
 dev_dependencies:
   process_run:
   # needed node dev dependencies
