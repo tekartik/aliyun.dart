@@ -10,7 +10,7 @@ import 'package:tekartik_aliyun_tablestore_universal/tablestore_universal.dart';
 import 'package:test/test.dart';
 
 TsClient? get tsClientTest => tsClientOptionsFromEnv != null
-    ? tablestore.client(options: tsClientOptionsFromEnv)
+    ? tablestoreUniversal.client(options: tsClientOptionsFromEnv)
     : null;
 
 void main() {

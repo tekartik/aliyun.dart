@@ -11,9 +11,20 @@ dependencies:
   path: ^1.7.0
   test:
   dev_test: '>=0.13.3-dev.1'
-
+  tekartik_aliyun_tablestore_node:
+    git:
+      url: https://github.com/tekartik/aliyun.dart
+      path: node/tablestore_node
+      ref: dart2_3
+    version: '>=0.2.3'
+  tekartik_aliyun_tablestore_universal:
+    git:
+      url: https://github.com/tekartik/aliyun.dart
+      path: common/tablestore_universal
+      ref: dart2_3
+    version: '>=0.2.3'
 dev_dependencies:
-  pedantic: ^1.9.0
+  process_run:
   # needed node dev dependencies
   build_runner:
   build_web_compilers:

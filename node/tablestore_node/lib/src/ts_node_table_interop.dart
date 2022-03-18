@@ -135,7 +135,7 @@ abstract class _TsClientTableDescriptionCapacityUnit {
   external int get write;
 }
 
-List<_TsClientPrimaryKey> tableMetaPrimaryKeys(
+List<_TsClientPrimaryKey> _tableMetaPrimaryKeys(
         _TsClientTableDescriptionTableMetaJs tableMeta) =>
     tableMeta.primaryKey.cast<_TsClientPrimaryKey>().toList(growable: false);
 
@@ -212,7 +212,7 @@ TsTableDescription tableDescriptionFromNative(Object nativeDesc) {
   TsTableDescriptionReservedThroughput? reservedThroughPut;
   if (nativeTableMeta != null) {
     List<TsPrimaryKeyDef>? primaryKeys;
-    var nativePrimaryKeys = tableMetaPrimaryKeys(nativeTableMeta);
+    var nativePrimaryKeys = _tableMetaPrimaryKeys(nativeTableMeta);
 
     primaryKeys = <TsPrimaryKeyDef>[];
     for (var element in nativePrimaryKeys) {

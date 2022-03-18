@@ -1,4 +1,5 @@
-import 'package:pedantic/pedantic.dart';
+import 'dart:async';
+
 import 'package:tekartik_aliyun_fc/fc.dart';
 import 'package:tekartik_aliyun_fc_http/src/fc_context_http.dart';
 import 'package:tekartik_aliyun_fc_http/src/fc_request_http.dart';

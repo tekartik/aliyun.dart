@@ -993,9 +993,9 @@ void rowTest(TsClient client) {
 
     group('getRangeComplex', () {
       var col1 = 'range_complex';
-      var _dataWritten = false;
+      var dataWritten = false;
       Future _writeComplexData() async {
-        if (!_dataWritten) {
+        if (!dataWritten) {
           await createWorkTable(client);
 
           var key1 = getWorkTableKey(col1, 1, 'col3_1', 2);
@@ -1019,7 +1019,7 @@ void rowTest(TsClient client) {
                   data: TsAttributes([TsAttribute.int('test', 4)])),
             ])
           ]));
-          _dataWritten = true;
+          dataWritten = true;
         }
       }
 

@@ -21,8 +21,20 @@ dependencies:
       path: common/fc
       ref: dart2_3
     version: '>=0.2.1'
+  js:
+  node_interop:
+  tekartik_common_utils:
+    git:
+      url: https://github.com/tekartik/common_utils.dart
+      ref: dart2_3
+    version: '>=0.10.14'
+  tekartik_js_utils:
+    git:
+      url: https://github.com/tekartik/common_js_utils.dart
+      ref: dart2_3
+    version: '>=0.10.14'
 dev_dependencies:
-  pedantic: ^1.9.0
+
   test: ^1.14.4
   # needed node dependencies
   build_runner:

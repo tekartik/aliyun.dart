@@ -7,8 +7,8 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dev_dependencies:
+  lints:
   dev_test: '>=0.13.0'
-  pedantic:
   path:
   pub_semver:
   process_run:

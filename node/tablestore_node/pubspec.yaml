@@ -22,10 +22,12 @@ dependencies:
       path: node_utils
       ref: dart2_3
     version: '>=0.1.0'
-
+  js:
+  node_interop:
+  cv:
 dev_dependencies:
   dev_test: '>=0.13.3-dev.1'
-  pedantic: ^1.9.0
+
   test: ^1.14.4
   # needed node dev dependencies
   build_runner:
