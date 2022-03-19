@@ -16,7 +16,8 @@ abstract class OssListFilesResponse {
   /// Truncated or not
   bool get isTruncated;
 
-  /// Next marker
+  /// Next marker, can be non null even if the query is done.
+  /// It is important to check for isTruncated before going on with the query.
   String? get nextMarker;
 }
 

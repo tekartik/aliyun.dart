@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
-import 'package:tekartik_common_utils/env_utils.dart';
 import 'package:test/test.dart';
 
 import 'table_test.dart';
@@ -620,13 +619,13 @@ void rowTest(TsClient client) {
         }
       });
 
+      var longValueText = '9007199254740991';
       // max int 9007199254740991
       await client.putRow(TsPutRowRequest(
           tableName: keyStringTableName,
           primaryKey: key,
           data: TsAttributes([
-            TsAttribute.long(
-                'test', TsValueLong.fromString('90071992547409910'))
+            TsAttribute.long('test', TsValueLong.fromString(longValueText))
           ])));
 
       // [{"columnName":"test","columnValue":{"buffer":[1,0,0,0,0,0,0,0],"offset":0},"timestamp":{"buffer":[34,112,237,99,116,1,0,0],"offset":0}}]},"RequestId":"0005aea6-5781-8d9d-2bc1-720b0a6d35ba"}
@@ -639,7 +638,7 @@ void rowTest(TsClient client) {
           ],
           'attributes': [
             {
-              'test': {'@long': '90071992547409910'}
+              'test': {'@long': longValueText}
             }
           ]
         }
@@ -647,17 +646,19 @@ void rowTest(TsClient client) {
       expect(
           (((getResponse.toDebugMap()['row'] as Map)['attributes'] as List)[0]
               as Map)['test'],
-          {'@long': '90071992547409910'});
+          {'@long': longValueText});
 
       expect(getResponse.row.attributes!.first.name, 'test');
       var long = getResponse.row.attributes!.first.value as TsValueLong;
+      /*
       if (isRunningAsJavascript) {
         expect(TsValueLong.fromNumber(long.toNumber()).toString(),
-            isNot('90071992547409910'));
+            isNot(longValueText));
       } else {
         expect(TsValueLong.fromNumber(long.toNumber()).toString(),
-            '90071992547409910');
-      }
+            longValueText);
+      }*/
+      expect(TsValueLong.fromNumber(long.toNumber()).toString(), longValueText);
     });
 
     test('binary', () async {
@@ -993,9 +994,9 @@ void rowTest(TsClient client) {
 
     group('getRangeComplex', () {
       var col1 = 'range_complex';
-      var _dataWritten = false;
+      var dataWritten = false;
       Future _writeComplexData() async {
-        if (!_dataWritten) {
+        if (!dataWritten) {
           await createWorkTable(client);
 
           var key1 = getWorkTableKey(col1, 1, 'col3_1', 2);
@@ -1019,7 +1020,7 @@ void rowTest(TsClient client) {
                   data: TsAttributes([TsAttribute.int('test', 4)])),
             ])
           ]));
-          _dataWritten = true;
+          dataWritten = true;
         }
       }
 

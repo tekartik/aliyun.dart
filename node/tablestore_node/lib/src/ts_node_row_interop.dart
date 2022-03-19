@@ -183,18 +183,18 @@ abstract class TsBatchGetRowResponseRowJs {
 
   String get tableName;
 
-  List get primaryKey;
+  List? get primaryKey;
 
-  List get attributes;
+  List? get attributes;
 }
 
-Iterable<TsRowPrimaryKeyValueJs> batchRowPrimaryKeyValuesJs(
+Iterable<TsRowPrimaryKeyValueJs>? batchRowPrimaryKeyValuesJs(
         TsBatchGetRowResponseRowJs js) =>
-    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
-Iterable<TsRowAttributeKeyValueJs> batchRowAttributeKeyValuesJs(
+Iterable<TsRowAttributeKeyValueJs>? batchRowAttributeKeyValuesJs(
         TsBatchGetRowResponseRowJs js) =>
-    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
+    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
 
 @JS()
 @anonymous
@@ -427,26 +427,26 @@ class TsStartLocalTransactionResponseJs {
 class TsGetRangeResponseJs {
   external List get rows;
 
-  external List get nextStartPrimaryKey;
+  external List? get nextStartPrimaryKey;
 }
 
-Iterable<TsRowPrimaryKeyValueJs> getRangeResponseNextStartPrimaryKeyValuesJs(
+Iterable<TsRowPrimaryKeyValueJs>? getRangeResponseNextStartPrimaryKeyValuesJs(
         TsGetRangeResponseJs js) =>
-    js.nextStartPrimaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+    js.nextStartPrimaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
 @JS()
 @anonymous
 class TsReadRowJs {
-  external List get primaryKey;
+  external List? get primaryKey;
 
-  external List get attributes;
+  external List? get attributes;
 }
 
-Iterable<TsRowPrimaryKeyValueJs> rowPrimaryKeyValuesJs(TsReadRowJs js) =>
-    js.primaryKey.map((e) => e as TsRowPrimaryKeyValueJs);
+Iterable<TsRowPrimaryKeyValueJs>? rowPrimaryKeyValuesJs(TsReadRowJs js) =>
+    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
-Iterable<TsRowAttributeKeyValueJs> rowAttributeKeyValuesJs(TsReadRowJs js) =>
-    js.attributes.map((e) => e as TsRowAttributeKeyValueJs);
+Iterable<TsRowAttributeKeyValueJs>? rowAttributeKeyValuesJs(TsReadRowJs js) =>
+    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
 
 // Response to native
 TsGetRowResponse getRowResponseFromNative(dynamic nativeResponseJs) {
@@ -464,7 +464,7 @@ class TsGetRowNode implements TsGetRow {
 
   @override
   TsAttributes? get attributes =>
-      fromNativeAttributes(rowAttributeKeyValuesJs(rowJs));
+      fromNativeAttributesOrNull(rowAttributeKeyValuesJs(rowJs));
 
   @override
   String toString() => toDebugMap().toString();
@@ -667,7 +667,7 @@ class TsGetRangeResponseNode implements TsGetRangeResponse {
       .toList(growable: false);
 
   @override
-  TsPrimaryKey get nextStartPrimaryKey => fromNativePrimaryKey(
+  TsPrimaryKey? get nextStartPrimaryKey => fromNativePrimaryKeyOrNull(
       getRangeResponseNextStartPrimaryKeyValuesJs(responseJs));
 }
 
