@@ -142,7 +142,7 @@ class OssClientFs with OssClientMixin {
     }
     paths.sort();
 
-    String _toOssPath(String path) =>
+    String toOssPath(String path) =>
         p.url.normalize(fs.path.relative(path, from: bucketPath));
 
     // marker?
@@ -150,7 +150,7 @@ class OssClientFs with OssClientMixin {
     if (options?.marker != null) {
       int? startIndex;
       for (var i = 0; i < paths.length; i++) {
-        if (options!.marker!.compareTo(_toOssPath(paths[i])) <= 0) {
+        if (options!.marker!.compareTo(toOssPath(paths[i])) <= 0) {
           startIndex = i;
         }
       }
@@ -166,7 +166,7 @@ class OssClientFs with OssClientMixin {
     if (paths.length > maxResults) {
       // set next marker
       isTruncated = true;
-      nextMarker = _toOssPath(paths[maxResults]);
+      nextMarker = toOssPath(paths[maxResults]);
 
       paths = paths.sublist(0, maxResults);
     }
@@ -176,7 +176,7 @@ class OssClientFs with OssClientMixin {
     for (var path in paths) {
       var stat = await fs.file(path).stat();
 
-      var name = _toOssPath(path);
+      var name = toOssPath(path);
       var size = stat.size;
       var dateModified = stat.modified;
       ossFiles

@@ -15,7 +15,7 @@ Future setupOssutil() async {
     await _lock.synchronized(() async {
       ossutil ??= await which('ossutil64');
       if (ossutil == null) {
-        Future _try(String path) async {
+        Future tryPath(String path) async {
           var file = File(path);
           var stat = file.statSync();
           if (stat.type != FileSystemEntityType.notFound) {
@@ -24,7 +24,7 @@ Future setupOssutil() async {
           }
         }
 
-        await _try('/opt/app/ossutil/ossutil64');
+        await tryPath('/opt/app/ossutil/ossutil64');
       }
     });
   }

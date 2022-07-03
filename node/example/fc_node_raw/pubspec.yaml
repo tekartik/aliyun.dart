@@ -9,7 +9,7 @@ environment:
 
 dependencies:
   node_interop:
-
+  process_run:
 dev_dependencies:
   lints:
   test: ^1.14.4

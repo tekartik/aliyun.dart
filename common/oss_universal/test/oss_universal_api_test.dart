@@ -3,14 +3,14 @@ import 'package:tekartik_common_utils/env_utils.dart';
 import 'package:test/test.dart';
 
 void main() {
-  void _expectNode([Object? e]) {
+  void expectNode([Object? e]) {
     if (e != null) {
       expect(e, isNot(const TypeMatcher<TestFailure>()));
     }
     expect(isRunningAsJavascript, isTrue);
   }
 
-  void _expectIo([Object? e]) {
+  void expectIo([Object? e]) {
     if (e != null) {
       expect(e, isNot(const TypeMatcher<TestFailure>()));
     }
@@ -26,16 +26,16 @@ void main() {
 
     try {
       ossServiceFsIo;
-      _expectIo();
+      expectIo();
     } catch (e) {
-      _expectNode(e);
+      expectNode(e);
     }
 
     try {
       ossServiceNode;
-      _expectNode();
+      expectNode();
     } catch (e) {
-      _expectIo(e);
+      expectIo(e);
     }
   });
 }
