@@ -8,13 +8,13 @@ import 'table_test.dart';
 
 void rowTest(TsClient client) {
   group('row', () {
-    Future _createKeyStringTable() async {
+    Future clientCreateKeyStringTable() async {
       await createKeyStringTable(client);
     }
 
     test('describeTable', () async {
       // We are limited in the number of create, test it well and sometimes delete!
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
 
       var tableDescription = await client.describeTable(keyStringTableName);
       var keys = ['tableMeta', 'tableOptions', 'reservedThroughput'];
@@ -36,7 +36,7 @@ void rowTest(TsClient client) {
 
     test('put/getRow', () async {
       var key = TsPrimaryKey([TsKeyValue('key', 'value')]);
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTableName,
           primaryKey: key,
@@ -67,7 +67,7 @@ void rowTest(TsClient client) {
 
     test('put/getRowColumns', () async {
       var key = TsPrimaryKey([TsKeyValue('key', 'get_row_columns')]);
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTableName,
           primaryKey: key,
@@ -204,7 +204,7 @@ void rowTest(TsClient client) {
     test('getRow missing record', () async {
       var key =
           TsPrimaryKey([TsKeyValue('key', 'dummy_key_that_should_not_exist')]);
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
 
       //  {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":{},"RequestId":"0005af5a-da0c-7e1b-e6c1-720b15164f6e"}
       var response = await client.getRow(
@@ -215,7 +215,7 @@ void rowTest(TsClient client) {
     test('put/deleteRow', () async {
       var key = TsPrimaryKey([TsKeyValue('key', 'value')]);
 
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTableName,
           primaryKey: key,
@@ -239,7 +239,7 @@ void rowTest(TsClient client) {
     });
 
     test('putRow', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key = TsPrimaryKey([TsKeyValue('key', 'putRow')]);
       // Delete first
       await client.deleteRow(
@@ -348,7 +348,7 @@ void rowTest(TsClient client) {
               .toMap(),
           {'test': TsAttribute('test', 'text')});
 
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTableName,
           condition: TsCondition.ignore,
@@ -376,7 +376,7 @@ void rowTest(TsClient client) {
     });
 
     test('updateRow', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key = TsPrimaryKey([TsKeyValue('key', 'updateRow')]);
 
       // Delete first
@@ -550,7 +550,7 @@ void rowTest(TsClient client) {
     });
 
     test('deleteRow', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key = TsPrimaryKey([TsKeyValue('key', 'deleteRow')]);
       // Put first
       await client.putRow(TsPutRowRequest(
@@ -596,7 +596,7 @@ void rowTest(TsClient client) {
     });
 
     test('long', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key = TsPrimaryKey([TsKeyValue('key', 'long')]);
       await client.putRow(TsPutRowRequest(
           tableName: keyStringTableName,
@@ -662,7 +662,7 @@ void rowTest(TsClient client) {
     });
 
     test('binary', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key = TsPrimaryKey([TsKeyValue('key', 'binary')]);
       var buffer = Uint8List.fromList([1, 2, 3]);
       await client.putRow(TsPutRowRequest(
@@ -695,7 +695,7 @@ void rowTest(TsClient client) {
     });
 
     test('batch_read', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
 
       // Put single
       var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_1')]);
@@ -744,7 +744,7 @@ void rowTest(TsClient client) {
     });
 
     test('batch_write', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_1')]);
       //var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
       //var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
@@ -793,7 +793,7 @@ void rowTest(TsClient client) {
     });
 
     test('batch_write_update_delete', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_write_update_delete')]);
       //var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
       //var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
@@ -894,7 +894,7 @@ void rowTest(TsClient client) {
     });
 
     test('no_batch', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key1 = TsPrimaryKey([TsKeyValue('key', 'batch_1')]);
       // var key2 = TsPrimaryKey([TsKeyValue('key', 'batch_2')]);
       // var key3 = TsPrimaryKey([TsKeyValue('key', 'batch_3')]);
@@ -927,7 +927,7 @@ void rowTest(TsClient client) {
     }, skip: true);
 
     test('range_simple', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key1 = TsPrimaryKey([TsKeyValue('key', 'range_1')]);
       var key2 = TsPrimaryKey([TsKeyValue('key', 'range_2')]);
       var key3 = TsPrimaryKey([TsKeyValue('key', 'range_3')]);
@@ -995,7 +995,7 @@ void rowTest(TsClient client) {
     group('getRangeComplex', () {
       var col1 = 'range_complex';
       var dataWritten = false;
-      Future _writeComplexData() async {
+      Future writeComplexData() async {
         if (!dataWritten) {
           await createWorkTable(client);
 
@@ -1025,7 +1025,7 @@ void rowTest(TsClient client) {
       }
 
       test('range_complex_single_condition', () async {
-        await _writeComplexData();
+        await writeComplexData();
 
         var response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
@@ -1105,7 +1105,7 @@ void rowTest(TsClient client) {
       });
 
       test('range_complex_composite_condition_1', () async {
-        await _writeComplexData();
+        await writeComplexData();
 
         var response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
@@ -1135,7 +1135,7 @@ void rowTest(TsClient client) {
       }, skip: true);
 
       test('range_complex_composite_condition_2', () async {
-        await _writeComplexData();
+        await writeComplexData();
 
         var response = await client.getRange(TsGetRangeRequest(
             tableName: workTableName,
@@ -1199,7 +1199,7 @@ void rowTest(TsClient client) {
       */
 
       test('range_complex_boundary', () async {
-        await _writeComplexData();
+        await writeComplexData();
 
         try {
           // TS!: errMap: {"message":"\n\fOTSInvalidPK\u0012)Validate PK size fail. Input: 1, Meta: 4.","code":400,"headers":{"date":"Wed, 16 Sep 2020 09:19:28 GMT","transfer-encoding":"chunked","connection":"keep-alive","authorization":"OTS LTAI4GCzUBNEhUsjDMwxrpHs:afS7DTs7cbaW5GB9Y0nc6O4Dz/g=","x-ots-contentmd5":"yt20bZ4gpFhPvN3pJ2XhVQ==","x-ots-contenttype":"protocol buffer","x-ots-date":"2020-09-16T09:19:28.148462Z","x-ots-requestid":"0005af6a-c3b1-a316-a5c1-720b0f1ffbdf"},"time":{},"retryable":false}
@@ -1405,7 +1405,7 @@ void rowTest(TsClient client) {
       });
 
       test('range_complex_limit', () async {
-        await _writeComplexData();
+        await writeComplexData();
 
         var request = TsGetRangeRequest(
             tableName: workTableName,
@@ -1484,7 +1484,7 @@ void rowTest(TsClient client) {
     });
 
     test('transaction1', () async {
-      await _createKeyStringTable();
+      await clientCreateKeyStringTable();
       var key = TsPrimaryKey([TsKeyValue('key', 'transaction')]);
       await client.putRow(
         TsPutRowRequest(
