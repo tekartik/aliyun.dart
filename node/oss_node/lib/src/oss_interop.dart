@@ -244,7 +244,7 @@ class OssClientJs {
 
 Future<OssClientListFilesResponseJs> ossClientJsListFiles(
     OssClientJs client, OssClientListFilesParamsJs? params) async {
-  return (await promiseToFuture(client.list(params)))
+  return (await promiseToFuture<Object>(client.list(params)))
       as OssClientListFilesResponseJs;
 }
 

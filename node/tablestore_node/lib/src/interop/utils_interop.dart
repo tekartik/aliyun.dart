@@ -119,9 +119,9 @@ dynamic tsJsify(Object? dartObject) {
   }
 
   if (dartObject is Map) {
-    var jsMap = util.newObject();
+    var jsMap = util.newObject<Object>();
     dartObject.forEach((key, value) {
-      util.setProperty(jsMap as Object, key as Object, tsJsify(value));
+      util.setProperty(jsMap, key as Object, tsJsify(value));
     });
     return jsMap;
   }
@@ -160,8 +160,8 @@ dynamic tsJsify(Object? dartObject) {
 }
 
 /// Calls [method] on JavaScript object [jsObject].
-dynamic callMethod(Object jsObject, String method, List<dynamic> args) =>
-    util.callMethod(jsObject, method, args);
+Object? callMethod(Object jsObject, String method, List<dynamic> args) =>
+    util.callMethod<Object?>(jsObject, method, args);
 
 /// Returns `true` if the [value] is a very basic built-in type - e.g.
 /// `null`, [num], [bool] or [String]. It returns `false` in the other case.

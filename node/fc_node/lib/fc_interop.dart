@@ -96,7 +96,7 @@ class FcHttpRequestNode implements FcHttpRequest {
   }
 
   Map<String, dynamic>? get queries {
-    return jsObjectAsMap(getProperty(req, 'queries'));
+    return jsObjectAsMap(getProperty<Object?>(req, 'queries'));
   }
 
   @override
@@ -114,8 +114,8 @@ class FcHttpRequestNode implements FcHttpRequest {
   Map<String, String> get headers => _headers ??= () {
         var lowerCaseHaders = <String, String>{};
         // Need to loop through the keys
-        var nativeHeaders = getProperty(req, 'headers');
-        var keys = jsObjectKeys(nativeHeaders as Object);
+        var nativeHeaders = getProperty<Object>(req, 'headers');
+        var keys = jsObjectKeys(nativeHeaders);
         for (var key in keys) {
           lowerCaseHaders[key.toLowerCase()] =
               getProperty(nativeHeaders, key) as String;
@@ -152,14 +152,14 @@ class FcHttpResponseNode implements FcHttpResponse {
   void setStatusCode(int statusCode) {
     // to call first
     // var sendResponse =
-    callMethod(impl, 'setStatusCode', [statusCode]);
+    callMethod<void>(impl, 'setStatusCode', [statusCode]);
   }
 
   @override
   void setHeader(String key, String value) {
     // to call first
     // var sendResponse =
-    callMethod(impl, 'setHeader', [key, value]);
+    callMethod<void>(impl, 'setHeader', [key, value]);
   }
 
   void setContentTypeJson() {

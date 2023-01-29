@@ -36,7 +36,7 @@ Future<void> main() async {
     }
 
     if (command == 'async') {
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future<void>.delayed(Duration(milliseconds: 1));
       await sendResponse();
     } else if (command == 'bodyBytes') {
       response.setStatusCode(200);

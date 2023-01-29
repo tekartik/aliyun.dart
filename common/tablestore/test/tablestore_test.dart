@@ -15,9 +15,9 @@ void main() {
     });
     test('key', () {
       var key = TsPrimaryKeyDef();
-      expect(key.toMap(), {});
+      expect(key.toMap(), isEmpty);
       key = TsPrimaryKeyDef.fromMap(key.toMap());
-      expect(key.toMap(), {});
+      expect(key.toMap(), isEmpty);
 
       key = TsPrimaryKeyDef(
           name: 'id', type: TsColumnType.integer, autoIncrement: true);

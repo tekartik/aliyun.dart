@@ -110,7 +110,7 @@ class TsClientSembast implements TsClient {
           'table name different in meta');
     }
     await (await _db).transaction((txn) async {
-      var tableNames = List.from(await _listTableNames(txn));
+      var tableNames = List<String>.from(await _listTableNames(txn));
 
       if (!tableNames.contains(name)) {
         var tableMetaRecord = getTableMetaRecord(name);
@@ -317,7 +317,6 @@ class TsClientSembast implements TsClient {
             isOk = false;
             errorMessage = e.message;
             // errorCode = e.
-
           }
 
           rows.add(TsBatchGetRowResponseRowSembast(

@@ -93,8 +93,8 @@ void main() {
     });
 
     test('INF_MIN/MAX', () {
-      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'INF_MIN')), {});
-      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'INF_MAX')), {});
+      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'INF_MIN')), isEmpty);
+      expect(jsObjectAsMap(getProperty(tablestoreJs!, 'INF_MAX')), isEmpty);
     });
   }, skip: client == null);
 }

@@ -32,7 +32,7 @@ void main() {
         }
 
         if (command == 'async') {
-          await Future.delayed(Duration(milliseconds: 10));
+          await Future<void>.delayed(Duration(milliseconds: 10));
           await sendResponse();
         } else {
           await sendResponse();
