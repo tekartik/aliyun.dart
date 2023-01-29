@@ -15,7 +15,7 @@ class TsArrayHack<T> {
 
   // Convert to javascript!
   dynamic toJs(dynamic Function(dynamic) jsify) {
-    var wrapper = JsArrayWrapper();
+    var wrapper = JsArrayWrapper<Object?>();
     for (var item in list) {
       wrapper.add(tsJsify(item));
     }

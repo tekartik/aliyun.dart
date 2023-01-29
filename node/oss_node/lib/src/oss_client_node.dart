@@ -101,7 +101,7 @@ class OssClientNode with OssClientMixin implements OssClient {
       dynamic Function(Function callback) action) async {
     var completer = Completer<T>();
     try {
-      action(allowInterop((err, data) {
+      action(allowInterop((Object? err, Object? data) {
         if (err != null) {
           if (debugAliyunOss) {
             if (data != null) {
@@ -138,7 +138,7 @@ class OssClientNode with OssClientMixin implements OssClient {
   Future<List<OssBucket>> listBuckets() async {
     var nativeResponse =
         await _nativeOperation<OssClientListBucketsResponseJs>(() async {
-      var result = await promiseToFuture(nativeInstance.listBuckets(
+      var result = await promiseToFuture<Object>(nativeInstance.listBuckets(
         _debugNativeRequestParams(
             'listBuckets', OssClientListBucketsParamsJs()),
       )) as OssClientListBucketsResponseJs;
@@ -189,7 +189,7 @@ class OssClientNode with OssClientMixin implements OssClient {
   Future<OssBucket> getBucket(String name) async {
     var nativeResponse =
         await _nativeOperation<OssClientGetBucketInfoResponseJs>(() async {
-      var result = await promiseToFuture(
+      var result = await promiseToFuture<Object>(
         nativeInstance
             .getBucketInfo(_debugNativeRequestParams('getBucketinfo', name)),
       ) as OssClientGetBucketInfoResponseJs;
@@ -208,8 +208,9 @@ class OssClientNode with OssClientMixin implements OssClient {
         if (debugAliyunOss) {
           log('<send>: put($bucketName, $path, ${bytes.length} bytes buffer');
         }
-        var result = await promiseToFuture(nativeInstance.put(path, buffer))
-            as OssClientPutResponseJs;
+        var result =
+            await promiseToFuture<Object>(nativeInstance.put(path, buffer))
+                as OssClientPutResponseJs;
         if (debugAliyunOss) {
           log('<resp>: ${nativeDataToDebugString(result)}');
         }
@@ -230,7 +231,7 @@ class OssClientNode with OssClientMixin implements OssClient {
           log('<send>: get($bucketName, $path)');
         }
         try {
-          var result = await promiseToFuture(nativeInstance.get(path))
+          var result = await promiseToFuture<Object>(nativeInstance.get(path))
               as OssClientGetResponseJs;
           if (debugAliyunOss) {
             log('<resp>: ${nativeDataToDebugString(result)}');
@@ -263,7 +264,7 @@ class OssClientNode with OssClientMixin implements OssClient {
         if (debugAliyunOss) {
           log('<send>: delete($bucketName, $path)');
         }
-        var result = await promiseToFuture(nativeInstance.delete(path))
+        var result = await promiseToFuture<Object>(nativeInstance.delete(path))
             as OssClientDeleteResponseJs;
         if (debugAliyunOss) {
           log('<resp>: ${nativeDataToDebugString(result)}');

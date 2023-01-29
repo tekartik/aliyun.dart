@@ -47,8 +47,8 @@ class TsPrimaryKeyDef {
 
   factory TsPrimaryKeyDef.fromMap(Map? map) {
     var model = asModel(map ?? {});
-    var name = model.getValue('name')?.toString();
-    var type = _columnTypeFromText(model.getValue('type')?.toString());
+    var name = model.getValue<Object>('name')?.toString();
+    var type = _columnTypeFromText(model.getValue<Object>('type')?.toString());
     var autoIncrement = parseBool(model.getValue('autoIncrement'));
     return TsPrimaryKeyDef(
         name: name, type: type, autoIncrement: autoIncrement);
@@ -73,9 +73,9 @@ class TsTableDescriptionTableMeta {
 
   factory TsTableDescriptionTableMeta.fromMap(Map map) {
     var model = asModel(map);
-    var tableName = model.getValue('name')?.toString();
+    var tableName = model.getValue<Object>('name')?.toString();
     List<TsPrimaryKeyDef>? primaryKeys;
-    var rawPrimaryKeys = model.getValue('primaryKeys');
+    var rawPrimaryKeys = model.getValue<Object>('primaryKeys');
     if (rawPrimaryKeys is List) {
       primaryKeys = rawPrimaryKeys
           .map((raw) => TsPrimaryKeyDef.fromMap(asModel(raw as Map)))
@@ -100,7 +100,7 @@ class TsTableDescriptionReservedThroughput {
   factory TsTableDescriptionReservedThroughput.fromMap(Map map) {
     var model = asModel(map);
     TsTableCapacityUnit? capacityUnit;
-    var rawCapacityUnit = model.getValue('capacityUnit');
+    var rawCapacityUnit = model.getValue<Object>('capacityUnit');
     if (rawCapacityUnit is Map) {
       capacityUnit = TsTableCapacityUnit.fromMap(rawCapacityUnit);
     }
@@ -198,17 +198,17 @@ class TsTableDescription {
   factory TsTableDescription.fromMap(Map map) {
     var model = asModel(map);
     TsTableDescriptionTableMeta? tableMeta;
-    var rawTableMeta = model.getValue('tableMeta');
+    var rawTableMeta = model.getValue<Object>('tableMeta');
     if (rawTableMeta is Map) {
       tableMeta = TsTableDescriptionTableMeta.fromMap(rawTableMeta);
     }
     TsTableDescriptionOptions? tableOptions;
-    var rawOptions = model.getValue('tableOptions');
+    var rawOptions = model.getValue<Object>('tableOptions');
     if (rawOptions is Map) {
       tableOptions = TsTableDescriptionOptions.fromMap(rawOptions);
     }
     TsTableDescriptionReservedThroughput? reservedThroughput;
-    var rawReservedThroughput = model.getValue('reservedThroughput');
+    var rawReservedThroughput = model.getValue<Object>('reservedThroughput');
     if (rawReservedThroughput is Map) {
       reservedThroughput =
           TsTableDescriptionReservedThroughput.fromMap(rawReservedThroughput);

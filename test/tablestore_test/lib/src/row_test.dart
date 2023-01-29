@@ -46,7 +46,7 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'value'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
 
@@ -77,7 +77,7 @@ void rowTest(TsClient client) {
             TsAttribute('test3', Uint8List.fromList([2]))
           ])));
       expect(response.toDebugMap(), {
-        'row': {'primaryKey': key.toDebugList(), 'attributes': []}
+        'row': {'primaryKey': key.toDebugList(), 'attributes': <Object?>[]}
       });
 
       // TSs: getRow {"tableName":"test_key_string","primaryKey":[{"key":"get_row_columns"}]}
@@ -225,13 +225,13 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'value'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
 
       var deleteResponse = await client.deleteRow(
           TsDeleteRowRequest(tableName: keyStringTableName, primaryKey: key));
-      expect(deleteResponse.toDebugMap(), {});
+      expect(deleteResponse.toDebugMap(), isEmpty);
 
       var getResponse = await client.getRow(
           TsGetRowRequest(tableName: keyStringTableName, primaryKey: key));
@@ -307,7 +307,7 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'putRow'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
       expect(
@@ -316,7 +316,7 @@ void rowTest(TsClient client) {
               .row
               .attributes!
               .toDebugList(),
-          []);
+          isEmpty);
 
       response = await client.putRow(TsPutRowRequest(
           tableName: keyStringTableName,
@@ -328,7 +328,7 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'putRow'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
       expect(
@@ -359,7 +359,7 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'putRow'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
 
@@ -416,7 +416,7 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'updateRow'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
       var getResponse = await client.getRow(
@@ -457,7 +457,7 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'updateRow'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
       getResponse = await client.getRow(
@@ -493,7 +493,7 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'updateRow'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
 
@@ -526,7 +526,7 @@ void rowTest(TsClient client) {
           'primaryKey': [
             {'key': 'updateRow'}
           ],
-          'attributes': []
+          'attributes': <Object?>[]
         }
       });
 
@@ -574,7 +574,7 @@ void rowTest(TsClient client) {
           tableName: keyStringTableName,
           condition: TsCondition.expectExist,
           primaryKey: key));
-      expect(response.toDebugMap(), {});
+      expect(response.toDebugMap(), isEmpty);
 
       try {
         response = await client.deleteRow(TsDeleteRowRequest(
@@ -592,7 +592,7 @@ void rowTest(TsClient client) {
           condition: TsCondition.ignore,
           primaryKey: key));
 
-      expect(response.toDebugMap(), {});
+      expect(response.toDebugMap(), isEmpty);
     });
 
     test('long', () async {
@@ -765,7 +765,7 @@ void rowTest(TsClient client) {
             'primaryKey': [
               {'key': 'batch_1'}
             ],
-            'attributes': []
+            'attributes': <Object?>[]
           }
         ]
       });
@@ -814,7 +814,7 @@ void rowTest(TsClient client) {
             'primaryKey': [
               {'key': 'batch_write_update_delete'}
             ],
-            'attributes': []
+            'attributes': <Object?>[]
           }
         ]
       });
@@ -884,7 +884,7 @@ void rowTest(TsClient client) {
             'primaryKey': [
               {'key': 'batch_write_update_delete'}
             ],
-            'attributes': []
+            'attributes': <Object?>[]
           }
         ]
       });

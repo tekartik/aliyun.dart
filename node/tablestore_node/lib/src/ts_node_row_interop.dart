@@ -281,15 +281,15 @@ class JsArrayWrapper<T> {
 dynamic toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
   var requestJs = util.newObject() as Object;
 
-  var tablesJs = [];
+  var tablesJs = <Object?>[];
   /*util.newObject();
   var tablesJsIndex = 0;*/
   for (var table in request.tables) {
     var tableJs = util.newObject() as Object;
     util.setProperty(tableJs, 'tableName', table.tableName);
-    var pksJs = JsArrayWrapper();
+    var pksJs = JsArrayWrapper<Object?>();
     for (var pk in table.primaryKeys) {
-      var pkcsJs = [];
+      var pkcsJs = <Object?>[];
       // var pkcsJsIndex = 0;
       for (var pkc in pk.list) {
         var pkcJs = util.newObject() as Object;
@@ -677,9 +677,9 @@ TsGetRangeResponse getRangeResponseFromNative(
   return TsGetRangeResponseNode(nativeResponseJs);
 }
 
-dynamic tsSingleConditionToNative(TsColumnSingleCondition condition) {
+Object? tsSingleConditionToNative(TsColumnSingleCondition condition) {
   var columnConditionJs =
-      util.callConstructor(tablestoreJs!.SingleColumnCondition, [
+      util.callConstructor<Object?>(tablestoreJs!.SingleColumnCondition, [
     condition.name,
     tsValueToNative(condition.value),
     tsComparatorTypeToNative(condition.operator)
@@ -737,13 +737,13 @@ dynamic tsWriteRowTypeToNative(TsWriteRowType type) {
   //throw UnsupportedError('invalid write row type $type');
 }
 
-dynamic tsConditionToNative(TsCondition condition) {
+Object? tsConditionToNative(TsCondition condition) {
   dynamic columnConditionJs;
   var columnCondition = condition.columnCondition;
   if (columnCondition != null) {
     columnConditionJs = tsColumnConditionToNative(columnCondition);
   }
-  return util.callConstructor(tablestoreJs!.Condition, [
+  return util.callConstructor<Object?>(tablestoreJs!.Condition, [
     tsConditionRowExistenceExpectationToNative(
         condition.rowExistenceExpectation),
     columnConditionJs

@@ -18,7 +18,7 @@ external Object toJSArray(List source);
 TsValueLong? dartifyValueLong(Object jsObject) {
   if (util.hasProperty(jsObject, 'offset')) {
     try {
-      if (util.getProperty(jsObject, 'buffer') is Iterable) {
+      if (util.getProperty<Object?>(jsObject, 'buffer') is Iterable) {
         return TsValueLong.fromString(jsObject.toString());
       }
     } on NoSuchMethodError {
