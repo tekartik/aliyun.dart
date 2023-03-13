@@ -1,5 +1,5 @@
 import 'dart:js';
-import 'dart:js_util';
+import 'dart:js_util' as jsu;
 
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/src/ts_common_node.dart';
@@ -21,7 +21,7 @@ class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
   @override
   @override
   TsClient client({TsClientOptions? options}) {
-    var nativeClient = callConstructor<Object?>(tablestoreJs!.Client, [
+    var nativeClient = jsu.callConstructor<Object?>(tablestoreJs!.Client, [
       TsClientOptionsJs(
           accessKeyId: options!.accessKeyId,
           secretAccessKey: options.secretAccessKey,
