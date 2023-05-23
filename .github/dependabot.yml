@@ -1,0 +1,105 @@
+# Dependabot configuration file.
+# See https://docs.github.com/en/code-security/dependabot/dependabot-version-updates
+version: 2
+
+enable-beta-ecosystems: true
+updates:
+  - package-ecosystem: "pub"
+    directory: "common/fc"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "common/fc_http"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "common/fc_universal"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "common/oss"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "common/oss_fs"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "common/oss_universal"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "common/tablestore"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "common/tablestore_sembast"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "common/tablestore_universal"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "io/cli"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "node/example/fc_node_basic"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "node/example/fc_node_raw"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "node/example/ts_node_min"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "node/fc_node"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "node/oss_node"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "node/tablestore_node"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "repo_support"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "test/tablestore_test"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "pub"
+    directory: "test/tablestore_universal_test"
+    schedule:
+      interval: "monthly"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
