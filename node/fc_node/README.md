@@ -1,22 +1,13 @@
-A library for Dart developers.
+# Setup
 
-Created from templates made available by Stagehand under a BSD-style
-[license](https://github.com/dart-lang/stagehand/blob/master/LICENSE).
+`pubspec.yaml`:
 
-## Usage
-
-A simple usage example:
-
-```dart
-import 'package:fc_node/fc_node.dart';
-
-main() {
-  var awesome = new Awesome();
-}
+```yaml
+dependencies:
+  tekartik_aliyun_fc_node:
+    git:
+      url: https://github.com/tekartik/aliyun.dart
+      path: node/fc_node
+      ref: dart3a
+    version: '>=0.1.0'
 ```
-
-## Features and bugs
-
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: http://example.com/issues/replaceme
