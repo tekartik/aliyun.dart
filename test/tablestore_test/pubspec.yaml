@@ -5,7 +5,7 @@ version: 0.1.0
 # homepage: https://www.example.com
 
 environment:
-  sdk: '>=2.18.0 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   path: ^1.7.0
@@ -15,7 +15,7 @@ dependencies:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/tablestore
-      ref: dart2_3
+      ref: dart3a
     version: '>=0.1.0'
 
 dev_dependencies:
@@ -27,7 +27,7 @@ dev_dependencies:
     git:
       url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: dart2_3
+      ref: dart3a
 
 dependency_overrides:
   tekartik_aliyun_tablestore:
