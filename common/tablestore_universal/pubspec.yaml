@@ -4,26 +4,26 @@ version: 0.2.3
 publish_to: none
 
 environment:
-  sdk: '>=2.18.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   tekartik_aliyun_tablestore:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/tablestore
-      ref: dart2_3
+      ref: dart3a
     version: '>=0.2.3'
   tekartik_aliyun_tablestore_node:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: node/tablestore_node
-      ref: dart2_3
+      ref: dart3a
     version: '>=0.2.3'
   tekartik_aliyun_tablestore_sembast:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/tablestore_sembast
-      ref: dart2_3
+      ref: dart3a
     version: '>=0.2.3'
   dev_test: '>=0.13.3-dev.1'
 
@@ -37,7 +37,7 @@ dev_dependencies:
     git:
       url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: dart2_3
+      ref: dart3a
 dependency_overrides:
   tekartik_aliyun_tablestore:
     path: ../tablestore

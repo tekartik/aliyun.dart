@@ -5,7 +5,7 @@ publish_to: none
 # homepage: https://www.example.com
 
 environment:
-  sdk: '>=2.18.0 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   path: ^1.7.0
@@ -13,25 +13,25 @@ dependencies:
     git:
       url: https://github.com/tekartik/app_node_utils.dart
       path: node_utils
-      ref: dart2_3
+      ref: dart3a
     version: '>=0.1.0'
   tekartik_aliyun_fc:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/fc
-      ref: dart2_3
+      ref: dart3a
     version: '>=0.2.1'
   js:
   node_interop:
   tekartik_common_utils:
     git:
       url: https://github.com/tekartik/common_utils.dart
-      ref: dart2_3
+      ref: dart3a
     version: '>=0.10.14'
   tekartik_js_utils:
     git:
       url: https://github.com/tekartik/js_utils.dart
-      ref: dart2_3
+      ref: dart3a
       path: js_utils
     version: '>=0.1.0'
 dev_dependencies:
@@ -44,7 +44,7 @@ dev_dependencies:
     git:
       url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: dart2_3
+      ref: dart3a
 
 dependency_overrides:
   tekartik_aliyun_fc:
