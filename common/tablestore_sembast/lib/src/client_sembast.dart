@@ -639,7 +639,7 @@ class TsRowRecordContextSembast {
   // Merge filter if needed
   Finder getFinder({Filter? filter}) {
     var filters = [
-      ...sembastPrimaryKeys.map((e) => Filter.equals(e.key!, e.value)).toList(),
+      ...sembastPrimaryKeys.map((e) => Filter.equals(e.key!, e.value)),
       if (filter != null) filter
     ];
     return Finder(filter: Filter.and(filters));
@@ -746,9 +746,8 @@ class TsGetRowResponseSembast extends TsReadRowResponseSembast
   final TsAttributes? attributes;
   final TsPrimaryKey? primaryKey;
 
-  TsGetRowResponseSembast(TsRowContextSembast rowContext, bool exists,
-      this.primaryKey, this.attributes)
-      : super(rowContext, exists);
+  TsGetRowResponseSembast(
+      super.rowContext, super.exists, this.primaryKey, this.attributes);
 
   @override
   TsGetRow get row => TsGetRowSembast(exists, primaryKey, attributes);

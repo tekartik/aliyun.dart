@@ -72,17 +72,17 @@ class TsAttributes with ListMixin<TsAttribute> {
 
 // Read only
 class TsAttribute extends TsKeyValue {
-  TsAttribute(String name, Object value) : super(name, value);
+  TsAttribute(super.name, super.value);
 
-  TsAttribute.int(String name, int value) : super.int(name, value);
+  TsAttribute.int(super.name, super.value) : super.int();
 
-  TsAttribute.long(String name, TsValueLong value) : super.long(name, value);
+  TsAttribute.long(super.name, super.value) : super.long();
 
-  TsAttribute.binary(String name, Uint8List value) : super.binary(name, value);
+  TsAttribute.binary(super.name, super.value) : super.binary();
 
-  TsAttribute.double(String name, double value) : super.double(name, value);
+  TsAttribute.double(super.name, super.value) : super.double();
 
-  TsAttribute.string(String name, String value) : super.string(name, value);
+  TsAttribute.string(super.name, super.value) : super.string();
 }
 
 class TsUpdateAttributes with ListMixin<TsUpdateAttribute> {

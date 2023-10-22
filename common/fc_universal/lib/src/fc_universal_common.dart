@@ -32,8 +32,7 @@ class FcServerHttp implements FcServer {
 
 class AliyunFunctionComputeHttpUniversal extends AliyunFunctionComputeHttp
     implements AliyunFunctionComputeUniversal {
-  AliyunFunctionComputeHttpUniversal(HttpServerFactory httpServerFactory)
-      : super(httpServerFactory);
+  AliyunFunctionComputeHttpUniversal(super.httpServerFactory);
 
   @override
   Future<FcServer> serve({int? port}) async {

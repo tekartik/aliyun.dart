@@ -242,23 +242,14 @@ class TsBatchWriteRowsRequestTable {
 }
 
 class TsBatchWriteRowsRequestDeleteRow extends TsBatchWriteRowsRequestRow {
-  TsBatchWriteRowsRequestDeleteRow(
-      {required TsPrimaryKey primaryKey, TsCondition? condition})
-      : super(
-            type: TsWriteRowType.delete,
-            primaryKey: primaryKey,
-            condition: condition);
+  TsBatchWriteRowsRequestDeleteRow({required super.primaryKey, super.condition})
+      : super(type: TsWriteRowType.delete);
 }
 
 class TsBatchWriteRowsRequestUpdateRow extends TsBatchWriteRowsRequestRow {
   TsBatchWriteRowsRequestUpdateRow(
-      {required TsPrimaryKey primaryKey,
-      TsCondition? condition,
-      required this.data})
-      : super(
-            type: TsWriteRowType.update,
-            primaryKey: primaryKey,
-            condition: condition);
+      {required super.primaryKey, super.condition, required this.data})
+      : super(type: TsWriteRowType.update);
   final TsUpdateAttributes data;
 }
 
@@ -266,15 +257,12 @@ class TsBatchWriteRowsRequestPutRow extends TsBatchWriteRowsRequestRow {
   final TsAttributes? data;
 
   TsBatchWriteRowsRequestPutRow(
-      {required TsPrimaryKey primaryKey,
-      TsCondition? condition,
+      {required super.primaryKey,
+      super.condition,
 
       /// Columns values
       this.data})
-      : super(
-            type: TsWriteRowType.put,
-            primaryKey: primaryKey,
-            condition: condition);
+      : super(type: TsWriteRowType.put);
 }
 
 abstract class TsBatchWriteRowsRequestRow {

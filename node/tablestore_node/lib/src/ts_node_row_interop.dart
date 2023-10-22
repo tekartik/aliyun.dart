@@ -512,7 +512,7 @@ abstract class TsReadRowResponseNode {
 
 class TsGetRowResponseNode extends TsReadRowResponseNode
     implements TsGetRowResponse {
-  TsGetRowResponseNode(TsReadRowResponseJs responseJs) : super(responseJs);
+  TsGetRowResponseNode(super.responseJs);
 
   @override
   String toString() => toDebugMap().toString();
@@ -520,7 +520,7 @@ class TsGetRowResponseNode extends TsReadRowResponseNode
 
 class TsPutRowResponseNode extends TsReadRowResponseNode
     implements TsPutRowResponse {
-  TsPutRowResponseNode(TsReadRowResponseJs responseJs) : super(responseJs);
+  TsPutRowResponseNode(super.responseJs);
 
   @override
   String toString() => toDebugMap().toString();
@@ -528,7 +528,7 @@ class TsPutRowResponseNode extends TsReadRowResponseNode
 
 class TsUpdateRowResponseNode extends TsReadRowResponseNode
     implements TsUpdateRowResponse {
-  TsUpdateRowResponseNode(TsReadRowResponseJs responseJs) : super(responseJs);
+  TsUpdateRowResponseNode(super.responseJs);
 
   @override
   String toString() => toDebugMap().toString();
