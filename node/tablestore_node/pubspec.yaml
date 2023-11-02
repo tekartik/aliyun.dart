@@ -8,7 +8,7 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
-  path: ^1.7.0
+  path: '>=1.8.0'
   tekartik_aliyun_tablestore:
     git:
       url: https://github.com/tekartik/aliyun.dart
@@ -28,7 +28,7 @@ dependencies:
 dev_dependencies:
   dev_test: '>=0.13.3-dev.1'
 
-  test: ^1.14.4
+  test: '>=1.14.4'
   # needed node dev dependencies
   build_runner:
   build_web_compilers:

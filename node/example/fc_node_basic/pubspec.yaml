@@ -36,7 +36,7 @@ dependencies:
     version: '>=0.5.5'
 dev_dependencies:
 
-  test: ^1.14.4
+  test: '>=1.14.4'
   # Aliyun function build
   tekartik_app_node_build:
     git:
