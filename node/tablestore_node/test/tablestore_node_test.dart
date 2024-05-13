@@ -1,4 +1,6 @@
 @TestOn('node')
+library;
+
 import 'dart:js_util';
 
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';

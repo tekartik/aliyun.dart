@@ -1,4 +1,6 @@
 @TestOn('node')
+library;
+
 import 'package:tekartik_aliyun_oss_node/environment_client.dart';
 import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 import 'package:test/test.dart';
