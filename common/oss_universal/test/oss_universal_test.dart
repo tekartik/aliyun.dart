@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:tekartik_aliyun_oss_universal/src/import.dart';
 import 'package:tekartik_aliyun_oss_universal/test/environment_client.dart';
 import 'package:tekartik_app_node_utils/node_utils.dart';
@@ -10,7 +8,8 @@ var _env = platform.environment;
 void main() {
   var bucketName = _env['ossTestBucketName'];
   if (bucketName == null) {
-    stderr.writeln('ossTestBucketName not defined as an environment variable');
+    // ignore: avoid_print
+    print('ossTestBucketName not defined as an environment variable');
   }
 
   // ignore: deprecated_member_use
@@ -33,7 +32,9 @@ void main() {
   }
 
   test('client', () {
+    // ignore: avoid_print
     print('client: $client');
+    // ignore: avoid_print
     print('options: $ossClientOptionsFromEnv');
   });
   group('oss', () {
@@ -45,6 +46,7 @@ void main() {
     }, skip: !isLocalTest);
     test('listBuckets', () async {
       var buckets = await client!.listBuckets();
+      // ignore: avoid_print
       print(buckets);
     });
     test('getBucketInfo', () async {
