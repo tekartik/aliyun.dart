@@ -25,6 +25,11 @@ dependencies:
   js:
   node_interop:
   cv:
+  tekartik_js_utils:
+    git:
+      url: https://github.com/tekartik/js_utils.dart
+      ref: dart3a
+      path: js_utils
 dev_dependencies:
   dev_test: '>=0.13.3-dev.1'
 
