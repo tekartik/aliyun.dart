@@ -19,6 +19,8 @@ void main() {
 
 void tablestoreTest(TsClient? client) {
   group('universal', () {
-    tablestore_test.tablestoreTest(client!);
+    if (client != null) {
+      tablestore_test.tablestoreTest(client);
+    }
   }, skip: client == null);
 }
