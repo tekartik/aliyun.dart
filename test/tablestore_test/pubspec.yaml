@@ -10,7 +10,7 @@ environment:
 dependencies:
   path: '>=1.8.0'
   test:
-  dev_test: '>=0.13.3-dev.1'
+  dev_build: '>=0.13.3-dev.1'
   tekartik_aliyun_tablestore:
     git:
       url: https://github.com/tekartik/aliyun.dart
