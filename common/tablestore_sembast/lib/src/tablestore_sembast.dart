@@ -1,4 +1,3 @@
-import 'package:sembast/sembast.dart';
 import 'package:sembast/sembast_memory.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/src/client_sembast.dart';
