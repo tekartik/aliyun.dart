@@ -14,7 +14,7 @@ dependencies:
       path: common/tablestore
       ref: dart3a
     version: '>=0.2.3'
-  sembast:
+  sembast: '>=3.7.4+2'
   path:
 dev_dependencies:
   test: '>=1.14.4'
