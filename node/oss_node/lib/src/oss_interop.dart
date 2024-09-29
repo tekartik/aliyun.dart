@@ -1,5 +1,5 @@
 @JS()
-library tekartik_aliyun_oss_node.src.oss_interop;
+library;
 
 import 'dart:js_util';
 

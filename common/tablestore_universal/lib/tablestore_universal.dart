@@ -1,4 +1,4 @@
-library tekartik_aliyun_tablestore_universal;
+library;
 
 export 'package:tekartik_aliyun_tablestore/tablestore.dart';
 

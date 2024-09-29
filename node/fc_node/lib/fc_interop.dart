@@ -1,5 +1,5 @@
 @JS()
-library tekartik_aliyun_fc_node.fc_interop;
+library;
 
 import 'dart:js_util';
 import 'dart:typed_data';

@@ -1,7 +1,7 @@
 /// Support for doing something awesome.
 ///
 /// More dartdocs go here.
-library tekartik_aliyun_tablestore_sembast_io;
+library;
 
 import 'package:sembast/sembast_io.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';

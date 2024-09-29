@@ -27,3 +27,4 @@ package-lock.json
 
 # Local folder
 .local/
+pubspec_overrides.yaml

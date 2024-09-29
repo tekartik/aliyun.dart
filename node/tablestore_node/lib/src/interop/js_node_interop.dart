@@ -1,5 +1,5 @@
 @JS()
-library tekartik_tablestore_node.lib.src.js_note_interop;
+library;
 
 import 'package:js/js.dart';
 import 'package:js/js_util.dart' as util;

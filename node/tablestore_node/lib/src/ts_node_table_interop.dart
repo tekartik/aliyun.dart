@@ -1,5 +1,5 @@
 @JS()
-library tekartik_aliyun_tablestore_node.ts_table_interop;
+library;
 
 import 'package:js/js.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
