@@ -1,0 +1,24 @@
+name: _
+publish_to: none
+environment:
+  sdk: ^3.6.0
+workspace:
+  - common/fc
+  - common/fc_http
+  - common/fc_universal
+  - common/oss
+  - common/oss_fs
+  - common/oss_universal
+  - common/tablestore
+  - common/tablestore_sembast
+  - common/tablestore_universal
+  - io/cli
+  - node/example/fc_node_basic
+  - node/example/fc_node_raw
+  - node/example/ts_node_min
+  - node/fc_node
+  - node/oss_node
+  - node/tablestore_node
+  - repo_support
+  - test/tablestore_test
+  - test/tablestore_universal_test

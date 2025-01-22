@@ -40,19 +40,4 @@ dev_dependencies:
       path: packages/build_node
       ref: dart3a
 
-dependency_overrides:
-  # WARNING
-  # tekartik_js_utils:
-  #    path: ../../../js_utils.dart/js_utils
-  # tekartik_app_node_build:
-  #  path: ../../../app_node_utils.dart/app_build
-  tekartik_aliyun_tablestore_universal:
-    path: ../../common/tablestore_universal
-  tekartik_aliyun_tablestore_test:
-    path: ../tablestore_test
-  tekartik_aliyun_tablestore_node:
-    path: ../../node/tablestore_node
-  tekartik_aliyun_tablestore:
-    path: ../../common/tablestore
-  tekartik_aliyun_tablestore_sembast:
-    path: ../../common/tablestore_sembast
+resolution: workspace

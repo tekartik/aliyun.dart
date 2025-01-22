@@ -21,3 +21,5 @@ dev_dependencies:
       url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
       ref: dart3a
+
+resolution: workspace

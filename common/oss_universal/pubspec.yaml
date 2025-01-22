@@ -39,10 +39,4 @@ dev_dependencies:
       path: packages/build_node
       ref: dart3a
 
-dependency_overrides:
-  tekartik_aliyun_oss_node:
-    path: ../../node/oss_node
-  tekartik_aliyun_oss:
-    path: ../oss
-  tekartik_aliyun_oss_fs:
-    path: ../oss_fs
+resolution: workspace

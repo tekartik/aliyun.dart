@@ -53,12 +53,4 @@ dev_dependencies:
       path: packages/build_node
       ref: dart3a
 
-dependency_overrides:
-  tekartik_aliyun_fc_universal:
-    path: ../../../common/fc_universal
-  tekartik_aliyun_fc_node:
-    path: ../../../node/fc_node
-  tekartik_aliyun_fc_http:
-    path: ../../../common/fc_http
-  tekartik_aliyun_fc:
-    path: ../../../common/fc
+resolution: workspace

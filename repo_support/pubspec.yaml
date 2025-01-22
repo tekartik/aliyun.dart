@@ -13,3 +13,5 @@ dev_dependencies:
   pub_semver:
   process_run:
 
+resolution: workspace
+

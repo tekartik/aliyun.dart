@@ -19,6 +19,4 @@ dependencies:
 dev_dependencies:
   test: '>=1.14.4'
 
-dependency_overrides:
-  tekartik_aliyun_tablestore:
-    path: ../tablestore
+resolution: workspace

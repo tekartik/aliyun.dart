@@ -38,10 +38,5 @@ dev_dependencies:
       url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
       ref: dart3a
-dependency_overrides:
-  tekartik_aliyun_tablestore:
-    path: ../tablestore
-  tekartik_aliyun_tablestore_node:
-    path: ../../node/tablestore_node
-  tekartik_aliyun_tablestore_sembast:
-    path: ../../common/tablestore_sembast
+
+resolution: workspace

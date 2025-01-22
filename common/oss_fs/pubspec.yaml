@@ -20,6 +20,4 @@ dependencies:
 dev_dependencies:
   test: '>=1.14.4'
 
-dependency_overrides:
-  tekartik_aliyun_oss:
-    path: ../oss
+resolution: workspace
