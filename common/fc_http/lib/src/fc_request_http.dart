@@ -46,7 +46,8 @@ class FcHttpRequestHttp implements FcHttpRequest {
   FcHttpRequestHeaders? _headers;
 
   @override
-  Map<String, String> get headers => _headers ??= () {
+  Map<String, String> get headers =>
+      _headers ??= () {
         var lowerCaseHaders = <String, String>{};
         requestImpl.headers.forEach((name, values) {
           lowerCaseHaders[name.toLowerCase()] = values.join(',');

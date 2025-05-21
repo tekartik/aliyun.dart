@@ -9,11 +9,12 @@ Model blobToDebugValue(Uint8List bytes) =>
 // Can be of any type TsValue, double, String but not int!
 Object tsValueToDebugValue(Object value) {
   assert(
-      (value is TsValue ||
-          value is String ||
-          value is Uint8List ||
-          value is double),
-      'value $value (type ${value.runtimeType} not supported');
+    (value is TsValue ||
+        value is String ||
+        value is Uint8List ||
+        value is double),
+    'value $value (type ${value.runtimeType} not supported',
+  );
   if (value is TsValueBase) {
     return value.toDebugMap();
   } else if (value is Uint8List) {
@@ -57,12 +58,13 @@ class TsValueInfinite implements TsValueBase {
 
   @override
   Model toDebugMap() => asModel({
-        '@infinite': this == min
+    '@infinite':
+        this == min
             ? 'min'
             : (this == max)
-                ? 'max'
-                : throw UnsupportedError('TsValueInfinite($_label)')
-      });
+            ? 'max'
+            : throw UnsupportedError('TsValueInfinite($_label)'),
+  });
 }
 
 mixin _TsValueLongMixin implements TsValueLong {

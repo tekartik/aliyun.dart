@@ -4,7 +4,7 @@ version: 0.2.3
 publish_to: none
 
 environment:
-  sdk: ^3.5.0
+  sdk: ^3.7.0
 
 dependencies:
   tekartik_aliyun_tablestore:
@@ -25,14 +25,14 @@ dependencies:
       path: common/tablestore_sembast
       ref: dart3a
     version: '>=0.2.3'
-  dev_build: '>=0.13.3-dev.1'
+  dev_build: ">=1.1.2"
 
 dev_dependencies:
 
-  test: '>=1.14.4'
+  test: ">=1.24.0"
   # needed node dev dependencies
-  build_runner:
-  build_web_compilers:
+  build_runner: ">=2.4.13"
+  build_web_compilers: ">=4.0.11"
   tekartik_build_node:
     git:
       url: https://github.com/tekartik/build_node.dart

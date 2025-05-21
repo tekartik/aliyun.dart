@@ -20,36 +20,47 @@ void main() {
       expect(key.toMap(), isEmpty);
 
       key = TsPrimaryKeyDef(
-          name: 'id', type: TsColumnType.integer, autoIncrement: true);
+        name: 'id',
+        type: TsColumnType.integer,
+        autoIncrement: true,
+      );
 
-      expect(key.toMap(),
-          {'name': 'id', 'type': 'integer', 'autoIncrement': true});
+      expect(key.toMap(), {
+        'name': 'id',
+        'type': 'integer',
+        'autoIncrement': true,
+      });
       key = TsPrimaryKeyDef.fromMap(key.toMap());
-      expect(key.toMap(),
-          {'name': 'id', 'type': 'integer', 'autoIncrement': true});
+      expect(key.toMap(), {
+        'name': 'id',
+        'type': 'integer',
+        'autoIncrement': true,
+      });
     });
     test('table', () {
       var description = TsTableDescription(
-          tableMeta: TsTableDescriptionTableMeta(
-              tableName: 'test_create1',
-              primaryKeys: [
-                TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
-                TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
-              ]),
-          reservedThroughput: tableCreateReservedThroughputDefault,
-          tableOptions: tableCreateOptionsDefault);
+        tableMeta: TsTableDescriptionTableMeta(
+          tableName: 'test_create1',
+          primaryKeys: [
+            TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+            TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer),
+          ],
+        ),
+        reservedThroughput: tableCreateReservedThroughputDefault,
+        tableOptions: tableCreateOptionsDefault,
+      );
       expect(description.toMap(), {
         'tableMeta': {
           'name': 'test_create1',
           'primaryKeys': [
             {'name': 'gid', 'type': 'integer'},
-            {'name': 'uid', 'type': 'integer'}
-          ]
+            {'name': 'uid', 'type': 'integer'},
+          ],
         },
         'reservedThroughput': {
-          'capacityUnit': {'read': 0, 'write': 0}
+          'capacityUnit': {'read': 0, 'write': 0},
         },
-        'tableOptions': {'timeToLive': -1, 'maxVersions': 1}
+        'tableOptions': {'timeToLive': -1, 'maxVersions': 1},
       });
     });
     test('TsPrimaryKey', () {

@@ -14,11 +14,12 @@ class TsClientOptions {
   /// Table store instance name
   final String? instanceName;
 
-  TsClientOptions(
-      {required this.accessKeyId,
-      required this.secretAccessKey,
-      required this.endpoint,
-      this.instanceName});
+  TsClientOptions({
+    required this.accessKeyId,
+    required this.secretAccessKey,
+    required this.endpoint,
+    this.instanceName,
+  });
 
   @override
   String toString() {
@@ -44,14 +45,16 @@ abstract class TsClient {
   Future<TsBatchGetRowsResponse> batchGetRows(TsBatchGetRowsRequest request);
 
   Future<TsBatchWriteRowsResponse> batchWriteRows(
-      TsBatchWriteRowsRequest request);
+    TsBatchWriteRowsRequest request,
+  );
 
   Future<TsDeleteRowResponse> deleteRow(TsDeleteRowRequest request);
 
   Future<TsGetRangeResponse> getRange(TsGetRangeRequest request);
 
   Future<TsStartLocalTransactionResponse> startLocalTransaction(
-      TsStartLocalTransactionRequest request);
+    TsStartLocalTransactionRequest request,
+  );
 }
 
 mixin TsClientMixin implements TsClient {

@@ -20,13 +20,14 @@ class TsExceptionSembast implements TsException {
   @override
   final bool retryable;
 
-  TsExceptionSembast(
-      {this.isConditionFailedError = false,
-      this.isTableNotExistError = false,
-      this.isPrimaryKeySizeError = false,
-      this.isPrimaryKeyTypeError = false,
-      required this.message,
-      this.retryable = false});
+  TsExceptionSembast({
+    this.isConditionFailedError = false,
+    this.isTableNotExistError = false,
+    this.isPrimaryKeySizeError = false,
+    this.isPrimaryKeyTypeError = false,
+    required this.message,
+    this.retryable = false,
+  });
 
   @override
   String toString() => '$message, retryable: $retryable';

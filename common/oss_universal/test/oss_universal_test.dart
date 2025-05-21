@@ -41,8 +41,10 @@ void main() {
     test('createBucket', () async {
       var testBucketName = 'oss_test_bucket';
       var bucket = await client!.putBucket(testBucketName);
-      expect((await client.listBuckets()).map((e) => e.name),
-          contains(bucket.name));
+      expect(
+        (await client.listBuckets()).map((e) => e.name),
+        contains(bucket.name),
+      );
     }, skip: !isLocalTest);
     test('listBuckets', () async {
       var buckets = await client!.listBuckets();
@@ -80,18 +82,32 @@ void main() {
       test('list files', () async {
         var bucket = await getOrCreateBucket();
         var content = 'Hello OSS';
-        await client!
-            .putAsString(bucket.name, 'test/list_files/no/file0.txt', content);
+        await client!.putAsString(
+          bucket.name,
+          'test/list_files/no/file0.txt',
+          content,
+        );
         await client.putAsString(
-            bucket.name, 'test/list_files/yes/file1.txt', content);
+          bucket.name,
+          'test/list_files/yes/file1.txt',
+          content,
+        );
         await client.putAsString(
-            bucket.name, 'test/list_files/yes/sub/file2.txt', content);
-        await client.putAsString(bucket.name,
-            'test/list_files/yes/other_sub/sub/file3.txt', content);
+          bucket.name,
+          'test/list_files/yes/sub/file2.txt',
+          content,
+        );
+        await client.putAsString(
+          bucket.name,
+          'test/list_files/yes/other_sub/sub/file3.txt',
+          content,
+        );
 
         var names = <String>[];
-        var options =
-            OssListFilesOptions(prefix: 'test/list_files/yes/', maxResults: 2);
+        var options = OssListFilesOptions(
+          prefix: 'test/list_files/yes/',
+          maxResults: 2,
+        );
         var response = await client.list(bucketName!, options);
         names.addAll(response.files.map((e) => e.name));
         expect(response.isTruncated, isTrue);
@@ -133,7 +149,9 @@ void main() {
       test('list dummy', () async {
         await getOrCreateBucket();
         var options = OssListFilesOptions(
-            prefix: 'test/dummy_that_should_not_exists', maxResults: 2);
+          prefix: 'test/dummy_that_should_not_exists',
+          maxResults: 2,
+        );
         var response = await client!.list(bucketName!, options);
         expect(response.files, isEmpty);
       });

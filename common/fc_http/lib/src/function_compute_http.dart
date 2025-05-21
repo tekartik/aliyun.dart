@@ -29,33 +29,41 @@ class AliyunFunctionComputeHttp implements AliyunFunctionCompute {
   Future<HttpServer> serveHttp({required int port}) async {
     assert(_functions.isNotEmpty, 'No handler exported');
 
-    var requestServer =
-        await httpServerFactory.bind(InternetAddress.anyIPv4, port);
+    var requestServer = await httpServerFactory.bind(
+      InternetAddress.anyIPv4,
+      port,
+    );
     var serverPort = requestServer.port;
     for (final info in _functions.values) {
       print('http://localhost:$serverPort/${info.name}');
     }
-    unawaited(Future.sync(() async {
-      await for (HttpRequest request in requestServer) {
-        var uri = request.uri;
-        // /test
-        var functionKey = uri.pathSegments.first;
-        var function = _functions[functionKey];
-        if (function == null) {
-          request.response.statusCode = httpStatusCodeNotFound;
-          request.response.writeln('not found');
-        } else {
-          var fcHttpRequestHttp = FcHttpRequestHttp(request);
-          var fcHttpResponseHttp = FcHttpResponseHttp(request);
-          var fcHttpContextHttp = FcHttpContextHttp(request);
-          function.handler(
-              fcHttpRequestHttp, fcHttpResponseHttp, fcHttpContextHttp);
+    unawaited(
+      Future.sync(() async {
+        await for (HttpRequest request in requestServer) {
+          var uri = request.uri;
+          // /test
+          var functionKey = uri.pathSegments.first;
+          var function = _functions[functionKey];
+          if (function == null) {
+            request.response.statusCode = httpStatusCodeNotFound;
+            request.response.writeln('not found');
+          } else {
+            var fcHttpRequestHttp = FcHttpRequestHttp(request);
+            var fcHttpResponseHttp = FcHttpResponseHttp(request);
+            var fcHttpContextHttp = FcHttpContextHttp(request);
+            function.handler(
+              fcHttpRequestHttp,
+              fcHttpResponseHttp,
+              fcHttpContextHttp,
+            );
+          }
         }
-      }
-    }));
+      }),
+    );
     return requestServer;
   }
 }
 
-final aliyunFunctionComputeMemory =
-    AliyunFunctionComputeHttp(httpServerFactoryMemory);
+final aliyunFunctionComputeMemory = AliyunFunctionComputeHttp(
+  httpServerFactoryMemory,
+);

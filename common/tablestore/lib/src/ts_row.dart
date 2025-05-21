@@ -6,12 +6,13 @@ class TsGetRowRequest {
   final TsPrimaryKey primaryKey;
   final List<String>? columns;
 
-  TsGetRowRequest(
-      {required this.tableName,
-      required this.primaryKey,
+  TsGetRowRequest({
+    required this.tableName,
+    required this.primaryKey,
 
-      /// Optional
-      this.columns});
+    /// Optional
+    this.columns,
+  });
 }
 
 class TsKeyStartBoundary extends TsKeyBoundary {
@@ -38,16 +39,17 @@ class TsGetRangeRequest {
   final int? limit;
   final TsColumnCondition? columnCondition;
 
-  TsGetRangeRequest(
-      {required this.tableName,
+  TsGetRangeRequest({
+    required this.tableName,
 
-      /// Optional
-      this.inclusiveStartPrimaryKey,
-      this.exclusiveEndPrimaryKey,
-      this.direction,
-      this.limit,
-      this.columns,
-      this.columnCondition});
+    /// Optional
+    this.inclusiveStartPrimaryKey,
+    this.exclusiveEndPrimaryKey,
+    this.direction,
+    this.limit,
+    this.columns,
+    this.columnCondition,
+  });
 }
 
 // Condition for put and delete
@@ -59,12 +61,14 @@ class TsCondition {
 
   /// Helpers
   static final TsCondition ignore = TsCondition(
-      rowExistenceExpectation: TsConditionRowExistenceExpectation.ignore);
+    rowExistenceExpectation: TsConditionRowExistenceExpectation.ignore,
+  );
   static final TsCondition expectExist = TsCondition(
-      rowExistenceExpectation: TsConditionRowExistenceExpectation.expectExist);
+    rowExistenceExpectation: TsConditionRowExistenceExpectation.expectExist,
+  );
   static final TsCondition expectNotExist = TsCondition(
-      rowExistenceExpectation:
-          TsConditionRowExistenceExpectation.expectNotExist);
+    rowExistenceExpectation: TsConditionRowExistenceExpectation.expectNotExist,
+  );
 
   Model toDebugMap() {
     return asModel({})
@@ -94,7 +98,10 @@ abstract class TsColumnCondition {
 
   factory TsColumnCondition.greaterThanOrEquals(String name, dynamic value) =>
       TsColumnSingleCondition(
-          TsComparatorType.greaterThanOrEquals, name, value);
+        TsComparatorType.greaterThanOrEquals,
+        name,
+        value,
+      );
 
   factory TsColumnCondition.or(List<TsColumnCondition> conditions) =>
       TsColumnCompositeCondition(TsLogicalOperator.or, conditions);
@@ -114,16 +121,9 @@ enum TsComparatorType {
   lessThanOrEquals,
 }
 
-enum TsDirection {
-  forward,
-  backward,
-}
+enum TsDirection { forward, backward }
 
-enum TsLogicalOperator {
-  and,
-  or,
-  not,
-}
+enum TsLogicalOperator { and, or, not }
 
 class TsColumnSingleCondition implements TsColumnCondition {
   final TsComparatorType operator;
@@ -131,10 +131,11 @@ class TsColumnSingleCondition implements TsColumnCondition {
   final dynamic value;
 
   @override
-  Model toDebugMap() => asModel({})
-    ..setValue('name', name)
-    ..setValue('operator', operator)
-    ..setValue('value', value);
+  Model toDebugMap() =>
+      asModel({})
+        ..setValue('name', name)
+        ..setValue('operator', operator)
+        ..setValue('value', value);
 
   TsColumnSingleCondition(this.operator, this.name, this.value);
 }
@@ -146,9 +147,13 @@ class TsColumnCompositeCondition implements TsColumnCondition {
   TsColumnCompositeCondition(this.operator, this.list);
 
   @override
-  Model toDebugMap() => asModel({})
-    ..setValue('operator', operator)
-    ..setValue('list', list.map((e) => e.toDebugMap()).toList(growable: false));
+  Model toDebugMap() =>
+      asModel({})
+        ..setValue('operator', operator)
+        ..setValue(
+          'list',
+          list.map((e) => e.toDebugMap()).toList(growable: false),
+        );
 }
 
 enum TsConditionRowExistenceExpectation {
@@ -181,13 +186,14 @@ class TsPutRowRequest {
   final TsCondition? condition;
   final TsAttributes data;
 
-  TsPutRowRequest(
-      {required this.tableName,
-      required this.primaryKey,
-      this.condition,
+  TsPutRowRequest({
+    required this.tableName,
+    required this.primaryKey,
+    this.condition,
 
-      /// Columns values
-      required this.data});
+    /// Columns values
+    required this.data,
+  });
 }
 
 class TsUpdateRowRequest {
@@ -196,21 +202,20 @@ class TsUpdateRowRequest {
   final TsCondition? condition;
   final TsUpdateAttributes data;
 
-  TsUpdateRowRequest(
-      {required this.tableName,
-      required this.primaryKey,
-      this.condition,
+  TsUpdateRowRequest({
+    required this.tableName,
+    required this.primaryKey,
+    this.condition,
 
-      /// Columns values
-      required this.data});
+    /// Columns values
+    required this.data,
+  });
 }
 
 class TsBatchGetRowsRequest {
   final List<TsBatchGetRowsRequestTable> tables;
 
-  TsBatchGetRowsRequest({
-    required this.tables,
-  });
+  TsBatchGetRowsRequest({required this.tables});
 }
 
 class TsBatchGetRowsRequestTable {
@@ -218,12 +223,13 @@ class TsBatchGetRowsRequestTable {
   final List<TsPrimaryKey> primaryKeys;
   final List<String>? columns;
 
-  TsBatchGetRowsRequestTable(
-      {required this.tableName,
-      required this.primaryKeys,
+  TsBatchGetRowsRequestTable({
+    required this.tableName,
+    required this.primaryKeys,
 
-      /// Optional
-      this.columns});
+    /// Optional
+    this.columns,
+  });
 }
 
 enum TsWriteRowType { put, update, delete }
@@ -243,26 +249,28 @@ class TsBatchWriteRowsRequestTable {
 
 class TsBatchWriteRowsRequestDeleteRow extends TsBatchWriteRowsRequestRow {
   TsBatchWriteRowsRequestDeleteRow({required super.primaryKey, super.condition})
-      : super(type: TsWriteRowType.delete);
+    : super(type: TsWriteRowType.delete);
 }
 
 class TsBatchWriteRowsRequestUpdateRow extends TsBatchWriteRowsRequestRow {
-  TsBatchWriteRowsRequestUpdateRow(
-      {required super.primaryKey, super.condition, required this.data})
-      : super(type: TsWriteRowType.update);
+  TsBatchWriteRowsRequestUpdateRow({
+    required super.primaryKey,
+    super.condition,
+    required this.data,
+  }) : super(type: TsWriteRowType.update);
   final TsUpdateAttributes data;
 }
 
 class TsBatchWriteRowsRequestPutRow extends TsBatchWriteRowsRequestRow {
   final TsAttributes? data;
 
-  TsBatchWriteRowsRequestPutRow(
-      {required super.primaryKey,
-      super.condition,
+  TsBatchWriteRowsRequestPutRow({
+    required super.primaryKey,
+    super.condition,
 
-      /// Columns values
-      this.data})
-      : super(type: TsWriteRowType.put);
+    /// Columns values
+    this.data,
+  }) : super(type: TsWriteRowType.put);
 }
 
 abstract class TsBatchWriteRowsRequestRow {
@@ -282,12 +290,13 @@ class TsDeleteRowRequest {
   final TsPrimaryKey primaryKey;
   final TsCondition? condition;
 
-  TsDeleteRowRequest(
-      {required this.tableName,
-      required this.primaryKey,
+  TsDeleteRowRequest({
+    required this.tableName,
+    required this.primaryKey,
 
-      /// Optional
-      this.condition});
+    /// Optional
+    this.condition,
+  });
 }
 
 abstract class TsGetRow {
@@ -385,21 +394,24 @@ extension TsGetRangeResponseExt on TsGetRangeResponse {
 
 extension TsBatchGetRowsResponseExt on TsBatchGetRowsResponse {
   Model toDebugMap() {
-    return asModel({})
-      ..setValue(
-          'tables',
-          tables
-              .map((table) =>
-                  table.map((row) => row.toDebugMap()).toList(growable: false))
-              .toList(growable: false));
+    return asModel({})..setValue(
+      'tables',
+      tables
+          .map(
+            (table) =>
+                table.map((row) => row.toDebugMap()).toList(growable: false),
+          )
+          .toList(growable: false),
+    );
   }
 }
 
 extension TsBatchWriteRowsResponseExt on TsBatchWriteRowsResponse {
   Model toDebugMap() {
-    return asModel({})
-      ..setValue(
-          'rows', rows.map((row) => row.toDebugMap()).toList(growable: false));
+    return asModel({})..setValue(
+      'rows',
+      rows.map((row) => row.toDebugMap()).toList(growable: false),
+    );
   }
 }
 
@@ -434,8 +446,10 @@ class TsStartLocalTransactionRequest {
   final TsPrimaryKey primaryKey;
 
   // Primary key must contain only the partition key (i.e. single key value
-  TsStartLocalTransactionRequest(
-      {required this.tableName, required this.primaryKey});
+  TsStartLocalTransactionRequest({
+    required this.tableName,
+    required this.primaryKey,
+  });
 }
 
 abstract class TsStartLocalTransactionResponse {

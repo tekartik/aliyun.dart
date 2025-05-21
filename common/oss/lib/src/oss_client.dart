@@ -20,17 +20,18 @@ class OssClientOptions {
   /// Table store endpoint
   final String endpoint;
 
-  OssClientOptions(
-      {required this.accessKeyId,
-      required this.accessKeySecret,
-      required this.endpoint});
+  OssClientOptions({
+    required this.accessKeyId,
+    required this.accessKeySecret,
+    required this.endpoint,
+  });
 
   @override
   String toString() {
     return {
       'endpoint': endpoint,
       'accessKeyId': obfuscate(accessKeyId),
-      'accessKeySecret': obfuscate(accessKeySecret)
+      'accessKeySecret': obfuscate(accessKeySecret),
     }.toString();
   }
 }
@@ -67,8 +68,10 @@ abstract class OssClient {
   Future<void> delete(String bucketName, String path);
 
   /// List all object in a bucket
-  Future<OssListFilesResponse> list(String bucketName,
-      [OssListFilesOptions? options]);
+  Future<OssListFilesResponse> list(
+    String bucketName, [
+    OssListFilesOptions? options,
+  ]);
 }
 
 mixin OssClientMixin implements OssClient {
@@ -77,10 +80,13 @@ mixin OssClientMixin implements OssClient {
       throw UnimplementedError('listBuckets');
 
   @override
-  Future<OssListFilesResponse> list(String bucketName,
-      [OssListFilesOptions? options]) {
+  Future<OssListFilesResponse> list(
+    String bucketName, [
+    OssListFilesOptions? options,
+  ]) {
     throw UnimplementedError(
-        'list($bucketName${options != null ? ', $options' : ''})');
+      'list($bucketName${options != null ? ', $options' : ''})',
+    );
   }
 
   @override
@@ -95,7 +101,10 @@ mixin OssClientMixin implements OssClient {
 
   @override
   Future<void> putAsBytes(
-      String bucketName, String path, Uint8List bytes) async {
+    String bucketName,
+    String path,
+    Uint8List bytes,
+  ) async {
     throw UnimplementedError('putAsBytes($bucketName, $path)');
   }
 

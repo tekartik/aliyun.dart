@@ -15,15 +15,14 @@ class OssExceptionNode implements OssException {
   dynamic _errMapValue(String key) => map != null ? map![key] : null;
 
   // Message can be null
-  OssExceptionNode(
-      {String? message,
-      this.map /*?*/
-      ,
-      bool? isNotFound,
-      bool? isRetryable})
-      : _message = message,
-        _isNotFound = isNotFound,
-        _isRetryable = isRetryable;
+  OssExceptionNode({
+    String? message,
+    this.map /*?*/,
+    bool? isNotFound,
+    bool? isRetryable,
+  }) : _message = message,
+       _isNotFound = isNotFound,
+       _isRetryable = isRetryable;
 
   // TableStoreNodeException(404:OTSObjec
   int? get code => parseInt(_errMapValue('code'));

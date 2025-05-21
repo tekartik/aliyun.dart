@@ -27,18 +27,23 @@ TsClientOptions? getTsClientOptionsFromEnv(Map<String, String> env) {
     return null;
   }
   return TsClientOptions(
-      endpoint: endpoint,
-      accessKeyId: accessKeyId,
-      secretAccessKey: secretAccessKey,
-      instanceName: instanceName);
+    endpoint: endpoint,
+    accessKeyId: accessKeyId,
+    secretAccessKey: secretAccessKey,
+    instanceName: instanceName,
+  );
 }
 
-TsClientOptions? get tsClientOptionsFromEnv => _tsClientOptionsFromEnv ??= () {
+TsClientOptions? get tsClientOptionsFromEnv =>
+    _tsClientOptionsFromEnv ??= () {
       if (isRunningAsJavascript) {
         return getTsClientOptionsFromEnv(_env);
       } else {
         // io sim
         return TsClientOptions(
-            endpoint: 'local', accessKeyId: '', secretAccessKey: '');
+          endpoint: 'local',
+          accessKeyId: '',
+          secretAccessKey: '',
+        );
       }
     }();

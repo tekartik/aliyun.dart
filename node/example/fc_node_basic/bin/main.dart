@@ -8,8 +8,11 @@ import 'package:tekartik_common_utils/json_utils.dart';
 import 'package:tekartik_http/http.dart';
 
 Future<void> main() async {
-  aliyunFunctionComputeUniversal.exportHttpHandler((FcHttpRequest request,
-      FcHttpResponse response, FcHttpContext httpContext) async {
+  aliyunFunctionComputeUniversal.exportHttpHandler((
+    FcHttpRequest request,
+    FcHttpResponse response,
+    FcHttpContext httpContext,
+  ) async {
     var command = request.path.split('/').last;
 
     // Testing logs if attached

@@ -8,15 +8,19 @@ Map<String, dynamic> toCreateTableParams(TsTableDescription description) {
       'tableMeta': {
         'tableName': description.tableMeta!.tableName,
         // TsArrayHack needed
-        'primaryKey':
-            TsArrayHack(description.tableMeta!.primaryKeys!.map((item) {
-          return {'name': item.name, 'type': columnTypeToNativeType(item.type)};
-        }))
+        'primaryKey': TsArrayHack(
+          description.tableMeta!.primaryKeys!.map((item) {
+            return {
+              'name': item.name,
+              'type': columnTypeToNativeType(item.type),
+            };
+          }),
+        ),
       },
     if (description.reservedThroughput != null)
       'reservedThroughput': description.reservedThroughput!.toMap(),
     if (description.tableOptions != null)
-      'tableOptions': description.tableOptions!.toMap()
+      'tableOptions': description.tableOptions!.toMap(),
   });
   return map;
 }

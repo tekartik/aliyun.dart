@@ -8,7 +8,8 @@ Future main() async {
 }
 
 Future copyToDeploy({String directory = 'bin'}) async {
-  var file =
-      await File('build/$directory/main.dart.js').copy('deploy/index.js');
+  var file = await File(
+    'build/$directory/main.dart.js',
+  ).copy('deploy/index.js');
   print('copied to $file ${file.statSync()}');
 }

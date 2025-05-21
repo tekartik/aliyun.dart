@@ -9,105 +9,118 @@ void main() {
   group('tablestore_node_common', () {
     test('toCreateTableParams', () {
       var description = TsTableDescription(
-          tableMeta: TsTableDescriptionTableMeta(
-              tableName: 'test_create1',
-              primaryKeys: [
-                TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
-                TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
-              ]),
-          reservedThroughput: tableCreateReservedThroughputDefault,
-          tableOptions: tableCreateOptionsDefault);
+        tableMeta: TsTableDescriptionTableMeta(
+          tableName: 'test_create1',
+          primaryKeys: [
+            TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+            TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer),
+          ],
+        ),
+        reservedThroughput: tableCreateReservedThroughputDefault,
+        tableOptions: tableCreateOptionsDefault,
+      );
       expect(toCreateTableParams(description), {
         'tableMeta': {
           'tableName': 'test_create1',
           'primaryKey': TsArrayHack([
             {'name': 'gid', 'type': 1},
-            {'name': 'uid', 'type': 1}
-          ])
+            {'name': 'uid', 'type': 1},
+          ]),
         },
         'reservedThroughput': {
-          'capacityUnit': {'read': 0, 'write': 0}
+          'capacityUnit': {'read': 0, 'write': 0},
         },
-        'tableOptions': {'timeToLive': -1, 'maxVersions': 1}
+        'tableOptions': {'timeToLive': -1, 'maxVersions': 1},
       });
     });
 
     test('toGetRowParams', () {
       var getRowRequest = TsGetRowRequest(
-          tableName: 'test',
-          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]));
+        tableName: 'test',
+        primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
+      );
       expect(toGetRowParams(getRowRequest), {
         'tableName': 'test',
         'primaryKey': [
-          {'key': TsValueLong.fromNumber(1)}
-        ]
+          {'key': TsValueLong.fromNumber(1)},
+        ],
       });
       getRowRequest = TsGetRowRequest(
-          tableName: 'test',
-          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
-          columns: ['col1', 'col2']);
+        tableName: 'test',
+        primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
+        columns: ['col1', 'col2'],
+      );
       expect(toGetRowParams(getRowRequest), {
         'tableName': 'test',
         'primaryKey': [
-          {'key': TsValueLong.fromNumber(1)}
+          {'key': TsValueLong.fromNumber(1)},
         ],
-        'columnsToGet': ['col1', 'col2']
+        'columnsToGet': ['col1', 'col2'],
       });
     });
 
     test('toPutRowParams', () {
       var r = TsPutRowRequest(
-          tableName: 'test',
-          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
-          data: TsAttributes(
-              [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')]));
+        tableName: 'test',
+        primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
+        data: TsAttributes([
+          TsAttribute.int('col1', 1),
+          TsAttribute('col2', 'value'),
+        ]),
+      );
       expect(toPutRowParams(r), {
         'condition': TsCondition.ignore,
         'tableName': 'test',
         'primaryKey': [
-          {'key': TsValueLong.fromNumber(1)}
+          {'key': TsValueLong.fromNumber(1)},
         ],
         'attributeColumns': [
           {'col1': TsValueLong.fromNumber(1)},
-          {'col2': 'value'}
+          {'col2': 'value'},
         ],
-        'returnContent': {'returnType': 1}
+        'returnContent': {'returnType': 1},
       });
     });
 
     test('toUpdateRowParams', () {
       var r = TsUpdateRowRequest(
-          tableName: 'test',
-          primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
-          data: TsUpdateAttributes([
-            TsUpdateAttributePut(TsAttributes(
-                [TsAttribute.int('col1', 1), TsAttribute('col2', 'value')])),
-            TsUpdateAttributeDelete(['col3', 'col4'])
-          ]));
+        tableName: 'test',
+        primaryKey: TsPrimaryKey([TsKeyValue.int('key', 1)]),
+        data: TsUpdateAttributes([
+          TsUpdateAttributePut(
+            TsAttributes([
+              TsAttribute.int('col1', 1),
+              TsAttribute('col2', 'value'),
+            ]),
+          ),
+          TsUpdateAttributeDelete(['col3', 'col4']),
+        ]),
+      );
       expect(toUpdateRowParams(r), {
         'condition': TsCondition.expectExist,
         'tableName': 'test',
         'primaryKey': [
-          {'key': TsValueLong.fromNumber(1)}
+          {'key': TsValueLong.fromNumber(1)},
         ],
         'updateOfAttributeColumns': [
           {
             'PUT': [
               {'col1': TsValueLong.fromNumber(1)},
-              {'col2': 'value'}
-            ]
+              {'col2': 'value'},
+            ],
           },
           {
-            'DELETE_ALL': TsArrayHack(['col3', 'col4'])
-          }
+            'DELETE_ALL': TsArrayHack(['col3', 'col4']),
+          },
         ],
-        'returnContent': {'returnType': 1}
+        'returnContent': {'returnType': 1},
       });
     });
 
     test('Exception', () {
       var exception = TsExceptionNode(
-          map: {'code': 403, 'message': '\u0017Condition check failed.'});
+        map: {'code': 403, 'message': '\u0017Condition check failed.'},
+      );
       expect(exception.isConditionFailedError, isTrue);
     });
   });

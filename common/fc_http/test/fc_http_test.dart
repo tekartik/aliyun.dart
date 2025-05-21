@@ -19,20 +19,26 @@ void main() {
         response.setHeader('content-type', 'application/json');
         expect(request.headers['Upper'], 'Value');
         expect(request.headers['upper'], 'Value');
-        await response.sendString(jsonEncode({
-          'method': request.method,
-          'body': body,
-          'path': request.path,
-          'url': request.url,
-          'headers': request.headers
-        }));
+        await response.sendString(
+          jsonEncode({
+            'method': request.method,
+            'body': body,
+            'path': request.path,
+            'url': request.url,
+            'headers': request.headers,
+          }),
+        );
       });
       var server = await functionCompute.serveHttp(port: 0);
       var url = 'http://localhost:${server.port}';
       var client = httpClientFactoryMemory.newClient();
       var result = await httpClientRead(
-          client, httpMethodGet, Uri.parse('$url/handler?t=1'),
-          headers: {'hk': 'hv', 'Upper': 'Value'}, body: 'body_data');
+        client,
+        httpMethodGet,
+        Uri.parse('$url/handler?t=1'),
+        headers: {'hk': 'hv', 'Upper': 'Value'},
+        body: 'body_data',
+      );
       var map = jsonDecode(result) as Map;
 
       expect(map['method'], 'GET');
@@ -51,7 +57,10 @@ void main() {
       var url = 'http://localhost:${server.port}';
       var client = httpClientFactoryMemory.newClient();
       var result = await httpClientRead(
-          client, httpMethodGet, Uri.parse('$url/handler'));
+        client,
+        httpMethodGet,
+        Uri.parse('$url/handler'),
+      );
       expect(result, 'test');
       await server.close(force: true);
       client.close();

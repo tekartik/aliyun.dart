@@ -110,7 +110,7 @@ abstract class _TsClientPrimaryKey {
 abstract class _TsClientTableDescriptionTableMetaJs {
   external String get tableName;
 
-  external List<dynamic /*_TsClientPrimaryKey*/ > get primaryKey;
+  external List<dynamic /*_TsClientPrimaryKey*/> get primaryKey;
 }
 
 @JS()
@@ -136,8 +136,8 @@ abstract class _TsClientTableDescriptionCapacityUnit {
 }
 
 List<_TsClientPrimaryKey> _tableMetaPrimaryKeys(
-        _TsClientTableDescriptionTableMetaJs tableMeta) =>
-    tableMeta.primaryKey.cast<_TsClientPrimaryKey>().toList(growable: false);
+  _TsClientTableDescriptionTableMetaJs tableMeta,
+) => tableMeta.primaryKey.cast<_TsClientPrimaryKey>().toList(growable: false);
 
 // {
 //   "shardSplits": [],
@@ -197,7 +197,7 @@ abstract class _TsClientTableDescriptionJs {
   external _TsClientTableDescriptionTableMetaJs? get tableMeta;
 
   external _TsClientTableDescriptionReservedThroughputJs?
-      get reservedThroughputDetails;
+  get reservedThroughputDetails;
 
   external _TsClientTableDescriptionTableOptionsJs? get tableOptions;
 }
@@ -216,32 +216,42 @@ TsTableDescription tableDescriptionFromNative(Object nativeDesc) {
 
     primaryKeys = <TsPrimaryKeyDef>[];
     for (var element in nativePrimaryKeys) {
-      primaryKeys.add(TsPrimaryKeyDef(
-          type: nativeTypeToColumnType(element.type), name: element.name));
+      primaryKeys.add(
+        TsPrimaryKeyDef(
+          type: nativeTypeToColumnType(element.type),
+          name: element.name,
+        ),
+      );
     }
     tableMeta = TsTableDescriptionTableMeta(
-        tableName: nativeTableMeta.tableName, primaryKeys: primaryKeys);
+      tableName: nativeTableMeta.tableName,
+      primaryKeys: primaryKeys,
+    );
   }
   if (nativeTableOptions != null) {
     tableOptions = TsTableDescriptionOptions(
-        timeToLive: nativeTableOptions.timeToLive,
-        maxVersions: nativeTableOptions.maxVersions);
+      timeToLive: nativeTableOptions.timeToLive,
+      maxVersions: nativeTableOptions.maxVersions,
+    );
   }
   if (nativeReservedThroughput != null) {
     TsTableCapacityUnit? capacityUnit;
     if (nativeReservedThroughput.capacityUnit != null) {
       capacityUnit = TsTableCapacityUnit(
-          write: nativeReservedThroughput.capacityUnit!.write,
-          read: nativeReservedThroughput.capacityUnit!.read);
+        write: nativeReservedThroughput.capacityUnit!.write,
+        read: nativeReservedThroughput.capacityUnit!.read,
+      );
     }
-    reservedThroughPut =
-        TsTableDescriptionReservedThroughput(capacityUnit: capacityUnit);
+    reservedThroughPut = TsTableDescriptionReservedThroughput(
+      capacityUnit: capacityUnit,
+    );
   }
 
   return TsTableDescription(
-      tableMeta: tableMeta,
-      tableOptions: tableOptions,
-      reservedThroughput: reservedThroughPut);
+    tableMeta: tableMeta,
+    tableOptions: tableOptions,
+    reservedThroughput: reservedThroughPut,
+  );
 }
 
 List<String> tableNamesFromNative(TsClientListTableResponseJs native) {

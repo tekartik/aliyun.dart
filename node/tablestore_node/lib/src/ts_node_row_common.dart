@@ -29,7 +29,7 @@ Map<String, dynamic> toPutRowParams(TsPutRowRequest request) {
     'primaryKey': tsPrimaryKeyParams(request.primaryKey),
 
     'attributeColumns': tsAttributeColumnsParams(request.data),
-    'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey}
+    'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey},
   });
   return map;
 }
@@ -44,7 +44,7 @@ Map<String, dynamic> toUpdateRowParams(TsUpdateRowRequest request) {
     'primaryKey': tsPrimaryKeyParams(request.primaryKey),
 
     'updateOfAttributeColumns': tsUpdateAttributesParams(request.data),
-    'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey}
+    'returnContent': {'returnType': tsNodeCommon.returnType.Primarykey},
   });
   return map;
 }
@@ -53,10 +53,11 @@ List<dynamic> tsAttributeColumnsParams(List<TsAttribute> attributes) =>
     attributes.map((e) => toPrimaryKeyValueParam(e)).toList();
 
 Map<String, dynamic> tsUpdateAttributeParams(
-    TsUpdateAttribute updateAttribute) {
+  TsUpdateAttribute updateAttribute,
+) {
   if (updateAttribute is TsUpdateAttributePut) {
     return <String, dynamic>{
-      'PUT': tsAttributeColumnsParams(updateAttribute.attributes)
+      'PUT': tsAttributeColumnsParams(updateAttribute.attributes),
     };
   } else if (updateAttribute is TsUpdateAttributeDelete) {
     return <String, dynamic>{'DELETE_ALL': TsArrayHack(updateAttribute.fields)};
@@ -66,8 +67,8 @@ Map<String, dynamic> tsUpdateAttributeParams(
 }
 
 List<Map<String, dynamic>> tsUpdateAttributesParams(
-        List<TsUpdateAttribute> attributes) =>
-    attributes.map((e) => tsUpdateAttributeParams(e)).toList();
+  List<TsUpdateAttribute> attributes,
+) => attributes.map((e) => tsUpdateAttributeParams(e)).toList();
 
 List<dynamic> tsPrimaryKeyParams(TsPrimaryKey primaryKey) =>
     primaryKey.list.map(toPrimaryKeyValueParam).toList();
@@ -92,11 +93,13 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
     'tableName': request.tableName,
     if (request.columns != null) 'columnsToGet': request.columns,
     if (request.inclusiveStartPrimaryKey != null)
-      'inclusiveStartPrimaryKey':
-          primaryKeyAsList(request.inclusiveStartPrimaryKey!),
+      'inclusiveStartPrimaryKey': primaryKeyAsList(
+        request.inclusiveStartPrimaryKey!,
+      ),
     if (request.exclusiveEndPrimaryKey != null)
-      'exclusiveEndPrimaryKey':
-          primaryKeyAsList(request.exclusiveEndPrimaryKey!),
+      'exclusiveEndPrimaryKey': primaryKeyAsList(
+        request.exclusiveEndPrimaryKey!,
+      ),
     'direction': request.direction ?? TsDirection.forward,
     if (request.columnCondition is TsColumnSingleCondition)
       'columnFilter': request.columnCondition,
@@ -107,7 +110,8 @@ Map<String, dynamic> toGetRangeParams(TsGetRangeRequest request) {
 }
 
 Map<String, dynamic> toStartLocalTransactionParams(
-    TsStartLocalTransactionRequest request) {
+  TsStartLocalTransactionRequest request,
+) {
   var map = asModel({
     'tableName': request.tableName,
     // Needed
@@ -117,7 +121,8 @@ Map<String, dynamic> toStartLocalTransactionParams(
 }
 
 int tsConditionRowExistenceExpectationToNative(
-    TsConditionRowExistenceExpectation rowExistenceExpecation) {
+  TsConditionRowExistenceExpectation rowExistenceExpecation,
+) {
   switch (rowExistenceExpecation) {
     case TsConditionRowExistenceExpectation.ignore:
       return tsNodeCommon.rowExistenceExpectation.IGNORE;

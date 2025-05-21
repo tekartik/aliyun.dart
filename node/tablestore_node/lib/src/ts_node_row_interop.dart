@@ -138,36 +138,45 @@ class TsRowAttributeKeyValueJs {
 @JS()
 @anonymous
 class TsGetRowParamsJs {
-  external factory TsGetRowParamsJs(
-      {int? maxVersions, String? tableName, List<dynamic>? primaryKey});
+  external factory TsGetRowParamsJs({
+    int? maxVersions,
+    String? tableName,
+    List<dynamic>? primaryKey,
+  });
 }
 
 @JS()
 @anonymous
 class TsBatchGetRowParamsJs {
-  external factory TsBatchGetRowParamsJs(
-      {List<TsBatchGetRowParamsTableJs>? tables});
+  external factory TsBatchGetRowParamsJs({
+    List<TsBatchGetRowParamsTableJs>? tables,
+  });
 }
 
 @JS()
 @anonymous
 class TsBatchGetRowParamsTableJs {
-  external factory TsBatchGetRowParamsTableJs(
-      {int? maxVersions, String? tableName, dynamic primaryKey});
+  external factory TsBatchGetRowParamsTableJs({
+    int? maxVersions,
+    String? tableName,
+    dynamic primaryKey,
+  });
 }
 
 // {tables: [[{isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string, capacityUnit: {read: 1, write: 0}, primaryKey: [{name: key, value: batch_1}], attributes: [{columnName: test, columnValue: {buffer: [1, 0, 0, 0, 0, 0, 0, 0], offset: 0}, timestamp: {buffer: [105, 65, 90, 108, 116, 1, 0, 0], offset: 0}}]}, {isOk: true, errorCode: null, errorMessage: null, tableName: test_key_string, capacityUnit: {read: 1, write: 0}, primaryKey: null, attributes: null}]], RequestId: 0005aec7-4095-ae6b-e5c1-720b0b23b32a}
 @JS()
 @anonymous
 abstract class TsBatchGetRowResponseJs {
-  external List/*<List<TsBatchGetRowResponseRowJs>>*/ tables;
+  external List /*<List<TsBatchGetRowResponseRowJs>>*/ tables;
 }
 
 extension TsBatchGetRowResponseJsExt on TsBatchGetRowResponseJs {
   List<List<TsBatchGetRowResponseRowJs>> get extTables => tables
-      .map((e) => (e as List)
-          .map((e) => e as TsBatchGetRowResponseRowJs)
-          .toList(growable: false))
+      .map(
+        (e) => (e as List)
+            .map((e) => e as TsBatchGetRowResponseRowJs)
+            .toList(growable: false),
+      )
       .toList(growable: false);
 }
 
@@ -189,17 +198,17 @@ abstract class TsBatchGetRowResponseRowJs {
 }
 
 Iterable<TsRowPrimaryKeyValueJs>? batchRowPrimaryKeyValuesJs(
-        TsBatchGetRowResponseRowJs js) =>
-    js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
+  TsBatchGetRowResponseRowJs js,
+) => js.primaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
 Iterable<TsRowAttributeKeyValueJs>? batchRowAttributeKeyValuesJs(
-        TsBatchGetRowResponseRowJs js) =>
-    js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
+  TsBatchGetRowResponseRowJs js,
+) => js.attributes?.map((e) => e as TsRowAttributeKeyValueJs);
 
 @JS()
 @anonymous
 abstract class TsBatchWriteRowResponseJs {
-  external List/*<TsBatchGetRowResponseRowJs>*/ tables;
+  external List /*<TsBatchGetRowResponseRowJs>*/ tables;
 }
 
 extension TsBatchWriteRowResponseJsExt on TsBatchWriteRowResponseJs {
@@ -239,14 +248,18 @@ List<dynamic> tsPrimaryKeyToNative(TsPrimaryKey primaryKey) =>
 
 TsGetRowParamsJs toGetRowParamsJs(TsGetRowRequest request) {
   return TsGetRowParamsJs(
-      maxVersions: 1,
-      tableName: request.tableName,
-      primaryKey: tsPrimaryKeyToNative(request.primaryKey));
+    maxVersions: 1,
+    tableName: request.tableName,
+    primaryKey: tsPrimaryKeyToNative(request.primaryKey),
+  );
 }
 
 @JS('Object.keys')
 external void jsObjectDefineProperty(
-    Object? obj, String name, dynamic property);
+  Object? obj,
+  String name,
+  dynamic property,
+);
 
 class JsArrayWrapper<T> {
   var native = util.newObject() as Object;
@@ -359,9 +372,11 @@ TsUpdateRowResponse updateRowResponseFromNative(dynamic nativeResponseJs) {
 }
 
 TsStartLocalTransactionResponse startLocalTransactionRowResponseFromNative(
-    dynamic nativeResponseJs) {
+  dynamic nativeResponseJs,
+) {
   return TsStartLocalTransactionResponseNode(
-      nativeResponseJs as TsStartLocalTransactionResponseJs);
+    nativeResponseJs as TsStartLocalTransactionResponseJs,
+  );
 }
 
 // Response to native
@@ -431,8 +446,8 @@ class TsGetRangeResponseJs {
 }
 
 Iterable<TsRowPrimaryKeyValueJs>? getRangeResponseNextStartPrimaryKeyValuesJs(
-        TsGetRangeResponseJs js) =>
-    js.nextStartPrimaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
+  TsGetRangeResponseJs js,
+) => js.nextStartPrimaryKey?.map((e) => e as TsRowPrimaryKeyValueJs);
 
 @JS()
 @anonymous
@@ -474,14 +489,19 @@ class TsGetRowNode implements TsGetRow {
 }
 
 TsAttributes fromNativeAttributes(Iterable<TsRowAttributeKeyValueJs> native) {
-  return TsAttributes(native.map((kvJs) {
-    return TsAttribute(
-        kvJs.columnName, tsDartifyValue(kvJs.columnValue) as Object);
-  }).toList());
+  return TsAttributes(
+    native.map((kvJs) {
+      return TsAttribute(
+        kvJs.columnName,
+        tsDartifyValue(kvJs.columnValue) as Object,
+      );
+    }).toList(),
+  );
 }
 
 TsAttributes? fromNativeAttributesOrNull(
-    Iterable<TsRowAttributeKeyValueJs>? native) {
+  Iterable<TsRowAttributeKeyValueJs>? native,
+) {
   if (native == null) {
     return null;
   }
@@ -489,13 +509,16 @@ TsAttributes? fromNativeAttributesOrNull(
 }
 
 TsPrimaryKey fromNativePrimaryKey(Iterable<TsRowPrimaryKeyValueJs> native) {
-  return TsPrimaryKey(native.map((kvJs) {
-    return TsKeyValue(kvJs.name, tsDartifyValue(kvJs.value) as Object);
-  }).toList());
+  return TsPrimaryKey(
+    native.map((kvJs) {
+      return TsKeyValue(kvJs.name, tsDartifyValue(kvJs.value) as Object);
+    }).toList(),
+  );
 }
 
 TsPrimaryKey? fromNativePrimaryKeyOrNull(
-    Iterable<TsRowPrimaryKeyValueJs>? native) {
+  Iterable<TsRowPrimaryKeyValueJs>? native,
+) {
   if (native == null) {
     return null;
   }
@@ -569,9 +592,11 @@ class TsBatchGetRowsResponseNode implements TsBatchGetRowsResponse {
 
   TsBatchGetRowsResponseNode(this.responseJs) {
     tables = responseJs.extTables
-        .map((rows) => rows
-            .map((e) => fromBatchGetRowResponseRowNative(e))
-            .toList(growable: false))
+        .map(
+          (rows) => rows
+              .map((e) => fromBatchGetRowResponseRowNative(e))
+              .toList(growable: false),
+        )
         .toList(growable: false);
   }
 
@@ -613,26 +638,28 @@ class TsBatchGetRowsResponseRowNode implements TsBatchGetRowsResponseRow {
 }
 */
 TsBatchGetRowsResponseRow fromBatchGetRowResponseRowNative(
-    TsBatchGetRowResponseRowJs rowJs) {
+  TsBatchGetRowResponseRowJs rowJs,
+) {
   return TsBatchGetRowsResponseRowImpl(
-      isOk: rowJs.isOk,
-      errorCode: rowJs.errorCode,
-      errorMessage: rowJs.errorMessage,
-      tableName: rowJs.tableName,
-      primaryKey: fromNativePrimaryKeyOrNull(batchRowPrimaryKeyValuesJs(rowJs)),
-      attributes:
-          fromNativeAttributesOrNull(batchRowAttributeKeyValuesJs(rowJs)));
+    isOk: rowJs.isOk,
+    errorCode: rowJs.errorCode,
+    errorMessage: rowJs.errorMessage,
+    tableName: rowJs.tableName,
+    primaryKey: fromNativePrimaryKeyOrNull(batchRowPrimaryKeyValuesJs(rowJs)),
+    attributes: fromNativeAttributesOrNull(batchRowAttributeKeyValuesJs(rowJs)),
+  );
 }
 
 /// It seems we cannot use Js here
 class TsBatchGetRowsResponseRowImpl implements TsBatchGetRowsResponseRow {
-  TsBatchGetRowsResponseRowImpl(
-      {required this.errorCode,
-      required this.errorMessage,
-      required this.tableName,
-      required this.isOk,
-      required this.attributes,
-      required this.primaryKey});
+  TsBatchGetRowsResponseRowImpl({
+    required this.errorCode,
+    required this.errorMessage,
+    required this.tableName,
+    required this.isOk,
+    required this.attributes,
+    required this.primaryKey,
+  });
 
   @override
   String toString() => toDebugMap().toString();
@@ -668,22 +695,24 @@ class TsGetRangeResponseNode implements TsGetRangeResponse {
 
   @override
   TsPrimaryKey? get nextStartPrimaryKey => fromNativePrimaryKeyOrNull(
-      getRangeResponseNextStartPrimaryKeyValuesJs(responseJs));
+    getRangeResponseNextStartPrimaryKeyValuesJs(responseJs),
+  );
 }
 
 // Response to native
 TsGetRangeResponse getRangeResponseFromNative(
-    TsGetRangeResponseJs nativeResponseJs) {
+  TsGetRangeResponseJs nativeResponseJs,
+) {
   return TsGetRangeResponseNode(nativeResponseJs);
 }
 
 Object? tsSingleConditionToNative(TsColumnSingleCondition condition) {
-  var columnConditionJs =
-      util.callConstructor<Object?>(tablestoreJs!.SingleColumnCondition, [
-    condition.name,
-    tsValueToNative(condition.value),
-    tsComparatorTypeToNative(condition.operator)
-  ]);
+  var columnConditionJs = util
+      .callConstructor<Object?>(tablestoreJs!.SingleColumnCondition, [
+        condition.name,
+        tsValueToNative(condition.value),
+        tsComparatorTypeToNative(condition.operator),
+      ]);
 
   return columnConditionJs;
 }
@@ -695,9 +724,11 @@ abstract class CompositeConditionJs {
 }
 
 dynamic tsCompositeConditionToNative(TsColumnCompositeCondition condition) {
-  var columnConditionJs = util.callConstructor(tablestoreJs!.CompositeCondition,
-          [tsLogicalOperatorTypeToNative(condition.operator)])
-      as CompositeConditionJs?;
+  var columnConditionJs =
+      util.callConstructor(tablestoreJs!.CompositeCondition, [
+            tsLogicalOperatorTypeToNative(condition.operator),
+          ])
+          as CompositeConditionJs?;
   for (var sub in condition.list) {
     columnConditionJs!.addSubCondition(tsColumnConditionToNative(sub));
   }
@@ -745,8 +776,9 @@ Object? tsConditionToNative(TsCondition condition) {
   }
   return util.callConstructor<Object?>(tablestoreJs!.Condition, [
     tsConditionRowExistenceExpectationToNative(
-        condition.rowExistenceExpectation),
-    columnConditionJs
+      condition.rowExistenceExpectation,
+    ),
+    columnConditionJs,
   ]);
 }
 
@@ -771,9 +803,11 @@ dynamic tsValueInfiniteToNative(TsValueInfinite value) {
 Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
   var map = <String, dynamic>{
     'tables': request.tables
-        .map((table) => <String, dynamic>{
-              'tableName': table.tableName,
-              'rows': TsArrayHack(table.rows.map((row) {
+        .map(
+          (table) => <String, dynamic>{
+            'tableName': table.tableName,
+            'rows': TsArrayHack(
+              table.rows.map((row) {
                 return <String, dynamic>{
                   // Needed
                   'type': row.type,
@@ -789,12 +823,14 @@ Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
                   else if (row is TsBatchWriteRowsRequestUpdateRow)
                     'attributeColumns': tsUpdateAttributesParams(row.data),
                   'returnContent': {
-                    'returnType': tsNodeCommon.returnType.Primarykey
-                  }
+                    'returnType': tsNodeCommon.returnType.Primarykey,
+                  },
                 };
-              }))
-            })
-        .toList(growable: false)
+              }),
+            ),
+          },
+        )
+        .toList(growable: false),
   };
 
   return map;
@@ -802,17 +838,21 @@ Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
 
 Map<String, dynamic> toBatchGetRowsParams(TsBatchGetRowsRequest request) {
   var map = <String, dynamic>{
-    'tables': request.tables
-        .map((table) => <String, dynamic>{
-              'tableName': table.tableName,
-              // exp: TODO not hardcode
-              'maxVersions': 1,
-              // !singular
-              'primaryKey':
-                  TsArrayHack(table.primaryKeys.map(tsPrimaryKeyParams)),
-              if (table.columns != null) 'columnsToGet': table.columns,
-            })
-        .toList()
+    'tables':
+        request.tables
+            .map(
+              (table) => <String, dynamic>{
+                'tableName': table.tableName,
+                // exp: TODO not hardcode
+                'maxVersions': 1,
+                // !singular
+                'primaryKey': TsArrayHack(
+                  table.primaryKeys.map(tsPrimaryKeyParams),
+                ),
+                if (table.columns != null) 'columnsToGet': table.columns,
+              },
+            )
+            .toList(),
   };
 
   return map;

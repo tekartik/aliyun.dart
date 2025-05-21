@@ -3,14 +3,16 @@ import 'package:tekartik_aliyun_oss/oss.dart';
 import 'oss_interop.dart' as interop;
 
 interop.OssClientListFilesParamsJs? unwrapListFilesOptions(
-    OssListFilesOptions? options) {
+  OssListFilesOptions? options,
+) {
   if (options == null) {
     return null;
   }
   return interop.newOssClientListFilesParamsJs(
-      maxKeys: options.maxResults,
-      marker: options.marker,
-      prefix: options.prefix);
+    maxKeys: options.maxResults,
+    marker: options.marker,
+    prefix: options.prefix,
+  );
 }
 
 class OssFileNode implements OssFile {
@@ -34,10 +36,11 @@ class OssListFilesResponseNode implements OssListFilesResponse {
   OssListFilesResponseNode(this.nativeInstance);
 
   @override
-  List<OssFile> get files => interop
-      .ossClientListFilesObjects(nativeInstance)
-      .map((e) => OssFileNode(e))
-      .toList();
+  List<OssFile> get files =>
+      interop
+          .ossClientListFilesObjects(nativeInstance)
+          .map((e) => OssFileNode(e))
+          .toList();
 
   @override
   bool get isTruncated => nativeInstance.isTruncated;

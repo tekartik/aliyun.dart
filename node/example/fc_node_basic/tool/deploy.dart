@@ -22,8 +22,10 @@ Future<void> deploy() async {
   }
   if (foundUrl != null) {
     print('url: $foundUrl');
-    var response =
-        await get(Uri.parse(foundUrl), headers: {'x-in': 'in-value'});
+    var response = await get(
+      Uri.parse(foundUrl),
+      headers: {'x-in': 'in-value'},
+    );
     print('status code: ${response.statusCode}');
     print('headers: ${response.headers}');
     print(response.body);
@@ -44,8 +46,10 @@ Future<void> deploy() async {
 
     var bodyBytesUrl = url.join(foundUrl, 'bodyBytes');
     print('url: $bodyBytesUrl');
-    response = await post(Uri.parse(bodyBytesUrl),
-        body: Uint8List.fromList([1, 2, 3]));
+    response = await post(
+      Uri.parse(bodyBytesUrl),
+      body: Uint8List.fromList([1, 2, 3]),
+    );
     print('status code: ${response.statusCode}');
     print('headers: ${response.headers}');
     print(response.bodyBytes);

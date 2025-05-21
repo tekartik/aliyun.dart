@@ -40,7 +40,8 @@ class OssClientNode with OssClientMixin implements OssClient {
   /// The error is a TablestoreNodeException
   // ignore: unused_element
   Future<T> _nativeOperationWithCallback<T>(
-      dynamic Function(Function callback) action) async {
+    dynamic Function(Function callback) action,
+  ) async {
     // 3 tests before aborting
     for (var i = 0; i < _retryCount; i++) {
       try {
@@ -100,29 +101,32 @@ class OssClientNode with OssClientMixin implements OssClient {
   ///
   /// The error is a TablestoreNodeException
   Future<T> _nativeSingleOperationWithCallback<T>(
-      dynamic Function(Function callback) action) async {
+    dynamic Function(Function callback) action,
+  ) async {
     var completer = Completer<T>();
     try {
-      action(allowInterop((Object? err, Object? data) {
-        if (err != null) {
-          if (debugAliyunOss) {
-            if (data != null) {
-              try {
-                print('[OSS!]: (data): ${jsObjectToDebugString(data)}');
-              } catch (_) {
-                print('err: some data');
+      action(
+        allowInterop((Object? err, Object? data) {
+          if (err != null) {
+            if (debugAliyunOss) {
+              if (data != null) {
+                try {
+                  print('[OSS!]: (data): ${jsObjectToDebugString(data)}');
+                } catch (_) {
+                  print('err: some data');
+                }
               }
             }
+            _handleError(completer, err);
+          } else {
+            // var response = data;
+            if (debugAliyunOss) {
+              print('OSSr: ${nativeDataToDebugString(data)}');
+            }
+            _handleSuccess(completer, data);
           }
-          _handleError(completer, err);
-        } else {
-          // var response = data;
-          if (debugAliyunOss) {
-            print('OSSr: ${nativeDataToDebugString(data)}');
-          }
-          _handleSuccess(completer, data);
-        }
-      }));
+        }),
+      );
     } catch (e) {
       _handleError(completer, e);
     }
@@ -138,23 +142,30 @@ class OssClientNode with OssClientMixin implements OssClient {
 
   @override
   Future<List<OssBucket>> listBuckets() async {
-    var nativeResponse =
-        await _nativeOperation<OssClientListBucketsResponseJs>(() async {
-      var result = await jsu.promiseToFuture<Object>(nativeInstance.listBuckets(
-        _debugNativeRequestParams(
-            'listBuckets', OssClientListBucketsParamsJs()),
-      )) as OssClientListBucketsResponseJs;
-      if (debugAliyunOss) {
-        log('<resp>: ${nativeDataToDebugString(result)}');
-      }
-      /*
+    var nativeResponse = await _nativeOperation<OssClientListBucketsResponseJs>(
+      () async {
+        var result =
+            await jsu.promiseToFuture<Object>(
+                  nativeInstance.listBuckets(
+                    _debugNativeRequestParams(
+                      'listBuckets',
+                      OssClientListBucketsParamsJs(),
+                    ),
+                  ),
+                )
+                as OssClientListBucketsResponseJs;
+        if (debugAliyunOss) {
+          log('<resp>: ${nativeDataToDebugString(result)}');
+        }
+        /*
       try {
         devPrint(nativeDataToDebugString(result));
       } catch (e) {
         devPrint(e);
       }*/
-      return result;
-    });
+        return result;
+      },
+    );
 
     // Need to wrap result first
     return wrapNativeBuckets(List.from(nativeResponse.buckets));
@@ -191,12 +202,15 @@ class OssClientNode with OssClientMixin implements OssClient {
   Future<OssBucket> getBucket(String name) async {
     var nativeResponse =
         await _nativeOperation<OssClientGetBucketInfoResponseJs>(() async {
-      var result = await jsu.promiseToFuture<Object>(
-        nativeInstance
-            .getBucketInfo(_debugNativeRequestParams('getBucketinfo', name)),
-      ) as OssClientGetBucketInfoResponseJs;
-      return result;
-    });
+          var result =
+              await jsu.promiseToFuture<Object>(
+                    nativeInstance.getBucketInfo(
+                      _debugNativeRequestParams('getBucketinfo', name),
+                    ),
+                  )
+                  as OssClientGetBucketInfoResponseJs;
+          return result;
+        });
     // devPrint(nativeDataToDebugString(nativeResponse));
     // Need to wrap result first
     return wrapNativeBucketInfo(nativeResponse.bucket);
@@ -227,33 +241,37 @@ class OssClientNode with OssClientMixin implements OssClient {
   @override
   Future<Uint8List> getAsBytes(String bucketName, String path) {
     return inBucket<Uint8List>(bucketName, () async {
-      var nativeResponse =
-          await _nativeOperation<OssClientGetResponseJs>(() async {
-        if (debugAliyunOss) {
-          log('<send>: get($bucketName, $path)');
-        }
-        try {
-          var result =
-              await jsu.promiseToFuture<Object>(nativeInstance.get(path))
-                  as OssClientGetResponseJs;
+      var nativeResponse = await _nativeOperation<OssClientGetResponseJs>(
+        () async {
           if (debugAliyunOss) {
-            log('<resp>: ${nativeDataToDebugString(result)}');
+            log('<send>: get($bucketName, $path)');
           }
-          return result;
-        } catch (e) {
-          if (debugAliyunOss) {
-            err('error $e getAsBytes');
+          try {
+            var result =
+                await jsu.promiseToFuture<Object>(nativeInstance.get(path))
+                    as OssClientGetResponseJs;
+            if (debugAliyunOss) {
+              log('<resp>: ${nativeDataToDebugString(result)}');
+            }
+            return result;
+          } catch (e) {
+            if (debugAliyunOss) {
+              err('error $e getAsBytes');
+            }
+            // error NoSuchKeyError: The specified key does not exist.
+            if (e.toString().toLowerCase().contains('nosuchkeyerror')) {
+              // not found!
+              throw OssExceptionNode(
+                message: e.toString(),
+                isNotFound: true,
+                isRetryable: false,
+              );
+            } else {
+              rethrow;
+            }
           }
-          // error NoSuchKeyError: The specified key does not exist.
-          if (e.toString().toLowerCase().contains('nosuchkeyerror')) {
-            // not found!
-            throw OssExceptionNode(
-                message: e.toString(), isNotFound: true, isRetryable: false);
-          } else {
-            rethrow;
-          }
-        }
-      });
+        },
+      );
       // devPrint(nativeDataToDebugString(nativeResponse));
       // Need to wrap result first
       return nativeResponse.res.data as Uint8List;
@@ -279,18 +297,22 @@ class OssClientNode with OssClientMixin implements OssClient {
   }
 
   @override
-  Future<OssListFilesResponse> list(String bucketName,
-      [OssListFilesOptions? options]) async {
+  Future<OssListFilesResponse> list(
+    String bucketName, [
+    OssListFilesOptions? options,
+  ]) async {
     return inBucket<OssListFilesResponseNode>(bucketName, () async {
-      var nativeResponse =
-          await _nativeOperation<OssClientListFilesResponseJs>(() async {
-        var params = unwrapListFilesOptions(options);
-        var result = await ossClientJsListFiles(
-            nativeInstance, _debugNativeRequestParams('list', params));
-        if (debugAliyunOss) {
-          log('<resp>: ${nativeDataToDebugString(result)}');
-        }
-        /*
+      var nativeResponse = await _nativeOperation<OssClientListFilesResponseJs>(
+        () async {
+          var params = unwrapListFilesOptions(options);
+          var result = await ossClientJsListFiles(
+            nativeInstance,
+            _debugNativeRequestParams('list', params),
+          );
+          if (debugAliyunOss) {
+            log('<resp>: ${nativeDataToDebugString(result)}');
+          }
+          /*
         if (devWarning(true)) {
           for (var file in result.objects) {
             try {
@@ -301,8 +323,9 @@ class OssClientNode with OssClientMixin implements OssClient {
           }
         }
         */
-        return result;
-      });
+          return result;
+        },
+      );
 
       // Need to wrap result first
       return OssListFilesResponseNode(nativeResponse);

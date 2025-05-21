@@ -16,7 +16,8 @@ class OssClientFs with OssClientMixin {
   /// if init is needed later
   Future<FileSystem>? _fsReady;
 
-  Future<FileSystem> get fsReady => _fsReady ??= () async {
+  Future<FileSystem> get fsReady =>
+      _fsReady ??= () async {
         await root.create(recursive: true);
         return fs;
       }();
@@ -24,8 +25,9 @@ class OssClientFs with OssClientMixin {
   /// Use the endpoint as the location
   String get location => options!.endpoint;
 
-  String fixFsPath(String path) => fs.path
-      .normalize(rootPath == null ? path : fs.path.join(rootPath!, path));
+  String fixFsPath(String path) => fs.path.normalize(
+    rootPath == null ? path : fs.path.join(rootPath!, path),
+  );
 
   OssClientFs({required this.service, required this.options});
 
@@ -80,7 +82,10 @@ class OssClientFs with OssClientMixin {
 
   @override
   Future<void> putAsBytes(
-      String bucketName, String path, Uint8List bytes) async {
+    String bucketName,
+    String path,
+    Uint8List bytes,
+  ) async {
     var fs = await fsReady;
     // Create parent dir
     var fsFilePath = getFsFilePath(bucketName, path);
@@ -122,8 +127,10 @@ class OssClientFs with OssClientMixin {
   }
 
   @override
-  Future<OssListFilesResponse> list(String bucketName,
-      [OssListFilesOptions? options]) async {
+  Future<OssListFilesResponse> list(
+    String bucketName, [
+    OssListFilesOptions? options,
+  ]) async {
     var fs = await fsReady;
     var bucketPath = getFsBucketPath(bucketName);
     var parentPath = getFsFilePath(bucketName, options?.prefix);
@@ -179,12 +186,16 @@ class OssClientFs with OssClientMixin {
       var name = toOssPath(path);
       var size = stat.size;
       var dateModified = stat.modified;
-      ossFiles
-          .add(OssFileFs(name: name, size: size, lastModified: dateModified));
+      ossFiles.add(
+        OssFileFs(name: name, size: size, lastModified: dateModified),
+      );
     }
 
     return OssListFilesResponseFs(
-        isTruncated: isTruncated, nextMarker: nextMarker, files: ossFiles);
+      isTruncated: isTruncated,
+      nextMarker: nextMarker,
+      files: ossFiles,
+    );
   }
 
   @override
@@ -196,5 +207,5 @@ class OssClientOptionsFs extends OssClientOptions {
   String? rootPath;
 
   OssClientOptionsFs()
-      : super(accessKeyId: '', accessKeySecret: '', endpoint: '');
+    : super(accessKeyId: '', accessKeySecret: '', endpoint: '');
 }

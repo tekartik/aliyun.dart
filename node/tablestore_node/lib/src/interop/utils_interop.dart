@@ -31,7 +31,7 @@ dynamic tsDartifyValue(Object? jsObject) {
     return jsLong;
   }
 
-/*  var jsDate = js.dartifyDate(jsObject);
+  /*  var jsDate = js.dartifyDate(jsObject);
   if (jsDate != null) {
     return jsDate;
   }

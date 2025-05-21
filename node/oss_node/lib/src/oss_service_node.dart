@@ -9,10 +9,13 @@ OssService ossServiceNode = OssServiceNode();
 class OssServiceNode with OssServiceMixin implements OssServiceNodeCommon {
   @override
   OssClient client({OssClientOptions? options}) {
-    var nativeClient = ossNewClient(OssClientOptionsJs(
+    var nativeClient = ossNewClient(
+      OssClientOptionsJs(
         accessKeyId: options!.accessKeyId,
         accessKeySecret: options.accessKeySecret,
-        endpoint: options.endpoint));
+        endpoint: options.endpoint,
+      ),
+    );
 
     // devPrint('tablestoreJs: ${jsObjectKeys(_tablestoreJs)}');
     //  [util, rowExistenceExpectation, Direction, UpdateType, BatchWriteType, ReturnType, DefinedColumnType, PrimaryKeyType, PrimaryKeyOption,
@@ -31,7 +34,8 @@ class OssServiceNode with OssServiceMixin implements OssServiceNodeCommon {
   String toString() {
     return 'TablestoreNode()';
   }
-/*
+
+  /*
   @override
   TsConstantPrimaryKey get primaryKeyType => tablestoreJs.PrimaryKeyType;
 

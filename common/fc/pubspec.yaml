@@ -4,10 +4,10 @@ version: 0.2.1
 publish_to: none
 
 environment:
-  sdk: ^3.5.0
+  sdk: ^3.7.0
 
 dependencies:
-  path: '>=1.8.0'
+  path: ">=1.9.0"
   tekartik_http:
     git:
       url: https://github.com/tekartik/http.dart
@@ -15,6 +15,6 @@ dependencies:
       ref: dart3a
     version: '>=0.2.0+2'
 dev_dependencies:
-  lints: '>=1.0.0'
-  test: '>=1.14.4'
+  lints: ">=5.0.0"
+  test: ">=1.24.0"
 resolution: workspace

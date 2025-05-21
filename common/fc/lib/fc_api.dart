@@ -37,8 +37,12 @@ abstract class FcHttpResponse {
   void setStatusCode(int statusCode);
 }
 
-typedef FcHttpHandler = dynamic Function(
-    FcHttpRequest request, FcHttpResponse response, FcHttpContext context);
+typedef FcHttpHandler =
+    dynamic Function(
+      FcHttpRequest request,
+      FcHttpResponse response,
+      FcHttpContext context,
+    );
 
 /// Abstract factory
 abstract class AliyunFunctionCompute {

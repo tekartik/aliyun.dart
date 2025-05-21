@@ -3,8 +3,11 @@ import 'package:tekartik_aliyun_tablestore_sembast/tablestore_sembast.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 import 'package:test/test.dart';
 
-var options =
-    TsClientOptions(endpoint: 'sembast', secretAccessKey: '', accessKeyId: '');
+var options = TsClientOptions(
+  endpoint: 'sembast',
+  secretAccessKey: '',
+  accessKeyId: '',
+);
 var tablestore = tablestoreSembastMemory;
 
 void main() {
@@ -38,14 +41,17 @@ void tablesTest(TsClientOptions options) {
     var names = await client.listTableNames();
     if (!names.contains(tableName)) {
       await client.createTable(
-          tableName,
-          TsTableDescription(
-              tableMeta: TsTableDescriptionTableMeta(
-                  tableName: tableName,
-                  primaryKeys: [
-                TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
-                TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
-              ])));
+        tableName,
+        TsTableDescription(
+          tableMeta: TsTableDescriptionTableMeta(
+            tableName: tableName,
+            primaryKeys: [
+              TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+              TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer),
+            ],
+          ),
+        ),
+      );
     }
     names = await client.listTableNames();
     expect(names, contains(tableName));

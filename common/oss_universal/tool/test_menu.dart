@@ -26,9 +26,13 @@ Future main(List<String> arguments) async {
 
     menu('oss', () {
       item('listBuckets', () async {
-        write(jsonPretty((await client!.listBuckets())
-            .map((e) => (e as OssBucketMixin).toDebugMap())
-            .toList())!);
+        write(
+          jsonPretty(
+            (await client!.listBuckets())
+                .map((e) => (e as OssBucketMixin).toDebugMap())
+                .toList(),
+          )!,
+        );
       });
     });
   });

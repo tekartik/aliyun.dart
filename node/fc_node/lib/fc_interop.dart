@@ -60,9 +60,7 @@ class FcHttpContextNode implements FcHttpContext {
 
   @override
   String toString() {
-    var map = <String, dynamic>{
-      'credentials': credentials,
-    };
+    var map = <String, dynamic>{'credentials': credentials};
     return map.toString();
   }
 }
@@ -80,7 +78,8 @@ class FcHttpRequestNode implements FcHttpRequest {
 
   Future _getRawBody({bool? encoding}) {
     return _rawBody ??= promiseToFuture(
-        _getRawBodyFn!(req, jsify({'encoding': encoding})) as Object);
+      _getRawBodyFn!(req, jsify({'encoding': encoding})) as Object,
+    );
   }
 
   @override
@@ -113,7 +112,8 @@ class FcHttpRequestNode implements FcHttpRequest {
   FcHttpRequestHeaders? _headers;
 
   @override
-  Map<String, String> get headers => _headers ??= () {
+  Map<String, String> get headers =>
+      _headers ??= () {
         var lowerCaseHaders = <String, String>{};
         // Need to loop through the keys
         var nativeHeaders = getProperty<Object>(req, 'headers');
@@ -172,6 +172,7 @@ class FcHttpResponseNode implements FcHttpResponse {
   Future<void> sendBytes(Uint8List bytes) async {
     impl.send(Buffer.from(bytes));
   }
-//response.setStatusCode(200);
-//response.setHeader('content-type', 'application/json');
+
+  //response.setStatusCode(200);
+  //response.setHeader('content-type', 'application/json');
 }

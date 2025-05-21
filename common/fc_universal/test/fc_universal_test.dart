@@ -8,8 +8,9 @@ void main() {
   group('memory', () {
     late AliyunFunctionComputeUniversal functionCompute;
     setUp(() {
-      functionCompute =
-          AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);
+      functionCompute = AliyunFunctionComputeHttpUniversal(
+        httpServerFactoryMemory,
+      );
     });
 
     test('basic', () async {
@@ -25,7 +26,7 @@ void main() {
             'body': body,
             'path': request.path,
             'url': request.url,
-            'headers': request.headers
+            'headers': request.headers,
           };
           map = await Future.value(map);
           await response.sendString(jsonEncode(map));
@@ -41,9 +42,13 @@ void main() {
       var server = await functionCompute.serve(port: 0);
       var uri = server.uri;
       var client = httpClientFactoryMemory.newClient();
-      var result = await httpClientRead(client, httpMethodGet,
-          Uri.parse(url.join(uri.toString(), 'handler?t=1')),
-          headers: {'hk': 'hv'}, body: 'body_data');
+      var result = await httpClientRead(
+        client,
+        httpMethodGet,
+        Uri.parse(url.join(uri.toString(), 'handler?t=1')),
+        headers: {'hk': 'hv'},
+        body: 'body_data',
+      );
       var map = jsonDecode(result) as Map;
 
       expect(map['method'], 'GET');
@@ -51,16 +56,24 @@ void main() {
       expect(map['path'], '/handler');
       expect(map['url'], endsWith('/handler?t=1'));
 
-      var response = await httpClientSend(client, httpMethodGet,
-          Uri.parse(url.join(uri.toString(), 'handler?t=1')),
-          headers: {'hk': 'hv'}, body: 'body_data');
+      var response = await httpClientSend(
+        client,
+        httpMethodGet,
+        Uri.parse(url.join(uri.toString(), 'handler?t=1')),
+        headers: {'hk': 'hv'},
+        body: 'body_data',
+      );
       expect(response.statusCode, 201);
       expect(response.headers['x-response'], 'test2');
 
       // Async
-      result = await httpClientRead(client, httpMethodGet,
-          Uri.parse(url.join(uri.toString(), 'handler/async?t=1')),
-          headers: {'hk': 'hv'}, body: 'body_data');
+      result = await httpClientRead(
+        client,
+        httpMethodGet,
+        Uri.parse(url.join(uri.toString(), 'handler/async?t=1')),
+        headers: {'hk': 'hv'},
+        body: 'body_data',
+      );
       map = jsonDecode(result) as Map;
 
       expect(map['method'], 'GET');

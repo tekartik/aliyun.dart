@@ -1,16 +1,12 @@
 import 'package:cv/cv.dart';
 import 'package:tekartik_common_utils/common_utils_import.dart';
 
-enum TsColumnType {
-  integer,
-  string,
-  binary,
-}
+enum TsColumnType { integer, string, binary }
 
 var _columnTypes = [
   TsColumnType.integer,
   TsColumnType.string,
-  TsColumnType.binary
+  TsColumnType.binary,
 ];
 
 String enumText(dynamic value) => value.toString().split('.').last;
@@ -40,7 +36,7 @@ class TsPrimaryKeyDef {
     var map = asModel({
       if (name != null) 'name': name,
       if (type != null) 'type': enumText(type),
-      if (autoIncrement ?? false) 'autoIncrement': true
+      if (autoIncrement ?? false) 'autoIncrement': true,
     });
     return map;
   }
@@ -51,7 +47,10 @@ class TsPrimaryKeyDef {
     var type = _columnTypeFromText(model.getValue<Object>('type')?.toString());
     var autoIncrement = parseBool(model.getValue('autoIncrement'));
     return TsPrimaryKeyDef(
-        name: name, type: type, autoIncrement: autoIncrement);
+      name: name,
+      type: type,
+      autoIncrement: autoIncrement,
+    );
   }
 }
 
@@ -65,8 +64,9 @@ class TsTableDescriptionTableMeta {
     var map = asModel({
       'name': tableName,
       if (primaryKeys != null)
-        'primaryKeys':
-            primaryKeys!.map((key) => key.toMap()).toList(growable: false)
+        'primaryKeys': primaryKeys!
+            .map((key) => key.toMap())
+            .toList(growable: false),
     });
     return map;
   }
@@ -82,7 +82,9 @@ class TsTableDescriptionTableMeta {
           .toList(growable: false);
     }
     return TsTableDescriptionTableMeta(
-        tableName: tableName, primaryKeys: primaryKeys);
+      tableName: tableName,
+      primaryKeys: primaryKeys,
+    );
   }
 }
 
@@ -92,8 +94,9 @@ class TsTableDescriptionReservedThroughput {
   TsTableDescriptionReservedThroughput({this.capacityUnit});
 
   Model toMap() {
-    var map = asModel(
-        {if (capacityUnit != null) 'capacityUnit': capacityUnit!.toMap()});
+    var map = asModel({
+      if (capacityUnit != null) 'capacityUnit': capacityUnit!.toMap(),
+    });
     return map;
   }
 
@@ -115,8 +118,10 @@ class TsTableCapacityUnit {
   TsTableCapacityUnit({this.read, this.write});
 
   Model toMap() {
-    var map = asModel(
-        {if (read != null) 'read': read, if (write != null) 'write': write});
+    var map = asModel({
+      if (read != null) 'read': read,
+      if (write != null) 'write': write,
+    });
     return map;
   }
 
@@ -137,7 +142,7 @@ class TsTableDescriptionOptions {
   Model toMap() {
     var map = asModel({
       if (timeToLive != null) 'timeToLive': timeToLive,
-      if (maxVersions != null) 'maxVersions': maxVersions
+      if (maxVersions != null) 'maxVersions': maxVersions,
     });
     return map;
   }
@@ -147,15 +152,20 @@ class TsTableDescriptionOptions {
     var maxVersions = parseInt(map['maxVersions']);
 
     return TsTableDescriptionOptions(
-        timeToLive: timeToLive, maxVersions: maxVersions);
+      timeToLive: timeToLive,
+      maxVersions: maxVersions,
+    );
   }
 }
 
 var tableCreateCapacityUnitDefault = TsTableCapacityUnit(read: 0, write: 0);
 var tableCreateReservedThroughputDefault = TsTableDescriptionReservedThroughput(
-    capacityUnit: tableCreateCapacityUnitDefault);
-var tableCreateOptionsDefault =
-    TsTableDescriptionOptions(maxVersions: 1, timeToLive: -1);
+  capacityUnit: tableCreateCapacityUnitDefault,
+);
+var tableCreateOptionsDefault = TsTableDescriptionOptions(
+  maxVersions: 1,
+  timeToLive: -1,
+);
 
 // reservedThroughput: {
 //     capacityUnit: {
@@ -178,8 +188,11 @@ class TsTableDescription {
   // In/Out
   final TsTableDescriptionOptions? tableOptions;
 
-  TsTableDescription(
-      {this.tableMeta, this.reservedThroughput, this.tableOptions});
+  TsTableDescription({
+    this.tableMeta,
+    this.reservedThroughput,
+    this.tableOptions,
+  });
 
   @override
   String toString() =>
@@ -190,7 +203,7 @@ class TsTableDescription {
       if (tableMeta != null) 'tableMeta': tableMeta!.toMap(),
       if (reservedThroughput != null)
         'reservedThroughput': reservedThroughput!.toMap(),
-      if (tableOptions != null) 'tableOptions': tableOptions!.toMap()
+      if (tableOptions != null) 'tableOptions': tableOptions!.toMap(),
     });
     return map;
   }
@@ -210,12 +223,14 @@ class TsTableDescription {
     TsTableDescriptionReservedThroughput? reservedThroughput;
     var rawReservedThroughput = model.getValue<Object>('reservedThroughput');
     if (rawReservedThroughput is Map) {
-      reservedThroughput =
-          TsTableDescriptionReservedThroughput.fromMap(rawReservedThroughput);
+      reservedThroughput = TsTableDescriptionReservedThroughput.fromMap(
+        rawReservedThroughput,
+      );
     }
     return TsTableDescription(
-        tableMeta: tableMeta,
-        tableOptions: tableOptions,
-        reservedThroughput: reservedThroughput);
+      tableMeta: tableMeta,
+      tableOptions: tableOptions,
+      reservedThroughput: reservedThroughput,
+    );
   }
 }

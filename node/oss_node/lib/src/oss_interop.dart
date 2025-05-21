@@ -78,8 +78,11 @@ class OssClientListFilesParamsJs {
   external factory OssClientListFilesParamsJs({String? prefix, String? marker});
 }
 
-OssClientListFilesParamsJs newOssClientListFilesParamsJs(
-    {int? maxKeys, String? prefix, String? marker}) {
+OssClientListFilesParamsJs newOssClientListFilesParamsJs({
+  int? maxKeys,
+  String? prefix,
+  String? marker,
+}) {
   var param = OssClientListFilesParamsJs(prefix: prefix, marker: marker);
   if (maxKeys != null) {
     setProperty(param, 'max-keys', maxKeys);
@@ -111,8 +114,8 @@ abstract class OssClientListFilesResponseJs {
 }
 
 List<OssFileJs> ossClientListFilesObjects(
-        OssClientListFilesResponseJs response) =>
-    response.objects.cast<OssFileJs>();
+  OssClientListFilesResponseJs response,
+) => response.objects.cast<OssFileJs>();
 /*
 @JS()
 @anonymous
@@ -198,8 +201,11 @@ class OssClientOptionsJs {
 
   external String get endpoint;
 
-  external factory OssClientOptionsJs(
-      {String? accessKeyId, String? accessKeySecret, String? endpoint});
+  external factory OssClientOptionsJs({
+    String? accessKeyId,
+    String? accessKeySecret,
+    String? endpoint,
+  });
 }
 
 /// Wrap a native error
@@ -245,7 +251,9 @@ class OssClientJs {
 }
 
 Future<OssClientListFilesResponseJs> ossClientJsListFiles(
-    OssClientJs client, OssClientListFilesParamsJs? params) async {
+  OssClientJs client,
+  OssClientListFilesParamsJs? params,
+) async {
   return (await promiseToFuture<Object>(client.list(params)))
       as OssClientListFilesResponseJs;
 }

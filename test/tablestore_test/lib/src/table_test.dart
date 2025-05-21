@@ -10,14 +10,17 @@ Future createTable1(TsClient client) async {
     var names = await client.listTableNames();
     if (!names.contains(twoKeysTable)) {
       await client.createTable(
-          twoKeysTable,
-          TsTableDescription(
-              tableMeta: TsTableDescriptionTableMeta(
-                  tableName: twoKeysTable,
-                  primaryKeys: [
-                TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
-                TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
-              ])));
+        twoKeysTable,
+        TsTableDescription(
+          tableMeta: TsTableDescriptionTableMeta(
+            tableName: twoKeysTable,
+            primaryKeys: [
+              TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+              TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer),
+            ],
+          ),
+        ),
+      );
     }
     names = await client.listTableNames();
     expect(names, contains(twoKeysTable));
@@ -36,12 +39,15 @@ Future createKeyStringTable(TsClient client, {String? name}) async {
     var names = await client.listTableNames();
     if (!names.contains(tableName)) {
       var description = TsTableDescription(
-          tableMeta:
-              TsTableDescriptionTableMeta(tableName: tableName, primaryKeys: [
+        tableMeta: TsTableDescriptionTableMeta(
+          tableName: tableName,
+          primaryKeys: [
             TsPrimaryKeyDef(name: 'key', type: TsColumnType.string),
-          ]),
-          reservedThroughput: tableCreateReservedThroughputDefault,
-          tableOptions: tableCreateOptionsDefault);
+          ],
+        ),
+        reservedThroughput: tableCreateReservedThroughputDefault,
+        tableOptions: tableCreateOptionsDefault,
+      );
       await client.createTable(tableName, description);
     }
     if (name == null) {
@@ -56,15 +62,18 @@ var workTableName = 'test_work';
 Future createWorkTable(TsClient client) async {
   if (!_tableWorkCreated) {
     var description = TsTableDescription(
-        tableMeta:
-            TsTableDescriptionTableMeta(tableName: workTableName, primaryKeys: [
+      tableMeta: TsTableDescriptionTableMeta(
+        tableName: workTableName,
+        primaryKeys: [
           TsPrimaryKeyDef(name: 'key1', type: TsColumnType.string),
           TsPrimaryKeyDef(name: 'key2', type: TsColumnType.integer),
           TsPrimaryKeyDef(name: 'key3', type: TsColumnType.string),
           TsPrimaryKeyDef(name: 'key4', type: TsColumnType.integer),
-        ]),
-        reservedThroughput: tableCreateReservedThroughputDefault,
-        tableOptions: tableCreateOptionsDefault);
+        ],
+      ),
+      reservedThroughput: tableCreateReservedThroughputDefault,
+      tableOptions: tableCreateOptionsDefault,
+    );
     var names = await client.listTableNames();
     if (!names.contains(workTableName)) {
       await client.createTable(workTableName, description);
@@ -74,12 +83,16 @@ Future createWorkTable(TsClient client) async {
 }
 
 TsPrimaryKey getWorkTableKey(
-    String col1, Object col2, Object col3, Object col4) {
+  String col1,
+  Object col2,
+  Object col3,
+  Object col4,
+) {
   return TsPrimaryKey([
     TsKeyValue('key1', col1),
     TsKeyValue('key2', col2 is int ? TsValueLong.fromNumber(col2) : col2),
     TsKeyValue('key3', col3),
-    TsKeyValue('key4', col4 is int ? TsValueLong.fromNumber(col4) : col4)
+    TsKeyValue('key4', col4 is int ? TsValueLong.fromNumber(col4) : col4),
   ]);
 }
 
@@ -104,14 +117,16 @@ void tablesTest(TsClient client) {
       var names = await client.listTableNames();
       if (!names.contains(tableName)) {
         var description = TsTableDescription(
-            tableMeta: TsTableDescriptionTableMeta(
-                tableName: create1Table,
-                primaryKeys: [
-                  TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
-                  TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer)
-                ]),
-            reservedThroughput: tableCreateReservedThroughputDefault,
-            tableOptions: tableCreateOptionsDefault);
+          tableMeta: TsTableDescriptionTableMeta(
+            tableName: create1Table,
+            primaryKeys: [
+              TsPrimaryKeyDef(name: 'gid', type: TsColumnType.integer),
+              TsPrimaryKeyDef(name: 'uid', type: TsColumnType.integer),
+            ],
+          ),
+          reservedThroughput: tableCreateReservedThroughputDefault,
+          tableOptions: tableCreateOptionsDefault,
+        );
         await client.createTable(tableName, description);
       }
     }
@@ -126,8 +141,9 @@ void tablesTest(TsClient client) {
     test('createTableAlways', () async {
       var tablePrefix = 'create_table_';
       var idMax = 0;
-      var names = (await client.listTableNames())
-          .where((name) => name.startsWith(tablePrefix));
+      var names = (await client.listTableNames()).where(
+        (name) => name.startsWith(tablePrefix),
+      );
       for (var name in names) {
         var id = parseInt(name.substring(tablePrefix.length));
         if (id != null && id > idMax) {
@@ -143,8 +159,8 @@ void tablesTest(TsClient client) {
       expect((await client.describeTable(name)).tableMeta!.toMap(), {
         'name': name,
         'primaryKeys': [
-          {'name': 'key', 'type': 'string'}
-        ]
+          {'name': 'key', 'type': 'string'},
+        ],
       });
     });
 
@@ -160,20 +176,21 @@ void tablesTest(TsClient client) {
 
       var tableDescription = await client.describeTable(create1Table);
       var keys = ['tableMeta', 'tableOptions', 'reservedThroughput'];
-      var map = tableDescription.toMap()
-        ..removeWhere((key, value) => !keys.contains(key));
+      var map =
+          tableDescription.toMap()
+            ..removeWhere((key, value) => !keys.contains(key));
       expect(map, {
         'tableMeta': {
           'name': 'test_create1',
           'primaryKeys': [
             {'name': 'gid', 'type': 'integer'},
-            {'name': 'uid', 'type': 'integer'}
-          ]
+            {'name': 'uid', 'type': 'integer'},
+          ],
         },
         'reservedThroughput': {
-          'capacityUnit': {'read': 0, 'write': 0}
+          'capacityUnit': {'read': 0, 'write': 0},
         },
-        'tableOptions': {'timeToLive': -1, 'maxVersions': 1}
+        'tableOptions': {'timeToLive': -1, 'maxVersions': 1},
       });
     });
 
@@ -187,8 +204,8 @@ void tablesTest(TsClient client) {
           {'name': 'key1', 'type': 'string'},
           {'name': 'key2', 'type': 'integer'},
           {'name': 'key3', 'type': 'string'},
-          {'name': 'key4', 'type': 'integer'}
-        ]
+          {'name': 'key4', 'type': 'integer'},
+        ],
       });
     });
   });

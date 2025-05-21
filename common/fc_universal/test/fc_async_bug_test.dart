@@ -5,8 +5,11 @@ import 'package:tekartik_http/http_memory.dart';
 import 'package:test/test.dart';
 
 // Never name the handler 'handler'!
-Future<void> handler(FcHttpRequest httpRequest, FcHttpResponse httpResp,
-    FcHttpContext httpContext) async {
+Future<void> handler(
+  FcHttpRequest httpRequest,
+  FcHttpResponse httpResp,
+  FcHttpContext httpContext,
+) async {
   try {
     await httpResp.sendString('1'); //jsonEncode(response));
   } catch (e) {
@@ -14,8 +17,11 @@ Future<void> handler(FcHttpRequest httpRequest, FcHttpResponse httpResp,
   }
 }
 
-Future<void> renamedHandler(FcHttpRequest httpRequest, FcHttpResponse httpResp,
-    FcHttpContext httpContext) async {
+Future<void> renamedHandler(
+  FcHttpRequest httpRequest,
+  FcHttpResponse httpResp,
+  FcHttpContext httpContext,
+) async {
   try {
     await httpResp.sendString('1'); //jsonEncode(response));
   } catch (e) {
@@ -27,8 +33,9 @@ void main() {
   group('memory', () {
     late AliyunFunctionComputeUniversal functionCompute;
     setUp(() {
-      functionCompute =
-          AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);
+      functionCompute = AliyunFunctionComputeHttpUniversal(
+        httpServerFactoryMemory,
+      );
     });
 
     test('bug_async', () async {
@@ -36,8 +43,11 @@ void main() {
       var server = await functionCompute.serve(port: 0);
       var uri = server.uri;
       var client = httpClientFactoryMemory.newClient();
-      await httpClientRead(client, httpMethodGet,
-          Uri.parse(url.join(uri.toString(), 'handler')));
+      await httpClientRead(
+        client,
+        httpMethodGet,
+        Uri.parse(url.join(uri.toString(), 'handler')),
+      );
       //var map = jsonDecode(result) as Map;
 
       await server.close();
@@ -49,8 +59,11 @@ void main() {
       var server = await functionCompute.serve(port: 0);
       var uri = server.uri;
       var client = httpClientFactoryMemory.newClient();
-      await httpClientRead(client, httpMethodGet,
-          Uri.parse(url.join(uri.toString(), 'handler')));
+      await httpClientRead(
+        client,
+        httpMethodGet,
+        Uri.parse(url.join(uri.toString(), 'handler')),
+      );
       //var map = jsonDecode(result) as Map;
       await server.close();
       client.close();

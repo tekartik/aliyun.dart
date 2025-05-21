@@ -25,10 +25,11 @@ class TablestoreNode with TablestoreMixin implements Tablestore, TsNodeCommon {
   TsClient client({TsClientOptions? options}) {
     var nativeClient = jsu.callConstructor<Object?>(tablestoreJs!.Client, [
       TsClientOptionsJs(
-          accessKeyId: options!.accessKeyId,
-          secretAccessKey: options.secretAccessKey,
-          endpoint: options.endpoint,
-          instancename: options.instanceName)
+        accessKeyId: options!.accessKeyId,
+        secretAccessKey: options.secretAccessKey,
+        endpoint: options.endpoint,
+        instancename: options.instanceName,
+      ),
     ]);
     // devPrint('tablestoreJs: ${jsObjectKeys(_tablestoreJs)}');
     //  [util, rowExistenceExpectation, Direction, UpdateType, BatchWriteType, ReturnType, DefinedColumnType, PrimaryKeyType, PrimaryKeyOption,
@@ -93,12 +94,14 @@ class TsClientNode with TsClientMixin implements TsClient {
   @override
   Future<List<String>> listTableNames() async {
     var nativeResponse =
-        await _nativeOperationWithCallback<TsClientListTableResponseJs>(
-            (callback) {
-      native.listTable(
-          _debugNativeRequestParams('listTable', TsClientListTableParamsJs()),
-          callback);
-    });
+        await _nativeOperationWithCallback<TsClientListTableResponseJs>((
+          callback,
+        ) {
+          native.listTable(
+            _debugNativeRequestParams('listTable', TsClientListTableParamsJs()),
+            callback,
+          );
+        });
     return tableNamesFromNative(nativeResponse);
   }
 
@@ -106,11 +109,14 @@ class TsClientNode with TsClientMixin implements TsClient {
   Future createTable(String name, TsTableDescription description) async {
     var params = toCreateTableParams(description);
     var jsParams = tsJsify(params);
-    var nativeResponse =
-        await _nativeOperationWithCallback<Object?>((callback) {
+    var nativeResponse = await _nativeOperationWithCallback<Object?>((
+      callback,
+    ) {
       // ignore: unused_local_variable
       native.createTable(
-          _debugNativeRequestParams('createTable', jsParams), callback);
+        _debugNativeRequestParams('createTable', jsParams),
+        callback,
+      );
     });
     print(jsObjectToDebugString(nativeResponse));
     return null;
@@ -149,12 +155,17 @@ class TsClientNode with TsClientMixin implements TsClient {
 
   @override
   Future<TsTableDescription?> deleteTable(String tableName) async {
-    var nativeDesc = await _nativeOperationWithCallback<Object?>((callback) {
-      native.deleteTable(
-          _debugNativeRequestParams(
-              'deleteTable', TsClientTableParamsJs(tableName: tableName)),
-          callback);
-    }) as Object;
+    var nativeDesc =
+        await _nativeOperationWithCallback<Object?>((callback) {
+              native.deleteTable(
+                _debugNativeRequestParams(
+                  'deleteTable',
+                  TsClientTableParamsJs(tableName: tableName),
+                ),
+                callback,
+              );
+            })
+            as Object;
     return tableDescriptionFromNative(nativeDesc);
   }
 
@@ -164,7 +175,8 @@ class TsClientNode with TsClientMixin implements TsClient {
   ///
   /// The error is a TablestoreNodeException
   Future<T> _nativeOperationWithCallback<T>(
-      dynamic Function(Function callback) action) async {
+    dynamic Function(Function callback) action,
+  ) async {
     // 3 tests before aborting
     for (var i = 0; i < _retryCount; i++) {
       try {
@@ -193,29 +205,32 @@ class TsClientNode with TsClientMixin implements TsClient {
   ///
   /// The error is a TablestoreNodeException
   Future<T> _nativeSingleOperationWithCallback<T>(
-      dynamic Function(Function callback) action) async {
+    dynamic Function(Function callback) action,
+  ) async {
     var completer = Completer<T>();
     try {
-      action(allowInterop((Object? err, Object? data) {
-        if (err != null) {
-          if (debugTs) {
-            if (data != null) {
-              try {
-                print('[TS!]: (data): ${jsObjectToDebugString(data)}');
-              } catch (_) {
-                print('err: some data');
+      action(
+        allowInterop((Object? err, Object? data) {
+          if (err != null) {
+            if (debugTs) {
+              if (data != null) {
+                try {
+                  print('[TS!]: (data): ${jsObjectToDebugString(data)}');
+                } catch (_) {
+                  print('err: some data');
+                }
               }
             }
+            _handleError(completer, err);
+          } else {
+            // var response = data;
+            if (debugTs) {
+              print('TSr: ${nativeDataToDebugString(data)}');
+            }
+            _handleSuccess(completer, data);
           }
-          _handleError(completer, err);
-        } else {
-          // var response = data;
-          if (debugTs) {
-            print('TSr: ${nativeDataToDebugString(data)}');
-          }
-          _handleSuccess(completer, data);
-        }
-      }));
+        }),
+      );
     } catch (e) {
       _handleError(completer, e);
     }
@@ -231,12 +246,17 @@ class TsClientNode with TsClientMixin implements TsClient {
 
   @override
   Future<TsTableDescription> describeTable(String tableName) async {
-    var nativeDesc = await _nativeOperationWithCallback<Object?>((callback) {
-      native.describeTable(
-          _debugNativeRequestParams(
-              'describeTable', TsClientTableParamsJs(tableName: tableName)),
-          callback);
-    }) as Object;
+    var nativeDesc =
+        await _nativeOperationWithCallback<Object?>((callback) {
+              native.describeTable(
+                _debugNativeRequestParams(
+                  'describeTable',
+                  TsClientTableParamsJs(tableName: tableName),
+                ),
+                callback,
+              );
+            })
+            as Object;
     return tableDescriptionFromNative(nativeDesc);
   }
 
@@ -250,16 +270,18 @@ class TsClientNode with TsClientMixin implements TsClient {
   Future<TsGetRowResponse> getRow(TsGetRowRequest request) async {
     if (useJs) {
       var jsParams = toGetRowParamsJs(request);
-      var nativeResponseJs =
-          await _nativeOperationWithCallback<Object?>((callback) {
+      var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
+        callback,
+      ) {
         native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
       });
       return getRowResponseFromNative(nativeResponseJs);
     } else {
       var params = toGetRowParams(request);
       var jsParams = tsJsify(params);
-      var nativeResponseJs =
-          await _nativeOperationWithCallback<Object?>((callback) {
+      var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
+        callback,
+      ) {
         native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
       });
       return getRowResponseFromNative(nativeResponseJs);
@@ -271,8 +293,9 @@ class TsClientNode with TsClientMixin implements TsClient {
     var params = toPutRowParams(request);
     var jsParams = tsJsify(params);
 
-    var nativeResponseJs =
-        await _nativeOperationWithCallback<Object?>((callback) {
+    var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
+      callback,
+    ) {
       native.putRow(_debugNativeRequestParams('putRow', jsParams), callback);
     });
     return putRowResponseFromNative(nativeResponseJs);
@@ -283,10 +306,13 @@ class TsClientNode with TsClientMixin implements TsClient {
     var params = toDeleteRowParams(request);
     var jsParams = tsJsify(params);
 
-    var nativeResponseJs =
-        await _nativeOperationWithCallback<Object?>((callback) {
+    var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
+      callback,
+    ) {
       native.deleteRow(
-          _debugNativeRequestParams('deleteRow', jsParams), callback);
+        _debugNativeRequestParams('deleteRow', jsParams),
+        callback,
+      );
     });
     return deleteRowResponseFromNative(nativeResponseJs);
   }
@@ -295,17 +321,21 @@ class TsClientNode with TsClientMixin implements TsClient {
   Future<TsGetRangeResponse> getRange(TsGetRangeRequest request) async {
     var params = toGetRangeParams(request);
     var jsParams = tsJsify(params);
-    var nativeResponseJs =
-        await _nativeOperationWithCallback<Object?>((callback) {
+    var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
+      callback,
+    ) {
       native.getRange(
-          _debugNativeRequestParams('getRange', jsParams), callback);
+        _debugNativeRequestParams('getRange', jsParams),
+        callback,
+      );
     });
     return getRangeResponseFromNative(nativeResponseJs as TsGetRangeResponseJs);
   }
 
   @override
   Future<TsBatchGetRowsResponse> batchGetRows(
-      TsBatchGetRowsRequest request) async {
+    TsBatchGetRowsRequest request,
+  ) async {
     if (useJs) {
       // tmp exp
       var jsParams = toBatchGetRowParamsJs(request);
@@ -319,7 +349,9 @@ class TsClientNode with TsClientMixin implements TsClient {
       var jsParams = tsJsify(params);
       var responseJs = await _nativeOperationWithCallback<Object?>((callback) {
         native.batchGetRow(
-            _debugNativeRequestParams('batchGetRow', jsParams), callback);
+          _debugNativeRequestParams('batchGetRow', jsParams),
+          callback,
+        );
       });
       return TsBatchGetRowsResponseNode(responseJs as TsBatchGetRowResponseJs);
     }
@@ -327,15 +359,19 @@ class TsClientNode with TsClientMixin implements TsClient {
 
   @override
   Future<TsBatchWriteRowsResponse> batchWriteRows(
-      TsBatchWriteRowsRequest request) async {
+    TsBatchWriteRowsRequest request,
+  ) async {
     var params = toWriteRowsParams(request);
     var jsParams = tsJsify(params);
     var responseJs = await _nativeOperationWithCallback<Object?>((callback) {
       native.batchWriteRow(
-          _debugNativeRequestParams('batchWriteRow', jsParams), callback);
+        _debugNativeRequestParams('batchWriteRow', jsParams),
+        callback,
+      );
     });
     return TsBatchWriteRowsResponseNode(
-        responseJs as TsBatchWriteRowResponseJs);
+      responseJs as TsBatchWriteRowResponseJs,
+    );
   }
 
   @override
@@ -343,25 +379,31 @@ class TsClientNode with TsClientMixin implements TsClient {
     var params = toUpdateRowParams(request);
     var jsParams = tsJsify(params);
 
-    var nativeResponseJs =
-        await _nativeOperationWithCallback<Object?>((callback) {
+    var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
+      callback,
+    ) {
       native.updateRow(
-          _debugNativeRequestParams('updateRow', jsParams), callback);
+        _debugNativeRequestParams('updateRow', jsParams),
+        callback,
+      );
     });
     return updateRowResponseFromNative(nativeResponseJs);
   }
 
   @override
   Future<TsStartLocalTransactionResponse> startLocalTransaction(
-      TsStartLocalTransactionRequest request) async {
+    TsStartLocalTransactionRequest request,
+  ) async {
     var params = toStartLocalTransactionParams(request);
     var jsParams = tsJsify(params);
 
-    var nativeResponseJs =
-        await _nativeOperationWithCallback<Object?>((callback) {
+    var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
+      callback,
+    ) {
       native.startLocalTransaction(
-          _debugNativeRequestParams('startLocalTransaction', jsParams),
-          callback);
+        _debugNativeRequestParams('startLocalTransaction', jsParams),
+        callback,
+      );
     });
     return startLocalTransactionRowResponseFromNative(nativeResponseJs);
   }

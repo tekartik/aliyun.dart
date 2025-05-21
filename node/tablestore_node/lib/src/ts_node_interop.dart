@@ -32,11 +32,12 @@ class TsClientOptionsJs {
 
   external String get instancename;
 
-  external factory TsClientOptionsJs(
-      {String? accessKeyId,
-      String? secretAccessKey,
-      String? endpoint,
-      String? instancename});
+  external factory TsClientOptionsJs({
+    String? accessKeyId,
+    String? secretAccessKey,
+    String? endpoint,
+    String? instancename,
+  });
 }
 
 @JS()

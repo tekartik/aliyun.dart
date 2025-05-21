@@ -20,8 +20,9 @@ class TablestoreSembast with TablestoreMixin implements Tablestore {
 }
 
 /// In memory factory (shared memory)
-final Tablestore tablestoreSembastMemory =
-    getTablestoreSembast(factory: databaseFactoryMemory);
+final Tablestore tablestoreSembastMemory = getTablestoreSembast(
+  factory: databaseFactoryMemory,
+);
 
 /// New in memory factory.
 Tablestore newTablestoreSembastMemory() =>

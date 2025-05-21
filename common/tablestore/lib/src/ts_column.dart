@@ -10,18 +10,19 @@ class TsKeyValue {
 
   TsKeyValue(this.name, this.value) {
     assert(
-        (value is TsValueLong ||
-            value is TsValueInfinite ||
-            value is String ||
-            value is Uint8List ||
-            value is double),
-        'TsKeyValue: value \'$name\': $value (type ${value.runtimeType} not supported');
+      (value is TsValueLong ||
+          value is TsValueInfinite ||
+          value is String ||
+          value is Uint8List ||
+          value is double),
+      'TsKeyValue: value \'$name\': $value (type ${value.runtimeType} not supported',
+    );
   }
 
   TsKeyValue.string(String name, String value) : this(name, value);
 
   TsKeyValue.int(String name, int value)
-      : this(name, TsValueLong.fromNumber(value));
+    : this(name, TsValueLong.fromNumber(value));
 
   TsKeyValue.long(String name, TsValueLong value) : this(name, value);
 
