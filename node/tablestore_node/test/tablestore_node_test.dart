@@ -14,10 +14,9 @@ import 'package:tekartik_aliyun_tablestore_node/src/universal/ts_node_universal.
 import 'package:tekartik_aliyun_tablestore_node/tablestore_node.dart';
 import 'package:test/test.dart';
 
-TsClient? get tsClientTest =>
-    tsClientOptionsFromEnv != null
-        ? tablestoreNode.client(options: tsClientOptionsFromEnv)
-        : null;
+TsClient? get tsClientTest => tsClientOptionsFromEnv != null
+    ? tablestoreNode.client(options: tsClientOptionsFromEnv)
+    : null;
 
 void main() {
   var client = tsClientTest; // ignore: unused_local_variable

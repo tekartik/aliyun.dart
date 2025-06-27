@@ -112,18 +112,17 @@ class FcHttpRequestNode implements FcHttpRequest {
   FcHttpRequestHeaders? _headers;
 
   @override
-  Map<String, String> get headers =>
-      _headers ??= () {
-        var lowerCaseHaders = <String, String>{};
-        // Need to loop through the keys
-        var nativeHeaders = getProperty<Object>(req, 'headers');
-        var keys = jsObjectKeys(nativeHeaders);
-        for (var key in keys) {
-          lowerCaseHaders[key.toLowerCase()] =
-              getProperty(nativeHeaders, key) as String;
-        }
-        return FcHttpRequestHeaders(lowerCaseHaders);
-      }();
+  Map<String, String> get headers => _headers ??= () {
+    var lowerCaseHaders = <String, String>{};
+    // Need to loop through the keys
+    var nativeHeaders = getProperty<Object>(req, 'headers');
+    var keys = jsObjectKeys(nativeHeaders);
+    for (var key in keys) {
+      lowerCaseHaders[key.toLowerCase()] =
+          getProperty(nativeHeaders, key) as String;
+    }
+    return FcHttpRequestHeaders(lowerCaseHaders);
+  }();
 
   @override
   String toString() {

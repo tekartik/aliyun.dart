@@ -131,11 +131,10 @@ class TsColumnSingleCondition implements TsColumnCondition {
   final dynamic value;
 
   @override
-  Model toDebugMap() =>
-      asModel({})
-        ..setValue('name', name)
-        ..setValue('operator', operator)
-        ..setValue('value', value);
+  Model toDebugMap() => asModel({})
+    ..setValue('name', name)
+    ..setValue('operator', operator)
+    ..setValue('value', value);
 
   TsColumnSingleCondition(this.operator, this.name, this.value);
 }
@@ -147,13 +146,9 @@ class TsColumnCompositeCondition implements TsColumnCondition {
   TsColumnCompositeCondition(this.operator, this.list);
 
   @override
-  Model toDebugMap() =>
-      asModel({})
-        ..setValue('operator', operator)
-        ..setValue(
-          'list',
-          list.map((e) => e.toDebugMap()).toList(growable: false),
-        );
+  Model toDebugMap() => asModel({})
+    ..setValue('operator', operator)
+    ..setValue('list', list.map((e) => e.toDebugMap()).toList(growable: false));
 }
 
 enum TsConditionRowExistenceExpectation {

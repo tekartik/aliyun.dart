@@ -64,34 +64,29 @@ class TsClientSembast implements TsClient {
 
   TsClientSembast(this.tablestore, this.options);
 
-  Future<Database> get _db =>
-      __db ??= () {
-        var relativeTopPath = join(
-          '.dart_tool',
-          'tekartik_aliyun',
-          'tablestore',
-        );
-        String path;
-        var instanceName = options?.instanceName ?? 'default.db';
-        if (isRelative(instanceName)) {
-          path = join(relativeTopPath, instanceName);
-        } else {
-          path = instanceName;
-        }
-        if (debugTs) {
-          print('[SBi] Opening $path');
-        }
-        return tablestore.factory.openDatabase(
-          path,
-          version: 1,
-          onVersionChanged: (db, oldVersion, newVersion) async {
-            if (oldVersion == 0) {
-              // create
-              await versionRecord.put(db, {'tekartik_tablestore': 1});
-            } else {}
-          },
-        );
-      }();
+  Future<Database> get _db => __db ??= () {
+    var relativeTopPath = join('.dart_tool', 'tekartik_aliyun', 'tablestore');
+    String path;
+    var instanceName = options?.instanceName ?? 'default.db';
+    if (isRelative(instanceName)) {
+      path = join(relativeTopPath, instanceName);
+    } else {
+      path = instanceName;
+    }
+    if (debugTs) {
+      print('[SBi] Opening $path');
+    }
+    return tablestore.factory.openDatabase(
+      path,
+      version: 1,
+      onVersionChanged: (db, oldVersion, newVersion) async {
+        if (oldVersion == 0) {
+          // create
+          await versionRecord.put(db, {'tekartik_tablestore': 1});
+        } else {}
+      },
+    );
+  }();
 
   Future<List<String>> _listTableNames(DatabaseClient client) async {
     return (await tablesMetaRecord.get(client))?.cast<String>() ?? <String>[];
@@ -677,18 +672,16 @@ class TsRowRecordContextSembast {
   List<KeyValueSembast>? _sembastPrimaryKeys;
   List<KeyValueSembast>? _sembastAttributes;
 
-  List<KeyValueSembast> get sembastPrimaryKeys =>
-      _sembastPrimaryKeys ??= () {
-        return toSembastKeyValues(row.primaryKey.list);
-      }();
+  List<KeyValueSembast> get sembastPrimaryKeys => _sembastPrimaryKeys ??= () {
+    return toSembastKeyValues(row.primaryKey.list);
+  }();
 
-  List<KeyValueSembast>? get sembastAttributes =>
-      _sembastAttributes ??= () {
-        if (attributes == null) {
-          return null;
-        }
-        return toSembastKeyValues(attributes!);
-      }();
+  List<KeyValueSembast>? get sembastAttributes => _sembastAttributes ??= () {
+    if (attributes == null) {
+      return null;
+    }
+    return toSembastKeyValues(attributes!);
+  }();
 
   Finder? _finder;
 
@@ -984,8 +977,9 @@ class TsRangeContextSembast {
     }
     var finder = Finder(
       filter: _and(boundaryFilter, columnFilter),
-      sortOrders:
-          table.tableMeta.primaryKeys!.map((e) => SortOrder(e.name!)).toList(),
+      sortOrders: table.tableMeta.primaryKeys!
+          .map((e) => SortOrder(e.name!))
+          .toList(),
       // Add 1 for next
       limit: request.limit != null ? request.limit! + 1 : null,
     );
@@ -994,22 +988,21 @@ class TsRangeContextSembast {
 
     TsGetRowSembast? nextRow;
 
-    var rows =
-        records.map((snapshot) {
-          var result = snapshot.value;
+    var rows = records.map((snapshot) {
+      var result = snapshot.value;
 
-          var primaryKey = TsPrimaryKey(
-            readKeyValues(result, table.primaryKeyNames),
-          );
+      var primaryKey = TsPrimaryKey(
+        readKeyValues(result, table.primaryKeyNames),
+      );
 
-          var attributes = sembastRecordValueToAttributes(
-            result,
-            request.columns,
-            table.primaryKeyNames,
-          );
+      var attributes = sembastRecordValueToAttributes(
+        result,
+        request.columns,
+        table.primaryKeyNames,
+      );
 
-          return TsGetRowSembast(true, primaryKey, attributes);
-        }).toList();
+      return TsGetRowSembast(true, primaryKey, attributes);
+    }).toList();
 
     if (request.limit != null && rows.length > request.limit!) {
       // Pick last

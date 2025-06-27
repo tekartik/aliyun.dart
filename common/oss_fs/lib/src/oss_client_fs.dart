@@ -16,11 +16,10 @@ class OssClientFs with OssClientMixin {
   /// if init is needed later
   Future<FileSystem>? _fsReady;
 
-  Future<FileSystem> get fsReady =>
-      _fsReady ??= () async {
-        await root.create(recursive: true);
-        return fs;
-      }();
+  Future<FileSystem> get fsReady => _fsReady ??= () async {
+    await root.create(recursive: true);
+    return fs;
+  }();
 
   /// Use the endpoint as the location
   String get location => options!.endpoint;

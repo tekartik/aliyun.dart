@@ -36,10 +36,9 @@ class OssListFilesOptions {
   OssListFilesOptions({this.maxResults, this.prefix, this.marker});
 
   @override
-  String toString() =>
-      {
-        if (maxResults != null) 'maxResults': maxResults,
-        if (prefix != null) 'prefix': prefix,
-        if (marker != null) 'marker': marker,
-      }.toString();
+  String toString() => {
+    if (maxResults != null) 'maxResults': maxResults,
+    if (prefix != null) 'prefix': prefix,
+    if (marker != null) 'marker': marker,
+  }.toString();
 }

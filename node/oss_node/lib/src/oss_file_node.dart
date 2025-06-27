@@ -36,11 +36,10 @@ class OssListFilesResponseNode implements OssListFilesResponse {
   OssListFilesResponseNode(this.nativeInstance);
 
   @override
-  List<OssFile> get files =>
-      interop
-          .ossClientListFilesObjects(nativeInstance)
-          .map((e) => OssFileNode(e))
-          .toList();
+  List<OssFile> get files => interop
+      .ossClientListFilesObjects(nativeInstance)
+      .map((e) => OssFileNode(e))
+      .toList();
 
   @override
   bool get isTruncated => nativeInstance.isTruncated;

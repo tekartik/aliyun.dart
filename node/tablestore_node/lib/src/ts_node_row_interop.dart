@@ -838,21 +838,20 @@ Map<String, dynamic> toWriteRowsParams(TsBatchWriteRowsRequest request) {
 
 Map<String, dynamic> toBatchGetRowsParams(TsBatchGetRowsRequest request) {
   var map = <String, dynamic>{
-    'tables':
-        request.tables
-            .map(
-              (table) => <String, dynamic>{
-                'tableName': table.tableName,
-                // exp: TODO not hardcode
-                'maxVersions': 1,
-                // !singular
-                'primaryKey': TsArrayHack(
-                  table.primaryKeys.map(tsPrimaryKeyParams),
-                ),
-                if (table.columns != null) 'columnsToGet': table.columns,
-              },
-            )
-            .toList(),
+    'tables': request.tables
+        .map(
+          (table) => <String, dynamic>{
+            'tableName': table.tableName,
+            // exp: TODO not hardcode
+            'maxVersions': 1,
+            // !singular
+            'primaryKey': TsArrayHack(
+              table.primaryKeys.map(tsPrimaryKeyParams),
+            ),
+            if (table.columns != null) 'columnsToGet': table.columns,
+          },
+        )
+        .toList(),
   };
 
   return map;

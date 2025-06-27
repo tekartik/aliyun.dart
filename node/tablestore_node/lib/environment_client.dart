@@ -34,16 +34,15 @@ TsClientOptions? getTsClientOptionsFromEnv(Map<String, String> env) {
   );
 }
 
-TsClientOptions? get tsClientOptionsFromEnv =>
-    _tsClientOptionsFromEnv ??= () {
-      if (isRunningAsJavascript) {
-        return getTsClientOptionsFromEnv(_env);
-      } else {
-        // io sim
-        return TsClientOptions(
-          endpoint: 'local',
-          accessKeyId: '',
-          secretAccessKey: '',
-        );
-      }
-    }();
+TsClientOptions? get tsClientOptionsFromEnv => _tsClientOptionsFromEnv ??= () {
+  if (isRunningAsJavascript) {
+    return getTsClientOptionsFromEnv(_env);
+  } else {
+    // io sim
+    return TsClientOptions(
+      endpoint: 'local',
+      accessKeyId: '',
+      secretAccessKey: '',
+    );
+  }
+}();

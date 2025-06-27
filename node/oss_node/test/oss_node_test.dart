@@ -5,10 +5,9 @@ import 'package:tekartik_aliyun_oss_node/environment_client.dart';
 import 'package:tekartik_aliyun_oss_node/oss_node.dart';
 import 'package:test/test.dart';
 
-OssClient? get tsClientTest =>
-    ossNodeClientOptionsFromEnv != null
-        ? ossServiceNode.client(options: ossNodeClientOptionsFromEnv)
-        : null;
+OssClient? get tsClientTest => ossNodeClientOptionsFromEnv != null
+    ? ossServiceNode.client(options: ossNodeClientOptionsFromEnv)
+    : null;
 
 void main() {
   var client = tsClientTest; // ignore: unused_local_variable

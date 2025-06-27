@@ -58,12 +58,11 @@ class TsValueInfinite implements TsValueBase {
 
   @override
   Model toDebugMap() => asModel({
-    '@infinite':
-        this == min
-            ? 'min'
-            : (this == max)
-            ? 'max'
-            : throw UnsupportedError('TsValueInfinite($_label)'),
+    '@infinite': this == min
+        ? 'min'
+        : (this == max)
+        ? 'max'
+        : throw UnsupportedError('TsValueInfinite($_label)'),
   });
 }
 

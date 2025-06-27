@@ -176,9 +176,8 @@ void tablesTest(TsClient client) {
 
       var tableDescription = await client.describeTable(create1Table);
       var keys = ['tableMeta', 'tableOptions', 'reservedThroughput'];
-      var map =
-          tableDescription.toMap()
-            ..removeWhere((key, value) => !keys.contains(key));
+      var map = tableDescription.toMap()
+        ..removeWhere((key, value) => !keys.contains(key));
       expect(map, {
         'tableMeta': {
           'name': 'test_create1',
