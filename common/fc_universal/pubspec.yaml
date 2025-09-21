@@ -13,19 +13,16 @@ dependencies:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/fc
-      ref: dart3a
     version: '>=0.1.1'
   tekartik_aliyun_fc_node:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: node/fc_node
-      ref: dart3a
     version: '>=0.1.1'
   tekartik_aliyun_fc_http:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/fc_http
-      ref: dart3a
     version: '>=0.1.4'
 dev_dependencies:
   test: ">=1.24.0"
@@ -36,6 +33,5 @@ dev_dependencies:
     git:
       url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: dart3a
 
 resolution: workspace

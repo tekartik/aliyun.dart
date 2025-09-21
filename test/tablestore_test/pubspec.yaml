@@ -15,7 +15,6 @@ dependencies:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/tablestore
-      ref: dart3a
     version: '>=0.1.0'
 
 dev_dependencies:
@@ -26,6 +25,5 @@ dev_dependencies:
     git:
       url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: dart3a
 
 resolution: workspace

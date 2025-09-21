@@ -14,6 +14,5 @@ Table universal import.
       git:
         url: https://github.com/tekartik/aliyun.dart
         path: common/tablestore_universal
-        ref: dart3a
       version: '>=0.1.0'
   ```

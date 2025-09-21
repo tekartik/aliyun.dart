@@ -15,19 +15,16 @@ dependencies:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: node/tablestore_node
-      ref: dart3a
     version: '>=0.2.3'
   tekartik_aliyun_tablestore_universal:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/tablestore_universal
-      ref: dart3a
     version: '>=0.2.3'
   tekartik_aliyun_tablestore_test:
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: test/tablestore_test
-      ref: dart3a
     # version: '>=0.1.0'
 dev_dependencies:
   process_run: ">=1.2.1+1"
@@ -38,6 +35,5 @@ dev_dependencies:
     git:
       url: https://github.com/tekartik/build_node.dart
       path: packages/build_node
-      ref: dart3a
 
 resolution: workspace

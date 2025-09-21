@@ -8,6 +8,5 @@ dependencies
     git:
       url: https://github.com/tekartik/aliyun.dart
       path: common/fc
-      ref: dart3a
     version: '>=0.1.1'
 ```
