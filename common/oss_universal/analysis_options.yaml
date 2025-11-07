@@ -3,8 +3,8 @@ include: package:tekartik_lints/strict.yaml
 
 linter:
   rules:
-    depend_on_referenced_packages: false
     avoid_print: true
+    depend_on_referenced_packages: false
 
 analyzer:
   exclude:
