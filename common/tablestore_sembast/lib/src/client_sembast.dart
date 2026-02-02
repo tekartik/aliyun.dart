@@ -691,7 +691,7 @@ class TsRowRecordContextSembast {
   Finder getFinder({Filter? filter}) {
     var filters = [
       ...sembastPrimaryKeys.map((e) => Filter.equals(e.key!, e.value)),
-      if (filter != null) filter,
+      ?filter,
     ];
     return Finder(filter: Filter.and(filters));
   }
