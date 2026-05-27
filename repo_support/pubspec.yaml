@@ -4,13 +4,13 @@ version: 0.2.0
 publish_to: none
 
 environment:
-  sdk: ^3.10.0
+  sdk: ^3.11.0
 
 dev_dependencies:
-  lints: ">=5.0.0"
-  dev_build: ">=1.1.7"
-  path: ">=1.9.0"
-  pub_semver: ">=2.1.4"
+  lints: ">=6.1.0"
+  dev_build: ">=1.1.7+3"
+  path: ">=1.9.1"
+  pub_semver: ">=2.2.0"
   process_run: ">=1.2.1+1"
 
 resolution: workspace

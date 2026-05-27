@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:tekartik_aliyun_tablestore_universal/environment_client.dart';
 import 'package:tekartik_aliyun_tablestore_universal/tablestore_universal.dart';
 

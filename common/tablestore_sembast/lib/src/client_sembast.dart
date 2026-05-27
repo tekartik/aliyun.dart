@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:typed_data';
 
 import 'package:path/path.dart';
@@ -895,7 +897,7 @@ Filter? tsConditionToSembastFilter(TsColumnCondition? condition) {
         );
     }
   }
-  throw 'Unsupported condition $condition';
+  throw StateError('Unsupported condition $condition');
 }
 
 class TsGetRangeSembast {

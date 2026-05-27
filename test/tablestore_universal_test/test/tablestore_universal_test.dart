@@ -16,6 +16,7 @@ void main() {
       // return;
     }
     test('options', () {
+      // ignore: avoid_print
       print('options: $tsClientOptionsFromEnv');
     });
     tablestoreTest(tsClientTest);

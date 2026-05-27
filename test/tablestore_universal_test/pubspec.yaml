@@ -5,12 +5,12 @@ version: 0.1.0
 # homepage: https://www.example.com
 
 environment:
-  sdk: ^3.10.0
+  sdk: ^3.11.0
 
 dependencies:
-  path: ">=1.9.0"
-  test: ">=1.24.0"
-  dev_build: ">=1.1.2"
+  path: ">=1.9.1"
+  test: ">=1.31.0"
+  dev_build: ">=1.1.7+3"
   tekartik_aliyun_tablestore_node:
     git:
       url: https://github.com/tekartik/aliyun.dart
@@ -29,8 +29,8 @@ dependencies:
 dev_dependencies:
   process_run: ">=1.2.1+1"
   # needed node dev dependencies
-  build_runner: ">=2.4.13"
-  build_web_compilers: ">=4.0.11"
+  build_runner: ">=2.15.0"
+  build_web_compilers: ">=4.4.19"
   tekartik_build_node:
     git:
       url: https://github.com/tekartik/build_node.dart

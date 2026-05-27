@@ -5,7 +5,7 @@ publish_to: none
 # homepage: https://www.example.com
 
 environment:
-  sdk: ^3.10.0
+  sdk: ^3.11.0
 
 dependencies:
   tekartik_aliyun_fc_universal:
@@ -19,7 +19,7 @@ dependencies:
       path: node_utils
     version: '>=0.1.0'
   process_run: ">=1.2.1+1"
-  path: ">=1.9.0"
+  path: ">=1.9.1"
   http:
   tekartik_common_utils:
     git:
@@ -32,7 +32,7 @@ dependencies:
     version: '>=0.5.5'
 dev_dependencies:
 
-  test: ">=1.24.0"
+  test: ">=1.31.0"
   # Aliyun function build
   tekartik_app_node_build:
     git:
@@ -40,8 +40,8 @@ dev_dependencies:
       path: app_build
     version: '>=0.1.0'
   # needed node dev dependencies
-  build_runner: ">=2.4.13"
-  build_web_compilers: ">=4.0.11"
+  build_runner: ">=2.15.0"
+  build_web_compilers: ">=4.4.19"
   tekartik_build_node:
     git:
       url: https://github.com/tekartik/build_node.dart

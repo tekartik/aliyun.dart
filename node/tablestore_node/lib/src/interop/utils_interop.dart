@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:typed_data';
 
 import 'package:js/js_util.dart' as util;
@@ -96,7 +98,7 @@ dynamic tsValueToNative(dynamic value) {
   if (value is String) {
     return value;
   }
-  throw 'Unsupported value $value (${value.runtimeType})';
+  throw StateError('Unsupported value $value (${value.runtimeType})');
 }
 
 /// Returns the JS implementation from Dart Object.

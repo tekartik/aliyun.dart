@@ -8,6 +8,7 @@ Future main() async {
     '../../node/tablestore_node',
     '../../test/tablestore_test',
   ]) {
+    // ignore: avoid_print
     print('package: $dir');
     await ioPackageRunCi(dir);
     /*

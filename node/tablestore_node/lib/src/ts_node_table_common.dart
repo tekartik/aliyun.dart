@@ -33,7 +33,7 @@ TsColumnType nativeTypeToColumnType(int type) {
   } else if (type == tsNodeCommon.primaryKeyType.BINARY) {
     return TsColumnType.binary;
   }
-  throw 'type $type not supported';
+  throw ArgumentError('type $type not supported');
 }
 
 int columnTypeToNativeType(TsColumnType? type) {
@@ -44,5 +44,5 @@ int columnTypeToNativeType(TsColumnType? type) {
   } else if (type == TsColumnType.binary) {
     return tsNodeCommon.primaryKeyType.BINARY;
   }
-  throw 'type $type not supported';
+  throw ArgumentError('type $type not supported');
 }

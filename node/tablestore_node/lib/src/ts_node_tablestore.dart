@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: avoid_print, deprecated_member_use
 
 import 'dart:js';
 import 'dart:js_util' as jsu;

@@ -794,7 +794,7 @@ dynamic tsValueInfiniteToNative(TsValueInfinite value) {
   if (value == TsValueInfinite.max) {
     return tablestoreJs!.INF_MAX;
   }
-  throw 'Unsupported TsValueInfinite($value)';
+  throw ArgumentError('Unsupported TsValueInfinite($value)');
 }
 
 //
