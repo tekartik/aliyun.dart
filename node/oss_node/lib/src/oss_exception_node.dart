@@ -16,13 +16,11 @@ class OssExceptionNode implements OssException {
 
   // Message can be null
   OssExceptionNode({
-    String? message,
+    this._message,
     this.map /*?*/,
-    bool? isNotFound,
-    bool? isRetryable,
-  }) : _message = message,
-       _isNotFound = isNotFound,
-       _isRetryable = isRetryable;
+    this._isNotFound,
+    this._isRetryable,
+  });
 
   // TableStoreNodeException(404:OTSObjec
   int? get code => parseInt(_errMapValue('code'));

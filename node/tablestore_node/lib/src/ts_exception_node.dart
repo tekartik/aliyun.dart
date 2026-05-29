@@ -15,7 +15,7 @@ class TsExceptionNode implements TsException {
   dynamic _errMapValue(String key) => map != null ? map![key] : null;
 
   // Message can be null
-  TsExceptionNode({String? message, this.map /*?*/}) : _message = message;
+  TsExceptionNode({this._message, this.map /*?*/});
 
   // TableStoreNodeException(404:OTSObjec
   int? get code => parseInt(_errMapValue('code'));
