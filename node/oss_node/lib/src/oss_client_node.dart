@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print, deprecated_member_use
 
-import 'dart:js';
 import 'dart:js_util' as jsu;
 import 'dart:typed_data';
 
@@ -17,54 +16,10 @@ class OssClientNode with OssClientMixin implements OssClient {
 
   OssClientNode(this.nativeInstance);
 
-  void _handleError(Completer completer, dynamic err) {
-    if (!completer.isCompleted) {
-      var exception = wrapNativeError(err);
-      completer.completeError(exception);
-    }
-  }
-
-  void _handleSuccess<T>(Completer<T> completer, T data) {
-    if (!completer.isCompleted) {
-      completer.complete(data);
-    }
-  }
-
   @override
   String toString() => 'OssClientNode()';
 
   final _retryCount = 3;
-
-  /// The return value is native
-  ///
-  /// The error is a TablestoreNodeException
-  // ignore: unused_element
-  Future<T> _nativeOperationWithCallback<T>(
-    dynamic Function(Function callback) action,
-  ) async {
-    // 3 tests before aborting
-    for (var i = 0; i < _retryCount; i++) {
-      try {
-        return await _nativeSingleOperationWithCallback(action);
-      } catch (e) {
-        // Do not retry if reponse says so
-        if (e is OssExceptionNode && !e.retryable) {
-          rethrow;
-        }
-        // Retry right away then in 1s
-        var delay = i * 1000;
-        if (i < _retryCount - 1) {
-          if (debugAliyunOss) {
-            print('retrying in $delay');
-          }
-          await sleep(delay);
-        } else {
-          break;
-        }
-      }
-    }
-    throw OssExceptionNode(message: 'timeout');
-  }
 
   /// The return value is native
   ///
@@ -95,42 +50,6 @@ class OssClientNode with OssClientMixin implements OssClient {
       }
     }
     throw OssExceptionNode(message: 'timeout');
-  }
-
-  /// The return value is native
-  ///
-  /// The error is a TablestoreNodeException
-  Future<T> _nativeSingleOperationWithCallback<T>(
-    dynamic Function(Function callback) action,
-  ) async {
-    var completer = Completer<T>();
-    try {
-      action(
-        allowInterop((Object? err, Object? data) {
-          if (err != null) {
-            if (debugAliyunOss) {
-              if (data != null) {
-                try {
-                  print('[OSS!]: (data): ${jsObjectToDebugString(data)}');
-                } catch (_) {
-                  print('err: some data');
-                }
-              }
-            }
-            _handleError(completer, err);
-          } else {
-            // var response = data;
-            if (debugAliyunOss) {
-              print('OSSr: ${nativeDataToDebugString(data)}');
-            }
-            _handleSuccess(completer, data);
-          }
-        }),
-      );
-    } catch (e) {
-      _handleError(completer, e);
-    }
-    return completer.future;
   }
 
   T _debugNativeRequestParams<T>(String method, T params) {

@@ -873,6 +873,17 @@ void rowTest(TsClient client) {
           ],
         ),
       );
+      var rows = response.tables.single;
+      expect(rows, hasLength(2));
+      expect(rows[0].attributes!.toDebugList(), [
+        {
+          'test': {'@long': '1'},
+        },
+      ]);
+      // Missing row: ok, without primary key nor attributes
+      expect(rows[1].isOk, isTrue);
+      expect(rows[1].primaryKey, isNull);
+      expect(rows[1].attributes?.list ?? <TsAttribute>[], isEmpty);
     });
 
     test('batch_write', () async {
@@ -944,7 +955,10 @@ void rowTest(TsClient client) {
               rows: [
                 TsBatchWriteRowsRequestPutRow(
                   primaryKey: key1,
-                  data: TsAttributes([TsAttribute.int('test', 1)]),
+                  data: TsAttributes([
+                    TsAttribute.int('test', 1),
+                    TsAttribute('other', 'kept'),
+                  ]),
                 ),
               ],
             ),
@@ -991,9 +1005,15 @@ void rowTest(TsClient client) {
       var getResponse = await client.getRow(
         TsGetRowRequest(tableName: keyStringTableName, primaryKey: key1),
       );
+      // The other attribute is kept
       expect(
-        getResponse.row.attributes!.list.first,
-        TsAttribute.int('test', 2),
+        getResponse.row.attributes!.toDebugList(),
+        unorderedEquals([
+          {
+            'test': {'@long': '2'},
+          },
+          {'other': 'kept'},
+        ]),
       );
 
       // conditional update
@@ -1041,9 +1061,15 @@ void rowTest(TsClient client) {
       getResponse = await client.getRow(
         TsGetRowRequest(tableName: keyStringTableName, primaryKey: key1),
       );
+      // The other attribute is kept
       expect(
-        getResponse.row.attributes!.list.first,
-        TsAttribute.int('test', 2),
+        getResponse.row.attributes!.toDebugList(),
+        unorderedEquals([
+          {
+            'test': {'@long': '2'},
+          },
+          {'other': 'kept'},
+        ]),
       );
 
       response = await client.batchWriteRows(
@@ -1371,17 +1397,23 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(1)},
+                {
+                  'key2': {'@long': '1'},
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(2)},
+                {
+                  'key4': {'@long': '2'},
+                },
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(1)},
+                {
+                  'test': {'@long': '1'},
+                },
               ],
             },
           ],
         });
-      }, skip: true);
+      });
 
       test('range_complex_composite_condition_2', () async {
         await writeComplexData();
@@ -1413,17 +1445,57 @@ void rowTest(TsClient client) {
             {
               'primaryKey': [
                 {'key1': 'range_complex'},
-                {'key2': TsValueLong.fromNumber(1)},
+                {
+                  'key2': {'@long': '1'},
+                },
                 {'key3': 'col3_1'},
-                {'key4': TsValueLong.fromNumber(2)},
+                {
+                  'key4': {'@long': '2'},
+                },
               ],
               'attributes': [
-                {'test': TsValueLong.fromNumber(1)},
+                {
+                  'test': {'@long': '1'},
+                },
+              ],
+            },
+            {
+              'primaryKey': [
+                {'key1': 'range_complex'},
+                {
+                  'key2': {'@long': '2'},
+                },
+                {'key3': 'col3_2'},
+                {
+                  'key4': {'@long': '3'},
+                },
+              ],
+              'attributes': [
+                {
+                  'test': {'@long': '2'},
+                },
+              ],
+            },
+            {
+              'primaryKey': [
+                {'key1': 'range_complex'},
+                {
+                  'key2': {'@long': '3'},
+                },
+                {'key3': 'col3_1'},
+                {
+                  'key4': {'@long': '4'},
+                },
+              ],
+              'attributes': [
+                {
+                  'test': {'@long': '3'},
+                },
               ],
             },
           ],
         });
-      }, skip: true);
+      });
 
       /*
       test('range_complex_composite_condition_2', () async {

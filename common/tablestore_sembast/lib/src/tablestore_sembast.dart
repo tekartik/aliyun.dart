@@ -32,4 +32,5 @@ Tablestore newTablestoreSembastMemory() =>
 Tablestore getTablestoreSembast({required DatabaseFactory factory}) =>
     TablestoreSembast(factory: factory);
 
-final debugTs = true; // devWarning(true); true for now
+/// Print every read and write (debug).
+final debugTs = false;

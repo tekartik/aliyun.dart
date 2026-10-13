@@ -29,5 +29,35 @@ void main() {
         expect(e.isNotFound, isTrue);
       }
     });
+
+    test('list pages with marker', () async {
+      var client = newOssServiceMemory().client();
+      var bucket = await client.putBucket('test');
+      for (var i = 1; i <= 5; i++) {
+        await client.putAsString(bucket.name, 'dir/f$i.txt', 'c$i');
+      }
+      var options = OssListFilesOptions(prefix: 'dir/', maxResults: 2);
+      var pages = <List<String>>[];
+      while (true) {
+        var response = await client.list(bucket.name, options);
+        pages.add(response.files.map((file) => file.name).toList());
+        if (!response.isTruncated) {
+          break;
+        }
+        options.marker = response.nextMarker;
+      }
+      expect(pages, [
+        ['dir/f1.txt', 'dir/f2.txt'],
+        ['dir/f3.txt', 'dir/f4.txt'],
+        ['dir/f5.txt'],
+      ]);
+
+      // A marker after every file returns nothing
+      var response = await client.list(
+        bucket.name,
+        OssListFilesOptions(prefix: 'dir/', marker: 'zzz'),
+      );
+      expect(response.files, isEmpty);
+    });
   });
 }

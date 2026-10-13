@@ -22,7 +22,9 @@ class FcHttpRequestHttp implements FcHttpRequest {
         return _body!;
       }
       var list = await requestImpl.toList();
-      return Uint8List.fromList(list.expand((element) => element).toList());
+      return _body = Uint8List.fromList(
+        list.expand((element) => element).toList(),
+      );
     });
   }
 

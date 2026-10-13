@@ -103,11 +103,14 @@ class TsClientSembast implements TsClient {
   @override
   Future deleteTable(String name) async {
     await (await _db).transaction((txn) async {
-      var tableNames = await _listTableNames(txn);
+      // The list read from sembast is immutable
+      var tableNames = List<String>.from(await _listTableNames(txn));
 
-      if (tableNames.contains(name)) {
-        tableNames.remove(name);
+      if (tableNames.remove(name)) {
         await tablesMetaRecord.put(txn, tableNames);
+        await getTableMetaRecord(name).delete(txn);
+        await getTableExtraInfoRecord(name).delete(txn);
+        await getTableStore(name).drop(txn);
       } else {
         throw TsExceptionSembast(message: 'table $name not found');
       }
@@ -298,14 +301,13 @@ class TsClientSembast implements TsClient {
 
           var record = row.record();
           var result = await record.get(requestTable.columns);
-          // return TsGetRowResponseSembast(row, result.primaryKey, result.attributes);
-          var isOk = true;
-
           rows.add(
             TsBatchGetRowResponseRowSembast(
               rowContext: row,
               attributes: result?.attributes,
-              isOk: isOk,
+              isOk: true,
+              // Like the real service, a missing row has no primary key
+              exists: result != null,
             ),
           );
         }
@@ -332,14 +334,16 @@ class TsClientSembast implements TsClient {
           int? key;
           try {
             key = await _checkPutDeleteCondition(record, requestRow.condition);
-            if (key != null) {
-              await record.delete();
-            }
             if (requestRow is TsBatchWriteRowsRequestPutRow) {
+              if (key != null) {
+                await record.delete();
+              }
               record = row.record(requestRow.data);
               await record.put();
             } else if (requestRow is TsBatchWriteRowsRequestDeleteRow) {
-              await record.deleteByKey(key);
+              if (key != null) {
+                await record.deleteByKey(key);
+              }
             } else if (requestRow is TsBatchWriteRowsRequestUpdateRow) {
               await _updateRow(key: key, record: record, data: requestRow.data);
             } else {
@@ -412,25 +416,7 @@ class TsClientSembast implements TsClient {
             ),
       );
 
-      record = await _updateRow(key: key, record: record, data: request.data);
-      var list = <TsAttribute?>[];
-      if (key != null) {
-        list.addAll((await record.get(null))!.attributes!);
-      }
-      // Merge!
-      for (var update in request.data) {
-        if (update is TsUpdateAttributePut) {
-          for (var attribute in update.attributes) {
-            list.removeWhere((element) => element!.name == attribute.name);
-            list.add(attribute);
-          }
-        } else if (update is TsUpdateAttributeDelete) {
-          list.removeWhere((element) => update.fields.contains(element!.name));
-        }
-      }
-      record = row.record(list.cast<TsAttribute>());
-      await record.delete();
-      await record.put();
+      await _updateRow(key: key, record: record, data: request.data);
       return TsUpdateRowResponseSembast(row);
     });
   }
@@ -471,12 +457,16 @@ class TsBatchWriteRowsResponseSembast implements TsBatchWriteRowsResponse {
 class TsBatchGetRowResponseRowSembast implements TsBatchGetRowsResponseRow {
   final TsRowContextSembast? rowContext;
 
+  /// False for a missing row in a batch get (no primary key then).
+  final bool exists;
+
   TsBatchGetRowResponseRowSembast({
     required this.attributes,
     this.errorCode,
     this.errorMessage,
     required this.isOk,
     this.rowContext,
+    this.exists = true,
   });
 
   @override
@@ -492,7 +482,7 @@ class TsBatchGetRowResponseRowSembast implements TsBatchGetRowsResponseRow {
   final bool isOk;
 
   @override
-  TsPrimaryKey get primaryKey => rowContext!.primaryKey;
+  TsPrimaryKey? get primaryKey => exists ? rowContext!.primaryKey : null;
 
   @override
   String get tableName => rowContext!.tableName!;
@@ -849,16 +839,14 @@ Filter? tsConditionToSembastFilter(TsColumnCondition? condition) {
     switch (condition.operator) {
       case TsLogicalOperator.and:
         assert(condition.list.length > 1);
-        return Filter.and(
-          condition.list.map(tsConditionToSembastFilter).toList()
-              as List<Filter>,
-        );
+        return Filter.and([
+          for (var item in condition.list) tsConditionToSembastFilter(item)!,
+        ]);
       case TsLogicalOperator.or:
         assert(condition.list.length > 1);
-        return Filter.or(
-          condition.list.map(tsConditionToSembastFilter).toList()
-              as List<Filter>,
-        );
+        return Filter.or([
+          for (var item in condition.list) tsConditionToSembastFilter(item)!,
+        ]);
       case TsLogicalOperator.not:
         assert(condition.list.length == 1);
         throw UnsupportedError('\'not\' not supported yet');
@@ -922,65 +910,53 @@ class TsRangeContextSembast {
     return Filter.and([filter1, filter2]);
   }
 
+  /// Compare a record primary key to a range bound (infinite values allowed).
+  int _compareToBound(Map<String, Object?> record, TsPrimaryKey bound) {
+    for (var kv in bound.list) {
+      if (kv.value == TsValueInfinite.min) {
+        return 1;
+      } else if (kv.value == TsValueInfinite.max) {
+        return -1;
+      }
+      var value = record[kv.name] as Comparable;
+      var cmp = value.compareTo(valueToSembastValue(kv.value));
+      if (cmp != 0) {
+        return cmp;
+      }
+    }
+    return 0;
+  }
+
   Future<TsGetRangeSembast> get() async {
     Filter? boundaryFilter;
     var columnFilter = tsConditionToSembastFilter(request.columnCondition);
     var startPrimaryKey = request.inclusiveStartPrimaryKey;
     var endPrimaryKey = request.exclusiveEndPrimaryKey;
+    // Backward: from the (inclusive) start down to the (exclusive) end
+    var backward = request.direction == TsDirection.backward;
 
     if (startPrimaryKey != null || endPrimaryKey != null) {
       boundaryFilter = Filter.custom((record) {
+        var value = record.value as Map<String, Object?>;
         if (startPrimaryKey != null) {
-          for (var kv in startPrimaryKey.list) {
-            var field = kv.name;
-            if (kv.value == TsValueInfinite.min) {
-              break;
-            } else if (kv.value == TsValueInfinite.max) {
-              return false;
-            } else {
-              var value = record[field] as Comparable;
-              var cmp = value.compareTo(valueToSembastValue(kv.value));
-              if (cmp < 0) {
-                return false;
-              } else if (cmp > 0) {
-                break;
-              }
-              // equals continue!
-            }
+          var cmp = _compareToBound(value, startPrimaryKey);
+          if (backward ? cmp > 0 : cmp < 0) {
+            return false;
           }
         }
-
         if (endPrimaryKey != null) {
-          for (var i = 0; i < endPrimaryKey.list.length; i++) {
-            var kv = endPrimaryKey.list[i];
-            var field = kv.name;
-            if (kv.value == TsValueInfinite.min) {
-              return false;
-            } else if (kv.value == TsValueInfinite.max) {
-              break;
-            } else {
-              var value = record[field] as Comparable;
-              var cmp = value.compareTo(valueToSembastValue(kv.value));
-              if (cmp > 0) {
-                return false;
-              } else if (cmp < 0) {
-                break;
-              }
-              // Last field make it strict
-              if (i == endPrimaryKey.list.length - 1) {
-                return false;
-              }
-            }
+          var cmp = _compareToBound(value, endPrimaryKey);
+          if (backward ? cmp <= 0 : cmp >= 0) {
+            return false;
           }
         }
-        // Condition
         return true;
       });
     }
     var finder = Finder(
       filter: _and(boundaryFilter, columnFilter),
       sortOrders: table.tableMeta.primaryKeys!
-          .map((e) => SortOrder(e.name!))
+          .map((e) => SortOrder(e.name!, !backward))
           .toList(),
       // Add 1 for next
       limit: request.limit != null ? request.limit! + 1 : null,

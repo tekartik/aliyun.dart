@@ -260,32 +260,19 @@ class TsClientNode with TsClientMixin implements TsClient {
     return tableDescriptionFromNative(nativeDesc);
   }
 
-  // experimental way (keep it false...)
-  final useJs = false;
-
   /*
   {"consumed":{"capacityUnit":{"read":1,"write":0}},"row":{"primaryKey":[{"name":"key","value":"value"}],"attributes":[{"columnName":"test","columnValue":"text","timestamp":{"buffer":[30,20,154,94,116,1,0,0],"offset":0}}]},"RequestId":"0005ae91-ac09-e850-e5c1-720b08a5216a"}
    */
   @override
   Future<TsGetRowResponse> getRow(TsGetRowRequest request) async {
-    if (useJs) {
-      var jsParams = toGetRowParamsJs(request);
-      var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
-        callback,
-      ) {
-        native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
-      });
-      return getRowResponseFromNative(nativeResponseJs);
-    } else {
-      var params = toGetRowParams(request);
-      var jsParams = tsJsify(params);
-      var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
-        callback,
-      ) {
-        native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
-      });
-      return getRowResponseFromNative(nativeResponseJs);
-    }
+    var params = toGetRowParams(request);
+    var jsParams = tsJsify(params);
+    var nativeResponseJs = await _nativeOperationWithCallback<Object?>((
+      callback,
+    ) {
+      native.getRow(_debugNativeRequestParams('getRow', jsParams), callback);
+    });
+    return getRowResponseFromNative(nativeResponseJs);
   }
 
   @override
@@ -336,25 +323,15 @@ class TsClientNode with TsClientMixin implements TsClient {
   Future<TsBatchGetRowsResponse> batchGetRows(
     TsBatchGetRowsRequest request,
   ) async {
-    if (useJs) {
-      // tmp exp
-      var jsParams = toBatchGetRowParamsJs(request);
-      var responseJs = await _nativeOperationWithCallback<Object?>((callback) {
-        _debugNativeRequestParams('batchGetRow', jsParams);
-        callMethod(native, 'batchGetRow', [jsParams, callback]);
-      });
-      return TsBatchGetRowsResponseNode(responseJs as TsBatchGetRowResponseJs);
-    } else {
-      var params = toBatchGetRowsParams(request);
-      var jsParams = tsJsify(params);
-      var responseJs = await _nativeOperationWithCallback<Object?>((callback) {
-        native.batchGetRow(
-          _debugNativeRequestParams('batchGetRow', jsParams),
-          callback,
-        );
-      });
-      return TsBatchGetRowsResponseNode(responseJs as TsBatchGetRowResponseJs);
-    }
+    var params = toBatchGetRowsParams(request);
+    var jsParams = tsJsify(params);
+    var responseJs = await _nativeOperationWithCallback<Object?>((callback) {
+      native.batchGetRow(
+        _debugNativeRequestParams('batchGetRow', jsParams),
+        callback,
+      );
+    });
+    return TsBatchGetRowsResponseNode(responseJs as TsBatchGetRowResponseJs);
   }
 
   @override

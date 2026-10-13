@@ -246,14 +246,6 @@ dynamic /*TsKeyValueJs*/ tsKeyValueToNative(TsKeyValue keyValue) {
 List<dynamic> tsPrimaryKeyToNative(TsPrimaryKey primaryKey) =>
     primaryKey.list.map(tsKeyValueToNative).toList();
 
-TsGetRowParamsJs toGetRowParamsJs(TsGetRowRequest request) {
-  return TsGetRowParamsJs(
-    maxVersions: 1,
-    tableName: request.tableName,
-    primaryKey: tsPrimaryKeyToNative(request.primaryKey),
-  );
-}
-
 @JS('Object.keys')
 external void jsObjectDefineProperty(
   Object? obj,
@@ -289,50 +281,6 @@ class JsArrayWrapper<T> {
       add(element);
     }
   }
-}
-
-dynamic toBatchGetRowParamsJs(TsBatchGetRowsRequest request) {
-  var requestJs = util.newObject() as Object;
-
-  var tablesJs = <Object?>[];
-  /*util.newObject();
-  var tablesJsIndex = 0;*/
-  for (var table in request.tables) {
-    var tableJs = util.newObject() as Object;
-    util.setProperty(tableJs, 'tableName', table.tableName);
-    var pksJs = JsArrayWrapper<Object?>();
-    for (var pk in table.primaryKeys) {
-      var pkcsJs = <Object?>[];
-      // var pkcsJsIndex = 0;
-      for (var pkc in pk.list) {
-        var pkcJs = util.newObject() as Object;
-        util.setProperty(pkcJs, pkc.name, pkc.value);
-        //util.setProperty(pkcsJs, pkcsJsIndex++, pkcJs);
-        pkcsJs.add(pkcJs);
-      }
-
-      pksJs.add(pkcsJs);
-    }
-    util.setProperty(tableJs, 'primaryKey', pksJs.native);
-    //util.callMethod(tablesJs, 'push', [tableJs]);
-    tablesJs.add(tableJs);
-    //util.setProperty(tablesJs, tablesJsIndex++, tableJs);
-  }
-  util.setProperty(requestJs, 'tables', tablesJs);
-
-  /*
-  var array = JsArray.from([
-    {'test': 1}
-  ]);
-  print('#1 ${jsObjectKeys(array)}');
-  print('#2 ${jsObjectKeys(util.newObject())}');
-  var arrayW = JsArrayWrapper();
-  arrayW.add({'test': 123});
-  arrayW.add({'test': 456});
-  print('#3 ${jsObjectKeys(arrayW.native)}');
-
-   */
-  return requestJs;
 }
 
 class TsPutRowParamsJs {}

@@ -26,7 +26,7 @@ class FcHttpResponseHttp implements FcHttpResponse {
 
   @override
   Future<void> sendBytes(Uint8List bytes) async {
-    requestImpl.response.write(bytes);
+    requestImpl.response.add(bytes);
     await requestImpl.response.close();
   }
 }

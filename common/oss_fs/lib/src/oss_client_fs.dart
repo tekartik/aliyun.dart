@@ -155,16 +155,17 @@ class OssClientFs with OssClientMixin {
 
     // marker?
     // TODO too slow for now
-    if (options?.marker != null) {
-      int? startIndex;
+    var marker = options?.marker;
+    if (marker != null) {
+      // Start at the first file at or after the marker, none if past the end
+      var startIndex = paths.length;
       for (var i = 0; i < paths.length; i++) {
-        if (options!.marker!.compareTo(toOssPath(paths[i])) <= 0) {
+        if (marker.compareTo(toOssPath(paths[i])) <= 0) {
           startIndex = i;
+          break;
         }
       }
-      if (startIndex != null) {
-        paths = paths.sublist(startIndex);
-      }
+      paths = paths.sublist(startIndex);
     }
 
     // limit?

@@ -28,6 +28,36 @@ class AliyunFunctionComputeHttp implements AliyunFunctionCompute {
     _functions[name] = _HandlerInfo(name, handler);
   }
 
+  /// Handle a single request, errors are reported as a 500 response.
+  Future<void> _handleRequest(HttpRequest request) async {
+    // /test
+    var segments = request.uri.pathSegments;
+    var function = segments.isEmpty ? null : _functions[segments.first];
+    if (function == null) {
+      request.response.statusCode = httpStatusCodeNotFound;
+      request.response.writeln('not found');
+      await request.response.close();
+      return;
+    }
+    try {
+      await function.handler(
+        FcHttpRequestHttp(request),
+        FcHttpResponseHttp(request),
+        FcHttpContextHttp(request),
+      );
+    } catch (e, st) {
+      print('handler ${function.name} error: $e');
+      print(st);
+      try {
+        request.response.statusCode = httpStatusCodeInternalServerError;
+        request.response.writeln('error');
+        await request.response.close();
+      } catch (_) {
+        // Response already sent
+      }
+    }
+  }
+
   Future<HttpServer> serveHttp({required int port}) async {
     assert(_functions.isNotEmpty, 'No handler exported');
 
@@ -42,23 +72,7 @@ class AliyunFunctionComputeHttp implements AliyunFunctionCompute {
     unawaited(
       Future.sync(() async {
         await for (HttpRequest request in requestServer) {
-          var uri = request.uri;
-          // /test
-          var functionKey = uri.pathSegments.first;
-          var function = _functions[functionKey];
-          if (function == null) {
-            request.response.statusCode = httpStatusCodeNotFound;
-            request.response.writeln('not found');
-          } else {
-            var fcHttpRequestHttp = FcHttpRequestHttp(request);
-            var fcHttpResponseHttp = FcHttpResponseHttp(request);
-            var fcHttpContextHttp = FcHttpContextHttp(request);
-            function.handler(
-              fcHttpRequestHttp,
-              fcHttpResponseHttp,
-              fcHttpContextHttp,
-            );
-          }
+          unawaited(_handleRequest(request));
         }
       }),
     );
