@@ -38,7 +38,9 @@ invoke it and reads its version. It does not wrap the OSS commands themselves
   (safe to call concurrently): it looks for `ossutil64` in the `PATH`
   (`which`), then falls back to `/opt/app/ossutil/ossutil64`. When nothing is
   found it writes `missing ossutil64 in path` on stderr and throws an
-  `UnsupportedError`. Catch that to degrade gracefully or to skip tests.
+  `UnsupportedError`. Catch that to degrade gracefully or to skip tests. Only
+  the 1.x `ossutil64` name is looked up: an ossutil 2.x install (`ossutil`)
+  is not found.
 * `ossutil` is a nullable global `String?` holding the resolved path; it is
   `null` before `setupOssutil()` and must not be interpolated into a command
   line (it is not escaped). Use `ossutilShell` instead: it is the same path
@@ -47,10 +49,13 @@ invoke it and reads its version. It does not wrap the OSS commands themselves
 * Build the command as `'$ossutilShell <args>'` and run it with
   `run(...)` or a `Shell()` from `package:process_run/shell_run.dart`; read
   `outLines` for the parsed output. Keep `verbose: false` when you parse the
-  output.
+  output. Escape every argument you add with `shellArgument(...)`
+  (`process_run`): a bucket, prefix or local path with a space or a quote
+  would otherwise break the command line or run another command.
 * `getOssutilVersion()` returns a `Version` (`package:pub_semver`, re-exported
   by `package:tekartik_common_utils/version_utils.dart`) by scanning the
-  `--version` output for the first `v`-prefixed token; it throws a
+  `--version` output for the first token that parses as a version (a leading
+  `v` is dropped, `ossutil version: v1.7.19` gives 1.7.19); it throws a
   `StateError` when nothing parses. Compare it with `greaterThanOrEqualTo` to
   require a minimum (the package's own test expects `>= 1.6.19`).
 * This package is Dart VM / io only (`dart:io`, `which`): do not import it
@@ -96,7 +101,7 @@ import 'package:tekartik_aliyun_cli/ossutil.dart';
 Future<List<String>> listObjects(String bucket, String prefix) async {
   await setupOssutil();
   var result = await run(
-    '$ossutilShell ls oss://$bucket/$prefix',
+    '$ossutilShell ls ${shellArgument('oss://$bucket/$prefix')}',
     verbose: false,
   );
   return result.outLines.toList();
@@ -104,8 +109,11 @@ Future<List<String>> listObjects(String bucket, String prefix) async {
 
 Future<void> uploadDirectory(String localDir, String bucket, String to) async {
   await setupOssutil();
-  // ossutilShell is already shell escaped, quote your own arguments.
-  await run("$ossutilShell cp -r -f '$localDir' 'oss://$bucket/$to'");
+  // ossutilShell is already shell escaped, escape your own arguments.
+  await run(
+    '$ossutilShell cp -r -f ${shellArgument(localDir)} '
+    '${shellArgument('oss://$bucket/$to')}',
+  );
 }
 ```
 
@@ -118,10 +126,11 @@ import 'package:tekartik_aliyun_cli/ossutil.dart';
 Future<void> deploy(String bucket, String buildDir) async {
   await setupOssutil();
   var shell = Shell();
+  var target = shellArgument('oss://$bucket/web/');
   await shell.run('''
-$ossutilShell rm -r -f oss://$bucket/web/
-$ossutilShell cp -r -f $buildDir oss://$bucket/web/
-$ossutilShell ls oss://$bucket/web/
+$ossutilShell rm -r -f $target
+$ossutilShell cp -r -f ${shellArgument(buildDir)} $target
+$ossutilShell ls $target
 ''');
 }
 ```
