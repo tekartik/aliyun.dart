@@ -1,3 +1,7 @@
+/// The runtime independent Aliyun OSS API: [OssService], [OssClient].
+/// Implementations: tekartik_aliyun_oss_node, tekartik_aliyun_oss_fs.
+library;
+
 export 'src/oss_bucket.dart' show OssBucket, OssBucketMixin;
 export 'src/oss_client.dart' show OssClient, OssClientOptions, OssClientMixin;
 export 'src/oss_exception.dart' show OssException;

@@ -35,8 +35,9 @@ the handler code against this package only.
   the only public library). Never import `lib/src/`.
 * A handler is an `FcHttpHandler`:
   `dynamic Function(FcHttpRequest request, FcHttpResponse response, FcHttpContext context)`.
-  Declare it `Future<void> ... async`. The runtimes call it without awaiting
-  and do not catch its errors: wrap the body in `try`/`catch` and always
+  Declare it `Future<void> ... async`. The node runtime calls it without
+  awaiting and does not catch its errors (the local http runtime awaits it
+  and answers 500 on an error): wrap the body in `try`/`catch` and always
   send an answer, otherwise the caller waits forever.
 * Register it once with
   `AliyunFunctionCompute.exportHttpHandler(handler, name: 'handler')`.
