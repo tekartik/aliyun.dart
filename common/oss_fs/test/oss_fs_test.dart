@@ -59,5 +59,43 @@ void main() {
       );
       expect(response.files, isEmpty);
     });
+
+    test('list prefix is a string prefix', () async {
+      var client = newOssServiceMemory().client();
+      var bucket = await client.putBucket('test');
+      for (var name in [
+        'dir/f1.txt',
+        'dir/f2.txt',
+        'dir/sub/f3.txt',
+        'dir.txt',
+        'dir2/x.txt',
+        'other.txt',
+      ]) {
+        await client.putAsString(bucket.name, name, 'content');
+      }
+      Future<List<String>> names(String? prefix) async => (await client.list(
+        bucket.name,
+        OssListFilesOptions(prefix: prefix),
+      )).files.map((file) => file.name).toList();
+      // Like OSS, not a directory: 'dir/f' and 'dir' match keys starting so.
+      expect(await names('dir/f'), ['dir/f1.txt', 'dir/f2.txt']);
+      expect(await names('dir'), [
+        'dir.txt',
+        'dir/f1.txt',
+        'dir/f2.txt',
+        'dir/sub/f3.txt',
+        'dir2/x.txt',
+      ]);
+      expect(await names('dir/'), [
+        'dir/f1.txt',
+        'dir/f2.txt',
+        'dir/sub/f3.txt',
+      ]);
+      expect(await names('dir/sub/'), ['dir/sub/f3.txt']);
+      expect(await names('none'), isEmpty);
+      expect(await names('none/'), isEmpty);
+      expect(await names(''), hasLength(6));
+      expect(await names(null), hasLength(6));
+    });
   });
 }

@@ -50,8 +50,8 @@ Future<void> main() async {
 
 * `OssClientOptions` holds the access key secret: read it from the
   environment, never from the source; its `toString` hides most of it.
-* `getAsBytes`/`getAsString` return null for a missing object; `delete`
-  ignores one.
+* `getAsBytes`/`getAsString` throw an `OssException` whose `isNotFound` is
+  true for a missing object (fs and nodejs); `delete` ignores one.
 * A listing is a page: go on with `options.marker = page.nextMarker` while
   `page.isTruncated` (`nextMarker` can be set on the last page).
 * `putBucket` works with the fs implementation only: on nodejs, create the

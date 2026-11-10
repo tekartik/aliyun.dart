@@ -6,8 +6,8 @@ description: >-
   ossServiceMemory, newOssServiceMemory, ossServiceFsIo, OssClientOptionsFs
   with rootPath, the package:tekartik_aliyun_oss_fs/oss_fs.dart and
   oss_fs_io.dart imports, the <rootPath>/<bucket>/<object path> layout,
-  OssException isNotFound behaviour, prefix and marker listing limits of the
-  mock, and injecting an OssService into code written against
+  OssException isNotFound behaviour, prefix and marker listing semantics of
+  the mock, and injecting an OssService into code written against
   tekartik_aliyun_oss (OssClient, putAsString, getAsString, list).
 ---
 
@@ -59,16 +59,18 @@ on node).
 * Missing object: `getAsBytes`/`getAsString` throw an `OssException` with
   `isNotFound == true` (they never return null); `delete` swallows every
   error.
-* `list(bucket, OssListFilesOptions(prefix:, maxResults:, marker:))` treats
-  `prefix` as a directory path (`<bucket>/<prefix>` is listed recursively),
-  not as a string prefix like real OSS: `prefix: 'dir'` or `'dir/'` lists
-  `dir/**`, `prefix: 'dir/fi'` lists nothing. Use directory-like prefixes
-  so the code behaves the same on both. Names are `/`-separated paths
-  relative to the bucket, sorted; `maxResults` (default 1000) truncates and
-  sets `isTruncated`/`nextMarker`. Marker pagination is approximate in the
-  current implementation (resuming at a marker skips entries when more
-  than one remains): in tests keep `maxResults` above the object count and
-  do not assert on multi-page results against the mock.
+* `list(bucket, OssListFilesOptions(prefix:, maxResults:, marker:))`: like
+  real OSS, `prefix` is a string prefix of the key (`prefix: 'dir'` lists
+  `dir.txt`, `dir/a.txt` and `dir2/b.txt`, `'dir/f'` lists `dir/f1.txt`).
+  Names are `/`-separated paths relative to the bucket, sorted;
+  `maxResults` (default 1000) truncates and sets `isTruncated`/`nextMarker`.
+  Page with `options.marker = response.nextMarker` until `isTruncated` is
+  false. Unlike OSS, the marker is inclusive and `nextMarker` is the first
+  key of the next page (OSS: exclusive marker, `nextMarker` the last key
+  returned): only pass markers obtained from `nextMarker`.
+* Keys are joined to the bucket directory as file paths: a key with `..`
+  segments or a leading `/` leaves the bucket (and the `rootPath` on io).
+  Never pass a key coming from a user unchecked.
 * Create the `OssService` in `main` or in the test `setUp` and hand it (or
   the `OssClient`) to the code under test; production code depends on
   `tekartik_aliyun_oss` only.
@@ -190,6 +192,6 @@ Uploader newUploader({bool inMemory = false}) => Uploader(
 
 * `service.client()` without options, then reading `bucket.location`.
 * Expecting `getAsString` to return null for a missing object.
-* Using a string prefix (`'dir/fi'`) that is not a directory path.
-* Asserting on multi-page `marker` results against the mock.
+* Passing the last key already received as `marker`: it comes again on the
+  mock (exclusive on OSS).
 * Sharing `ossServiceMemory` between tests that expect a blank state.

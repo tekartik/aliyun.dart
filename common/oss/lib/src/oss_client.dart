@@ -53,7 +53,8 @@ abstract class OssClient {
 
   /// Get a file as bytes
   ///
-  /// null if not found.
+  /// A missing file throws an [OssException] whose `isNotFound` is true
+  /// (fs and node implementations).
   Future<Uint8List?> getAsBytes(String bucketName, String path);
 
   /// Write a file as a string

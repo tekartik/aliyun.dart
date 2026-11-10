@@ -776,9 +776,11 @@ class TsRowContextSembast {
   TsRowRecordContextSembast record([List<TsAttribute>? attributes]) {
     if (attributes != null) {
       for (var attribute in attributes) {
+        // The TsAttribute types (Tablestore STRING, INTEGER, BINARY, DOUBLE)
         if (!(attribute.value is String ||
             attribute.value is TsValueLong ||
-            attribute.value is Uint8List)) {
+            attribute.value is Uint8List ||
+            attribute.value is double)) {
           throw TsExceptionSembast(
             message:
                 'Invalid value type for $attribute ${attribute.value.runtimeType}',

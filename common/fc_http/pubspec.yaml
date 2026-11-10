@@ -1,5 +1,5 @@
 name: tekartik_aliyun_fc_http
-description: A starting point for Dart libraries or applications.
+description: Aliyun Function Compute HTTP handlers on a tekartik_http server (memory or io)
 version: 0.1.5
 publish_to: none
 

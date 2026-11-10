@@ -51,7 +51,9 @@ tests, or a local file for a dev/offline mode. No Aliyun account, no network.
   `.dart_tool/tekartik_aliyun/tablestore/`; an absolute path is used as is.
   Use a distinct `instanceName` per test file to avoid sharing state, or
   `newTablestoreSembastMemory()` for a guaranteed empty database.
-* Opening a database prints a `[SBi] Opening <path>` line; that is expected.
+* Attribute values: `String`, `TsValueLong` (`TsAttribute.int`), `double`
+  (`TsAttribute.double`) and `Uint8List`; another type fails with a
+  `TsException`.
 * Behaviour matches the shared suite for tables, `putRow`, `getRow`,
   `updateRow`, `deleteRow`, `getRange`, `batchGetRows` and `batchWriteRows`,
   including `TsCondition`, `TsColumnCondition`, `TsValueLong`,

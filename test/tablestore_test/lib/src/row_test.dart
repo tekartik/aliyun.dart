@@ -69,6 +69,23 @@ void rowTest(TsClient client) {
       });
     });
 
+    test('put/get double attribute', () async {
+      // DOUBLE is an attribute type (was refused by the sembast mock)
+      var key = TsPrimaryKey([TsKeyValue('key', 'double_attribute')]);
+      await clientCreateKeyStringTable();
+      await client.putRow(
+        TsPutRowRequest(
+          tableName: keyStringTableName,
+          primaryKey: key,
+          data: TsAttributes([TsAttribute.double('value', 1.5)]),
+        ),
+      );
+      var getResponse = await client.getRow(
+        TsGetRowRequest(tableName: keyStringTableName, primaryKey: key),
+      );
+      expect(getResponse.row.attributes!.toMap()['value']!.value, 1.5);
+    });
+
     test('put/getRowColumns', () async {
       var key = TsPrimaryKey([TsKeyValue('key', 'get_row_columns')]);
       await clientCreateKeyStringTable();

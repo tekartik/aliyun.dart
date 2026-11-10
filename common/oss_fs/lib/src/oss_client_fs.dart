@@ -134,7 +134,14 @@ class OssClientFs with OssClientMixin {
   ]) async {
     var fs = await fsReady;
     var bucketPath = getFsBucketPath(bucketName);
-    var parentPath = getFsFilePath(bucketName, options?.prefix);
+    // Like OSS, the prefix is a string prefix of the key, not a directory:
+    // list the directory part of the prefix, then keep the matching keys.
+    var prefix = options?.prefix ?? '';
+    var prefixDirEnd = prefix.lastIndexOf('/');
+    var parentPath = getFsFilePath(
+      bucketName,
+      prefixDirEnd <= 0 ? null : prefix.substring(0, prefixDirEnd),
+    );
     List<FileSystemEntity> files;
     try {
       files = await fs.directory(parentPath).list(recursive: true).toList();
@@ -142,16 +149,17 @@ class OssClientFs with OssClientMixin {
       // Not found?
       files = <FileSystemEntity>[];
     }
+    String toOssPath(String path) =>
+        p.url.normalize(fs.path.relative(path, from: bucketPath));
+
     var paths = <String>[];
     for (var file in files) {
-      if (await fs.isFile(file.path)) {
+      if (await fs.isFile(file.path) &&
+          toOssPath(file.path).startsWith(prefix)) {
         paths.add(file.path);
       }
     }
     paths.sort();
-
-    String toOssPath(String path) =>
-        p.url.normalize(fs.path.relative(path, from: bucketPath));
 
     // marker?
     // TODO too slow for now

@@ -15,6 +15,9 @@ class _HandlerInfo {
   _HandlerInfo(this.name, this.handler);
 }
 
+/// Function Compute runtime on a `tekartik_http` server: export one handler
+/// with [exportHttpHandler], then [serveHttp]; the handler answers at
+/// `/<name>` and below.
 class AliyunFunctionComputeHttp implements AliyunFunctionCompute {
   final HttpServerFactory httpServerFactory;
   final _functions = <String, _HandlerInfo>{};
@@ -58,6 +61,8 @@ class AliyunFunctionComputeHttp implements AliyunFunctionCompute {
     }
   }
 
+  /// Serves the exported handler on [port] (0: a free port), on every
+  /// interface.
   Future<HttpServer> serveHttp({required int port}) async {
     assert(_functions.isNotEmpty, 'No handler exported');
 

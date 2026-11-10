@@ -1,12 +1,13 @@
-/// Support for doing something awesome.
-///
-/// More dartdocs go here.
+/// Aliyun Tablestore on a sembast file database (Dart VM):
+/// [tablestoreSembastIo] and [getTablestoreSembastIo].
 library;
 
 import 'package:sembast/sembast_io.dart';
 import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_sembast/tablestore_sembast.dart';
 
+/// File databases under `.dart_tool/tekartik_aliyun/tablestore/` of the
+/// current directory (relative instance names).
 final Tablestore tablestoreSembastIo = getTablestoreSembast(
   factory: databaseFactoryIo,
 );
@@ -14,5 +15,3 @@ final Tablestore tablestoreSembastIo = getTablestoreSembast(
 /// Get an io factory
 Tablestore getTablestoreSembastIo({String? rootPath}) =>
     getTablestoreSembast(factory: createDatabaseFactoryIo(rootPath: rootPath));
-
-// TODO: Export any libraries intended for clients of this package.

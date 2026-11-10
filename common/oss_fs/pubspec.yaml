@@ -1,5 +1,5 @@
 name: tekartik_aliyun_oss_fs
-description: Tablestore mock implementation
+description: Aliyun OSS implementation on a file system (fs_shim), memory or io
 version: 0.3.1
 publish_to: none
 # homepage: https://www.example.com

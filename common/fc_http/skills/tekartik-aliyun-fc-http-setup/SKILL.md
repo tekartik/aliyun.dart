@@ -60,16 +60,20 @@ wraps this package on the VM).
   in memory) and `server.close(force: true)`. `serveHttp` prints
   `http://localhost:<port>/<name>` for the exported handler.
 * Routing: the first path segment must be the exported `name`
-  (`/handler`, `/handler/anything?x=1`). Any other first segment gets a 404
-  status but the response is never closed (the client waits): only call
-  exported names, route sub commands inside the handler on `request.path`.
+  (`/handler`, `/handler/anything?x=1`). Any other first segment (or `/`)
+  gets a 404 `not found` answer; route sub commands inside the handler on
+  `request.path`.
 * Request mapping: `request.path` is the full path (`/handler/anything`),
-  `request.url` the absolute url with query, `request.headers` lower-cased
+  `request.url` the url with its query (`/handler/anything?x=1` on io, the
+  absolute `http://localhost:<port>/...` in memory: read the query with
+  `Uri.parse(request.url).queryParameters`), `request.headers` lower-cased
   (multi-valued headers joined with `,`), `getBodyString`/`getBodyBytes`
   read the whole body (GET or POST). `sendString`/`sendBytes` write and
   close the response; `setStatusCode`/`setHeader` must come before. The
-  handler is invoked without being awaited and its errors are not caught:
-  wrap the body in `try`/`catch` and answer an error status.
+  handler is awaited: an error it throws is printed and answered 500
+  (`error`). The node runtime does not do that, so keep a `try`/`catch` in
+  handlers meant for both. A handler that returns without sending leaves
+  the client waiting.
 * `aliyunFunctionComputeMemory` is a shared instance on
   `httpServerFactoryMemory`; since an instance accepts a single export,
   create a fresh `AliyunFunctionComputeHttp(httpServerFactoryMemory)` per
