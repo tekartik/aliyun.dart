@@ -25,12 +25,25 @@ class OssExceptionNode implements OssException {
   // TableStoreNodeException(404:OTSObjec
   int? get code => parseInt(_errMapValue('code'));
 
+  /// The http status of the native (ali-oss) error, if any.
+  ///
+  /// Network errors have none (or a negative one).
+  int? get status => parseInt(_errMapValue('status'));
+
+  bool get _isClientError {
+    var status = this.status;
+    return status != null && status >= 400 && status < 500;
+  }
+
+  /// A client error (4xx: not found, access denied, bad request...) is not
+  /// retryable.
   @override
   bool get retryable =>
-      _isRetryable ?? parseBool(_errMapValue('retryable')) ?? true;
+      _isRetryable ?? parseBool(_errMapValue('retryable')) ?? !_isClientError;
 
+  /// True for a 404 (missing bucket or key).
   @override
-  bool get isNotFound => _isNotFound ?? false;
+  bool get isNotFound => _isNotFound ?? (status == 404);
 
   final bool? _isNotFound;
   final bool? _isRetryable;

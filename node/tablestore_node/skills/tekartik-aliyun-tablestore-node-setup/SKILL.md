@@ -83,7 +83,16 @@ platform. Shared code that must also run on the Dart VM should depend on
   * Errors raised by the `tablestore` npm module are translated to
     `TsException`; test `isTableNotExistError`, `isConditionFailedError`,
     `isPrimaryKeySizeError`, `isPrimaryKeyTypeError` and `retryable` instead
-    of parsing `message`.
+    of parsing `message`. `isConditionFailedError` means an
+    `OTSConditionCheckFail` only: Tablestore also answers 403 for
+    `OTSAuthFailed` / `OTSNoPermissionAccess`, which are not condition
+    failures.
+  * Values: integers are `TsValueLong` (`TsKeyValue.int`, `TsAttribute.int`,
+    `TsValueLong.fromNumber`), sent as a tablestore `Long` (INTEGER). A plain
+    Dart number is sent as a javascript number (DOUBLE): dart2js cannot tell
+    `1` from `1.0`, so `TsAttribute('count', 1)` creates a DOUBLE column.
+    Column condition values (`TsColumnCondition.greaterThan('ratio', 0.5)`)
+    accept strings, bytes, `TsValueLong` and numbers (DOUBLE).
 * Credentials: read them from the environment with
   `package:tekartik_aliyun_tablestore_node/environment_client.dart` -
   `tsClientOptionsFromEnv` (the `endpoint`, `accessKeyId`, `secretAccessKey`
@@ -117,7 +126,6 @@ platform. Shared code that must also run on the Dart VM should depend on
 ### Client from the environment, list the tables
 
 ```dart
-import 'package:tekartik_aliyun_tablestore/tablestore.dart';
 import 'package:tekartik_aliyun_tablestore_node/environment_client.dart';
 import 'package:tekartik_aliyun_tablestore_node/tablestore_node.dart';
 
@@ -167,7 +175,8 @@ import 'package:tekartik_aliyun_tablestore_node/environment_client.dart';
 import 'package:tekartik_aliyun_tablestore_node/tablestore_node.dart';
 
 Future<void> main() async {
-  var options = getTsClientOptionsFromEnv(const {});
+  // endpoint, accessKeyId, secretAccessKey and instanceName env variables.
+  var options = tsClientOptionsFromEnv;
   if (options == null) {
     return;
   }

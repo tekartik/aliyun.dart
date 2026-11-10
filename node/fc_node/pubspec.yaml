@@ -1,5 +1,5 @@
 name: tekartik_aliyun_fc_node
-description: A starting point for Dart libraries or applications.
+description: Aliyun Function Compute http handlers on the nodejs runtime (dart2js)
 version: 0.2.2+1
 publish_to: none
 # homepage: https://www.example.com

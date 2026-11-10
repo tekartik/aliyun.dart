@@ -123,5 +123,26 @@ void main() {
       );
       expect(exception.isConditionFailedError, isTrue);
     });
+    test('Exception 403 not a condition failure', () {
+      // Tablestore also answers 403 for an authentication or permission
+      // error, which was reported as a condition failure.
+      for (var message in [
+        '\n\rOTSAuthFailed\u0012\u0011Signature mismatch.',
+        '\n\u0015OTSNoPermissionAccess\u0012\u0013Access is forbidden.',
+      ]) {
+        var exception = TsExceptionNode(
+          map: {'code': 403, 'message': message, 'retryable': false},
+        );
+        expect(exception.isConditionFailedError, isFalse);
+      }
+      var exception = TsExceptionNode(
+        map: {
+          'code': 403,
+          'message':
+              '\n\u0015OTSConditionCheckFail\u0012\u0017Condition check failed.',
+        },
+      );
+      expect(exception.isConditionFailedError, isTrue);
+    });
   });
 }

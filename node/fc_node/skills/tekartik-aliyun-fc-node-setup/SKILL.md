@@ -10,8 +10,8 @@ description: >-
   FcHttpResponseNode with setContentTypeJson, FcHttpContextNode with
   credentials, HttpReqJs, HttpResponseJs, HttpContextJs, Buffer), the
   package:tekartik_aliyun_fc_node/fc_node.dart import, the raw-body node
-  module, and the build_runner dart2js build to deploy/index.js with
-  template.yml and fun deploy.
+  module, handler errors answered 500, and the dart2js build to
+  deploy/index.js (afcNodeBuild) with template.yml and fun deploy.
 ---
 
 # Function Compute on nodejs (tekartik_aliyun_fc_node)
@@ -64,30 +64,39 @@ compiled with dart2js and executed by node.
 * The handler is
   `(FcHttpRequest request, FcHttpResponse response, FcHttpContext context)`.
   Read `request.method`, `request.path`, `request.url`, `request.headers`
-  (always lower-cased keys) and `await request.getBodyString()` /
+  (always lower-cased keys) and `await request.getBodyString()` (UTF-8) /
   `await request.getBodyBytes()`. Body reading goes through the `raw-body`
   node module (`require('raw-body')`), provided by the Function Compute
   nodejs runtime; add it to `package.json` if you run the compiled js
-  elsewhere. The body is cached, so calling it twice is fine, but do not mix
-  the string and the bytes flavours on the same request.
+  elsewhere, version 2.x or 3.x (4.x exports an object, not a function, and
+  every body read fails). The body bytes are read once: the string and the
+  bytes flavours can both be called, in any order.
 * Respond exactly once: `response.setStatusCode(code)` and
   `response.setHeader(key, value)` **before** the single
   `await response.sendString(text)` or `await response.sendBytes(bytes)`
-  (bytes go out through a node `Buffer`). Nothing else terminates the
-  invocation, so wrap your logic in a try/catch and always send something.
+  (bytes go out through a node `Buffer`). The handler is awaited: an error
+  (thrown or a failed future) is printed and answered with a 500 `error`
+  (as `tekartik_aliyun_fc_http` does). A handler that returns without
+  sending anything leaves the client waiting until the function timeout.
 * Node-only extras, behind an `is` check on the abstract type:
   `FcHttpRequestNode.queries` (the parsed query string as a
   `Map<String, dynamic>?`) and `getRawBody()`,
   `FcHttpResponseNode.setContentTypeJson()`, and
   `FcHttpContextNode.credentials` (the STS credentials the function runs
-  with). The base `FcHttpContext` has no member at all.
+  with: access key id, secret and security token). The base `FcHttpContext`
+  has no member at all. Never print the context: its `toString()` holds the
+  credentials in clear.
 * This package cannot run on the Dart VM (`dart:js`, `node_interop`): declare
   `platforms: [ vm, node ]` in `dart_test.yaml` but keep the node-only code
   out of vm tests, and build with `build_web_compilers` in `dart2js` mode.
-* Build and deploy: `dart run build_runner build --output=build/ -- -p node`,
-  copy `build/bin/main.dart.js` to `deploy/index.js`, then `fun deploy` from
-  `deploy/` with a `template.yml` declaring
-  `Handler: index.handler`, `Runtime: nodejs12` and an `httpTrigger` event.
+* Build and deploy: `afcNodeBuild()` from
+  `package:tekartik_app_node_build/afc_build.dart` (dev dependency
+  `tekartik_app_node_build`, `https://github.com/tekartik/app_node_utils.dart`,
+  `app_build`) compiles `bin/main.dart` with build_runner in dart2js mode,
+  adds the node preamble and copies `build/bin/main.dart.js` to
+  `deploy/index.js`; then `fun deploy` from `deploy/` (or `afcNodeDeploy()`)
+  with a `template.yml` declaring `Handler: index.handler`, a nodejs
+  `Runtime` and an `httpTrigger` event.
 
 ## Examples
 
@@ -104,18 +113,14 @@ void main() {
     FcHttpResponse response,
     FcHttpContext context,
   ) async {
-    try {
-      var body = await request.getBodyString();
-      response.setStatusCode(200);
-      response.setHeader('content-type', 'application/json');
-      await response.sendString(
-        '{"method": "${request.method}", "path": "${request.path}", '
-        '"length": ${body.length}}',
-      );
-    } catch (e) {
-      response.setStatusCode(500);
-      await response.sendString('error: $e');
-    }
+    // An exception here is answered with a 500 by the runtime wrapper.
+    var body = await request.getBodyString();
+    response.setStatusCode(200);
+    response.setHeader('content-type', 'application/json');
+    await response.sendString(
+      '{"method": "${request.method}", "path": "${request.path}", '
+      '"length": ${body.length}}',
+    );
   });
 }
 ```
@@ -209,12 +214,17 @@ targets:
           compiler: dart2js
 ```
 
-```bash
-# compile bin/main.dart to javascript
-dart run build_runner build --output=build/ -- -p node
-# index.js is what template.yml points at (Handler: index.handler)
-cp build/bin/main.dart.js deploy/index.js
-cd deploy && fun deploy
+```dart
+// tool/build_and_deploy.dart
+import 'package:tekartik_app_node_build/afc_build.dart';
+
+Future<void> main() async {
+  // bin/main.dart -> deploy/index.js (Handler: index.handler)
+  await afcNodeBuild();
+  // fun deploy in deploy/
+  var result = await afcNodeDeploy();
+  print('url: ${result.url}');
+}
 ```
 
 ### tool/run_test_node.dart

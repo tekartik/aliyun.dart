@@ -68,33 +68,29 @@ class FcHttpContextNode implements FcHttpContext {
 // ["_events","_eventsCount","_maxListeners","method","clientIP","url","path","queries","headers","getHeader"
 class FcHttpRequestNode implements FcHttpRequest {
   final HttpReqJs req;
-  Future? _rawBody;
+
+  /// The body is read once, as bytes, and shared by [getBodyString] and
+  /// [getBodyBytes].
+  Future<Uint8List>? _rawBody;
 
   FcHttpRequestNode(this.req);
 
-  Future getRawBody() {
-    return _rawBody ??= promiseToFuture(_getRawBodyFn!(req) as Object);
+  /// The raw body bytes (a node `Buffer`), read once.
+  Future<Uint8List> getRawBody() {
+    return _rawBody ??= promiseToFuture<Object>(
+      _getRawBodyFn!(req) as Object,
+    ).then((buffer) => buffer as Uint8List);
   }
 
-  Future _getRawBody({bool? encoding}) {
-    return _rawBody ??= promiseToFuture(
-      _getRawBodyFn!(req, jsify({'encoding': encoding})) as Object,
-    );
-  }
-
+  /// The body decoded as UTF-8 (malformed sequences replaced, as raw-body
+  /// does).
   @override
   Future<String> getBodyString() async {
-    var buff = await _getRawBody(encoding: true);
-    // print('rawbody ${buff.runtimeType}');
-    return buff.toString();
+    return utf8.decode(await getRawBody(), allowMalformed: true);
   }
 
   @override
-  Future<Uint8List> getBodyBytes() async {
-    var buff = await _getRawBody();
-    // devPrint('rawbody ${buff.runtimeType}');
-    return buff as Uint8List;
-  }
+  Future<Uint8List> getBodyBytes() => getRawBody();
 
   Map<String, dynamic>? get queries {
     return jsObjectAsMap(getProperty<Object?>(req, 'queries'));

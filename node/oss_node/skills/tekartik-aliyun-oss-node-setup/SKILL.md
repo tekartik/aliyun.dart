@@ -64,9 +64,14 @@ platform `ossServiceNode` throws `UnimplementedError`.
 * `putBucket(name)` is **not** implemented on node (it throws
   `UnimplementedError`, it only exists for the mocks): create the bucket in
   the Aliyun console first.
-* A missing object throws an `OssException` with `isNotFound` true (the
-  ali-oss `NoSuchKeyError` is translated); use `retryable` to decide whether
-  to retry. Catch it rather than expecting a null.
+* Every error is an `OssException` wrapping the ali-oss error (its message
+  is kept): `isNotFound` is true for a 404 (a missing object, `NoSuchKey`,
+  or a missing bucket, `NoSuchBucket`), `retryable` is false for a client
+  error (4xx: `AccessDenied`, `InvalidAccessKeyId`, bad request...). A
+  missing object throws rather than returning null: catch it.
+* The client retries by itself: a retryable error (5xx, network) is tried 3
+  times (immediately, then after 1s) and the last error is thrown; a 4xx is
+  thrown at once. Do not add your own retry loop on top.
 * Listing is paginated: read `response.files` (`OssFile` with `name`, `size`,
   `lastModified`), and only continue while `response.isTruncated` is true,
   reusing `response.nextMarker` as the `marker` of the next

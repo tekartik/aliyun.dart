@@ -222,6 +222,16 @@ OssExceptionNode wrapNativeError(dynamic err) {
   } catch (_) {
     message = err.toString();
   }
+  // The message of a js Error is not enumerable.
+  if (message == null && errMap?['message'] == null) {
+    try {
+      var nativeMessage = getProperty<Object?>(err as Object, 'message');
+      if (nativeMessage is String) {
+        message = nativeMessage;
+      }
+    } catch (_) {}
+    message ??= err.toString();
+  }
 
   if (debugAliyunOss) {
     if (errMap != null) {

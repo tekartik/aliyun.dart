@@ -98,6 +98,11 @@ dynamic tsValueToNative(dynamic value) {
   if (value is String) {
     return value;
   }
+  // A number is sent as a js number (DOUBLE), as an attribute value is (an
+  // INTEGER must be a TsValueLong; dart2js cannot tell 1 from 1.0).
+  if (value is num) {
+    return value;
+  }
   throw StateError('Unsupported value $value (${value.runtimeType})');
 }
 

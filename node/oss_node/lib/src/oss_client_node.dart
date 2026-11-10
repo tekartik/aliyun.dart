@@ -23,33 +23,31 @@ class OssClientNode with OssClientMixin implements OssClient {
 
   /// The return value is native
   ///
-  /// The error is a TablestoreNodeException
+  /// The error is an [OssExceptionNode] wrapping the native error: a client
+  /// error (4xx) is thrown right away, other errors are retried (3 attempts)
+  /// and the last one is thrown.
   Future<T> _nativeOperation<T>(FutureOr<T> Function() action) async {
     // 3 tests before aborting
-    for (var i = 0; i < _retryCount; i++) {
+    for (var i = 0; ; i++) {
       try {
         return await action();
-      } catch (e) {
+      } catch (e, st) {
         if (debugAliyunOss) {
           print('error $e');
         }
-        // Do not retry if reponse says so
-        if (e is OssExceptionNode && !e.retryable) {
-          rethrow;
+        var exception = wrapNativeError(e);
+        // Do not retry if reponse says so, nor after the last attempt
+        if (!exception.retryable || i >= _retryCount - 1) {
+          Error.throwWithStackTrace(exception, st);
         }
         // Retry right away then in 1s
         var delay = i * 1000;
-        if (i < _retryCount - 1) {
-          if (debugAliyunOss) {
-            print('retrying in $delay');
-          }
-          await sleep(delay);
-        } else {
-          break;
+        if (debugAliyunOss) {
+          print('retrying in $delay');
         }
+        await sleep(delay);
       }
     }
-    throw OssExceptionNode(message: 'timeout');
   }
 
   T _debugNativeRequestParams<T>(String method, T params) {

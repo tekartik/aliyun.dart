@@ -34,10 +34,17 @@ class TsExceptionNode implements TsException {
 
   // JS: condition failed
   // {"message":"\n\u0015OTSConditionCheckFail\u0012\u0017Condition check failed.","code":403,"headers":{"date":"Sun, 06 Sep 2020 06:33:01 GMT","transfer-encoding":"chunked","connection":"keep-alive","authorization":"OTS LTAI4GCzUBNEhUsjDMwxrpHs:VrOVjJHFxuRacGHrnl71NW+fC0Q=","x-ots-contentmd5":"tb1xxFT1i9oAap/9e+zMLA==","x-ots-contenttype":"protocol buffer","x-ots-date":"2020-09-06T06:33:01.163851Z","x-ots-requestid":"0005ae9f-4602-9e74-a5c1-720b0df7d216"},"time":{},"retryable":false}
+  /// True for an OTSConditionCheckFail error.
+  ///
+  /// Checked on the message: Tablestore also answers 403 for an
+  /// authentication (OTSAuthFailed) or permission (OTSNoPermissionAccess)
+  /// error.
   @override
-  bool get isConditionFailedError =>
-      isForbidden403 ||
-      message.toLowerCase().contains('condition check failed');
+  bool get isConditionFailedError {
+    var lowerCaseMessage = message.toLowerCase();
+    return lowerCaseMessage.contains('condition check failed') ||
+        lowerCaseMessage.contains('otsconditioncheckfail');
+  }
 
   @override
   bool get isTableNotExistError =>

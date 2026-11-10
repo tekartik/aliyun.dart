@@ -1,0 +1,9 @@
+{
+  "name": "tekartik_aliyun_fc_node",
+  "description": "Node modules for the tests (the Function Compute nodejs runtime ships raw-body)",
+  "private": true,
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "raw-body": "^3.0.2"
+  }
+}
