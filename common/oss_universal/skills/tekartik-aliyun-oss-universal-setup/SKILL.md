@@ -74,8 +74,10 @@ The memory mock is re-exported for unit tests.
   `accessKeyId`, `accessKeySecret`, `endpoint`, `ossTestBucketName`; see
   `.local/ds_env.example.yaml` in the package). Never commit it.
 * Behaviour to code for on both sides: a missing object throws
-  `OssException` with `isNotFound`; the local mock lists a `prefix` as a
-  directory and its marker pagination is approximate; `putBucket` is only
+  `OssException` with `isNotFound`; `prefix` is a string prefix of the key
+  on both (`dir` also lists `dir.txt`); the local mock `marker` is
+  inclusive (OSS: exclusive), page with `options.marker = page.nextMarker`
+  only; `putBucket` is only
   meaningful locally (guard it with `isLocalTest`); `bucket.location` is
   the region on node and the (empty) endpoint of the options locally.
 * Tests: `dart_test.yaml` declares `platforms: [vm, node]`. `dart test` runs

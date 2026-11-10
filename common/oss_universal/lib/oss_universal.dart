@@ -1,3 +1,8 @@
+/// One Aliyun OSS service for the Dart VM (a file system mock) and nodejs
+/// (the real OSS): [ossServiceUniversal], the memory mock
+/// ([newOssServiceMemory]) and the re-exported `tekartik_aliyun_oss` API.
+library;
+
 export 'package:tekartik_aliyun_oss/oss.dart';
 export 'package:tekartik_aliyun_oss_fs/oss_fs.dart'
     show ossServiceMemory, newOssServiceMemory, debugAliyunOss;

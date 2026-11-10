@@ -62,13 +62,14 @@ becomes `index.js` on Aliyun.
 * The `name:` of `exportHttpHandler` (default `'handler'`) is the first url
   path segment locally (`/handler`, `/handler/sub?x=1`) and the
   `Handler: index.<name>` of the Function Compute template. Never name the
-  Dart function itself `handler` (recorded bug, `test/fc_async_bug_test.dart`).
-  Locally, only call the exported name: another first segment gets a 404
-  whose response is never closed.
+  Dart function itself `handler`: on node (dart2js) it fails with
+  `this.bodyFunction.call$2 is not a function` (`test/fc_async_bug_test.dart`).
+  Locally, another first segment gets a 404.
 * Keep `bin/main.dart` platform neutral: no `dart:io`, no `dart:js`; `print`
   and `Future.delayed` are fine. Set status and headers before the single
-  `sendString`/`sendBytes`, `await` it, and catch your own errors: the
-  runtime neither awaits the handler nor catches its exceptions.
+  `sendString`/`sendBytes` and `await` it. Every runtime awaits the
+  handler; an error is printed and answered 500 (catch it yourself for
+  another answer).
 * Tests: `AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory)` or
   `newAliyunFunctionComputeUniversalMemory()` gives an isolated memory
   instance (one export each; `aliyunFunctionComputeUniversalMemory` is the

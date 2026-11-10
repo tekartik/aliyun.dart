@@ -5,14 +5,20 @@ import 'package:tekartik_http/http_memory.dart';
 export 'package:tekartik_aliyun_fc/fc_api.dart';
 export 'package:tekartik_aliyun_fc_http/src/function_compute_http.dart';
 
+/// The server returned by [AliyunFunctionComputeUniversal.serve].
 abstract class FcServer {
+  /// The server root (`http://localhost:<port>/`), the handler is at
+  /// `handler` below it; null on nodejs (no local server).
   Uri? get uri;
 
+  /// Stops the server (no-op on nodejs).
   Future<void> close();
 }
 
+/// A Function Compute runtime that can also serve its handler locally.
 abstract class AliyunFunctionComputeUniversal extends AliyunFunctionCompute {
-  /// No effect on node
+  /// Serves the exported handler on [port] (`0`: a free port): required on
+  /// the Dart VM and in memory, no effect on nodejs.
   Future<FcServer> serve({int? port});
 }
 
@@ -41,8 +47,11 @@ class AliyunFunctionComputeHttpUniversal extends AliyunFunctionComputeHttp
   }
 }
 
+/// The shared memory instance (one handler export): prefer
+/// [newAliyunFunctionComputeUniversalMemory] in tests.
 final AliyunFunctionComputeUniversal aliyunFunctionComputeUniversalMemory =
     AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);
 
+/// A new memory instance (every platform), for a test.
 AliyunFunctionComputeUniversal newAliyunFunctionComputeUniversalMemory() =>
     AliyunFunctionComputeHttpUniversal(httpServerFactoryMemory);
